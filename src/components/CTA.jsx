@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useReveal } from '../hooks/useReveal'
 import logo from '../assets/logo.png'
 
-const WHATSAPP_NUMBER = '5566996021336'
+const WHATSAPP_NUMBER = '5566996440184'
 
 function WhatsAppIcon({ size = 20 }) {
   return (

@@ -60,7 +60,7 @@ export default function Footer() {
             <h5 className="text-[12px] font-bold tracking-[0.15em] uppercase text-white/30 mb-4">Contato</h5>
             <div className="flex flex-col gap-2.5">
               <a
-                href="https://wa.me/5566996021336"
+                href="https://wa.me/5566996440184"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-[14px] text-white/55 hover:text-[#25D366] transition-colors duration-200"
