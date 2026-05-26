@@ -2,6 +2,7 @@ import Header from './components/Header'
 import Hero from './components/Hero'
 import About from './components/About'
 import GoldStrip from './components/GoldStrip'
+import Services from './components/Services'
 import Solutions from './components/Solutions'
 import Journey from './components/Journey'
 import Why from './components/Why'
@@ -16,6 +17,7 @@ export default function App() {
         <Hero />
         <About />
         <GoldStrip />
+        <Services />
         <Solutions />
         <Journey />
         <Why />

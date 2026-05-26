@@ -28,7 +28,7 @@ export default function Journey() {
   const stepsRef = useRevealAll()
 
   return (
-    <section id="servicos" className="py-24 lg:py-32 bg-[#0a1c3a]">
+    <section id="jornada" className="py-24 lg:py-32 bg-[#0a1c3a]">
       <div className="max-w-[1200px] mx-auto px-6">
 
         {/* Header */}
