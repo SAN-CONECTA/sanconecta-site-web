@@ -12,9 +12,11 @@ export default function Header() {
   }, [])
 
   const navLinks = [
-    { href: '#sobre', label: 'Sobre' },
+    { href: '#top', label: 'Início' },
+    { href: '#sobre', label: 'Sobre Nós' },
+    { href: '#servicos', label: 'Serviços' },
     { href: '#solucoes', label: 'Soluções' },
-    { href: '#jornada', label: 'Como funciona' },
+    { href: '#contato', label: 'Contato' },
   ]
 
   return (
