@@ -4,6 +4,7 @@ import About from './components/About'
 import GoldStrip from './components/GoldStrip'
 import Services from './components/Services'
 import Solutions from './components/Solutions'
+import Partners from './components/Partners'
 import Journey from './components/Journey'
 import Why from './components/Why'
 import CTA from './components/CTA'
@@ -19,6 +20,7 @@ export default function App() {
         <GoldStrip />
         <Services />
         <Solutions />
+        <Partners />
         <Journey />
         <Why />
         <CTA />

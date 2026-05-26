@@ -113,6 +113,19 @@ img {
 .reveal-delay-3 { transition-delay: 0.3s; }
 .reveal-delay-4 { transition-delay: 0.4s; }
 
+@keyframes marquee {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.animate-marquee {
+  animation: marquee 28s linear infinite;
+}
+
+.marquee-track:hover .animate-marquee {
+  animation-play-state: paused;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .reveal {
     opacity: 1;
@@ -122,7 +135,8 @@ img {
   .animate-spin-slow,
   .animate-spin-reverse,
   .animate-float-1,
-  .animate-float-2 {
+  .animate-float-2,
+  .animate-marquee {
     animation: none;
   }
 }
