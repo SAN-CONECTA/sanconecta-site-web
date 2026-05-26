@@ -65,9 +65,9 @@ export default function Solutions() {
         <div ref={cardsRef} className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
           {/* TrustPanel */}
-          <article className="reveal reveal-delay-1 group relative flex flex-col rounded-3xl border border-cyan-500/20 bg-gradient-to-b from-[#0a1c3a] to-[#07142e] p-8 hover:border-cyan-500/40 transition-all duration-300 hover:shadow-[0_20px_60px_-20px_rgba(95,209,230,0.15)] hover:-translate-y-1">
+          <article className="reveal reveal-delay-1 group relative flex flex-col rounded-3xl border border-white/10 p-8 hover:border-white/20 transition-all duration-300 hover:shadow-[0_20px_60px_-20px_rgba(0,0,0,0.4)] hover:-translate-y-1" style={{ background: '#1c271c' }}>
             {/* Top glow */}
-            <div className="absolute top-0 left-8 right-8 h-px bg-gradient-to-r from-transparent via-cyan-500/40 to-transparent" />
+            <div className="absolute top-0 left-8 right-8 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
 
             <div className="flex items-start justify-between mb-6">
               <a
@@ -77,31 +77,26 @@ export default function Solutions() {
                 className="flex items-center gap-2.5 group/link"
                 aria-label="Visitar site da TrustPanel"
               >
-                <div className="w-10 h-10 rounded-xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center">
-                  <span className="text-[16px] font-bold text-cyan-400 font-['Fraunces',Georgia,serif]">T</span>
-                </div>
-                <span className="text-[18px] font-bold font-['Fraunces',Georgia,serif] text-white group-hover/link:text-cyan-400 transition-colors">
-                  Trust<span className="text-cyan-400">Panel</span>
-                </span>
+                <img src="/Logo_TrustPanel_Vertical_03.png" alt="TrustPanel" className="h-9 w-auto object-contain" style={{ filter: 'brightness(0) invert(1)' }} />
                 <span className="text-white/30 group-hover/link:text-cyan-400 transition-colors">
                   <ExternalIcon />
                 </span>
               </a>
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-[11px] font-bold tracking-[0.1em] uppercase text-cyan-400">
-                <CheckIcon color="#5fd1e6" />
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 border border-white/20 text-[11px] font-bold tracking-[0.1em] uppercase text-white">
+                <CheckIcon color="white" />
                 Canal Exclusivo
               </span>
             </div>
 
-            <p className="text-white/60 text-[15px] leading-relaxed mb-6">
+            <p className="text-white/70 text-[15px] leading-relaxed mb-6">
               Gestão automatizada de certificados digitais A1 — controle, criptografia AES-256 e zero risco de vazamento.
             </p>
 
             <ul className="flex flex-col gap-3 mb-8 flex-1">
               {trustPanelFeatures.map((f, i) => (
-                <li key={i} className="flex items-start gap-3 text-[14px] text-white/65">
-                  <span className="flex-shrink-0 mt-0.5 text-cyan-500">
-                    <CheckIcon color="#5fd1e6" />
+                <li key={i} className="flex items-start gap-3 text-[14px] text-white/80">
+                  <span className="flex-shrink-0 mt-0.5">
+                    <CheckIcon color="white" />
                   </span>
                   {f}
                 </li>
@@ -110,7 +105,7 @@ export default function Solutions() {
 
             <a
               href="#contato"
-              className="group/btn inline-flex items-center gap-2 text-[14px] font-semibold text-cyan-400 hover:text-cyan-300 transition-colors"
+              className="group/btn inline-flex items-center gap-2 text-[14px] font-semibold text-white hover:text-white/80 transition-colors"
             >
               Quero implantar na minha empresa
               <span className="transition-transform duration-200 group-hover/btn:translate-x-1">
@@ -120,9 +115,9 @@ export default function Solutions() {
           </article>
 
           {/* EX Group */}
-          <article className="reveal reveal-delay-2 group relative flex flex-col rounded-3xl border border-[#d4a93a]/20 bg-gradient-to-b from-[#0a1c3a] to-[#07142e] p-8 hover:border-[#d4a93a]/40 transition-all duration-300 hover:shadow-[0_20px_60px_-20px_rgba(212,169,58,0.12)] hover:-translate-y-1">
+          <article className="reveal reveal-delay-2 group relative flex flex-col rounded-3xl border border-white/10 p-8 hover:border-white/20 transition-all duration-300 hover:shadow-[0_20px_60px_-20px_rgba(0,0,0,0.3)] hover:-translate-y-1" style={{ background: '#daa521' }}>
             {/* Top glow */}
-            <div className="absolute top-0 left-8 right-8 h-px bg-gradient-to-r from-transparent via-[#d4a93a]/40 to-transparent" />
+            <div className="absolute top-0 left-8 right-8 h-px bg-gradient-to-r from-transparent via-white/30 to-transparent" />
 
             <div className="flex items-start justify-between mb-6">
               <a
@@ -132,31 +127,26 @@ export default function Solutions() {
                 className="flex items-center gap-2.5 group/link"
                 aria-label="Visitar site da EX Soluções Tributárias"
               >
-                <div className="w-10 h-10 rounded-xl bg-[#d4a93a]/10 border border-[#d4a93a]/30 flex items-center justify-center">
-                  <span className="text-[13px] font-bold text-[#f0c75c] font-['Fraunces',Georgia,serif]">eX</span>
-                </div>
-                <span className="text-[18px] font-bold font-['Fraunces',Georgia,serif] text-white group-hover/link:text-[#f0c75c] transition-colors">
-                  EX<span className="text-[#f0c75c]"> Soluções Tributárias</span>
-                </span>
-                <span className="text-white/30 group-hover/link:text-[#f0c75c] transition-colors">
+                <img src="https://exsolucoestributarias.com.br/wp-content/uploads/2025/04/logo-ex-consultoria.svg" alt="EX Soluções Tributárias" className="h-9 w-auto object-contain" style={{ filter: 'brightness(0) invert(1)' }} />
+                <span className="text-white/50 group-hover/link:text-white transition-colors">
                   <ExternalIcon />
                 </span>
               </a>
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#d4a93a]/10 border border-[#d4a93a]/20 text-[11px] font-bold tracking-[0.1em] uppercase text-[#f0c75c]">
-                <CheckIcon color="#f0c75c" />
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 border border-white/20 text-[11px] font-bold tracking-[0.1em] uppercase text-white">
+                <CheckIcon color="white" />
                 Canal Autorizado
               </span>
             </div>
 
-            <p className="text-white/60 text-[15px] leading-relaxed mb-6">
+            <p className="text-white/80 text-[15px] leading-relaxed mb-6">
               Recuperação de créditos tributários, diagnóstico fiscal e Método Expert — soluções para Simples Nacional, Lucro Presumido e Lucro Real.
             </p>
 
             <ul className="flex flex-col gap-3 mb-8 flex-1">
               {exGroupFeatures.map((f, i) => (
-                <li key={i} className="flex items-start gap-3 text-[14px] text-white/65">
-                  <span className="flex-shrink-0 mt-0.5 text-[#d4a93a]">
-                    <CheckIcon color="#d4a93a" />
+                <li key={i} className="flex items-start gap-3 text-[14px] text-white/90">
+                  <span className="flex-shrink-0 mt-0.5">
+                    <CheckIcon color="white" />
                   </span>
                   {f}
                 </li>
@@ -165,7 +155,7 @@ export default function Solutions() {
 
             <a
               href="#contato"
-              className="group/btn inline-flex items-center gap-2 text-[14px] font-semibold text-[#f0c75c] hover:text-[#d4a93a] transition-colors"
+              className="group/btn inline-flex items-center gap-2 text-[14px] font-semibold text-white hover:text-white/80 transition-colors"
             >
               Quero meu diagnóstico tributário
               <span className="transition-transform duration-200 group-hover/btn:translate-x-1">

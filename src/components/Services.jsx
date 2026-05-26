@@ -61,7 +61,7 @@ export default function Services() {
   const cardsRef = useRevealAll()
 
   return (
-    <section id="servicos" className="py-24 lg:py-32 bg-[#0a1c3a]">
+    <section className="py-24 lg:py-32 bg-[#0a1c3a]">
       <div className="max-w-[1200px] mx-auto px-6">
 
         <div ref={headRef} className="reveal text-center mb-14 max-w-2xl mx-auto">
