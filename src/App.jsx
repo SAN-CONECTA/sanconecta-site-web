@@ -5,6 +5,7 @@ import WhatWeDo from './components/WhatWeDo'
 import Services from './components/Services'
 import Solutions from './components/Solutions'
 import Partners from './components/Partners'
+import ConsultaCNPJ from './components/ConsultaCNPJ'
 import Journey from './components/Journey'
 import Why from './components/Why'
 import CTA from './components/CTA'
@@ -21,6 +22,7 @@ export default function App() {
         <Services />
         <Solutions />
         <Partners />
+        <ConsultaCNPJ />
         <Journey />
         <Why />
         <CTA />

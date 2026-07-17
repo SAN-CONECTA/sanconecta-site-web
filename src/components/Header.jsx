@@ -16,6 +16,7 @@ export default function Header() {
     { href: '#sobre', label: 'Sobre Nós' },
     { href: '#servicos', label: 'Serviços' },
     { href: '#solucoes', label: 'Soluções' },
+    { href: '#consulta', label: 'Consulta CNPJ' },
     { href: '#contato', label: 'Contato' },
   ]
 

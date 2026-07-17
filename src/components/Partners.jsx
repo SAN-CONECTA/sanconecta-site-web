@@ -25,17 +25,17 @@ const ARROW_SPEED = 4     // px/frame — velocidade ao segurar seta
 
 function PartnerCard({ name, logo }) {
   return (
-    <div className="flex-shrink-0 flex items-center justify-center w-[200px] h-[88px] mx-3 rounded-2xl border border-white/[0.08] bg-white/[0.04] px-6 transition-all duration-300 hover:border-white/20 hover:bg-white/[0.08]">
+    <div className="flex-shrink-0 flex items-center justify-center w-[200px] h-[88px] mx-3 rounded-2xl border border-black/[0.07] bg-white px-6 shadow-sm transition-all duration-300 hover:border-black/20 hover:shadow-md">
       <img
         src={logo}
         alt={name}
         className="max-h-12 max-w-[150px] w-auto object-contain select-none"
-        style={{ opacity: 0.8 }}
+        style={{ opacity: 0.85 }}
         onMouseEnter={e => { e.currentTarget.style.opacity = '1' }}
-        onMouseLeave={e => { e.currentTarget.style.opacity = '0.8' }}
+        onMouseLeave={e => { e.currentTarget.style.opacity = '0.85' }}
         onError={e => {
           e.currentTarget.style.display = 'none'
-          e.currentTarget.parentElement.innerHTML = `<span style="font-size:13px;font-weight:600;color:rgba(255,255,255,0.5)">${name}</span>`
+          e.currentTarget.parentElement.innerHTML = `<span style="font-size:13px;font-weight:600;color:rgba(0,0,0,0.4)">${name}</span>`
         }}
         draggable={false}
       />
@@ -47,7 +47,7 @@ function ArrowBtn({ dir, onStart, onStop }) {
   return (
     <button
       aria-label={dir === 'left' ? 'Anterior' : 'Próximo'}
-      className="absolute top-1/2 -translate-y-1/2 z-20 w-10 h-10 flex items-center justify-center rounded-full bg-white/[0.07] border border-white/[0.12] text-white/60 hover:bg-white/[0.14] hover:text-white transition-all duration-200 select-none"
+      className="absolute top-1/2 -translate-y-1/2 z-20 w-10 h-10 flex items-center justify-center rounded-full bg-white border border-black/10 text-black/40 shadow-md hover:bg-gray-50 hover:text-black/70 transition-all duration-200 select-none"
       style={{ [dir === 'left' ? 'left' : 'right']: '12px' }}
       onMouseDown={onStart}
       onMouseUp={onStop}
@@ -109,16 +109,16 @@ export default function Partners() {
   }, [])
 
   return (
-    <section className="py-20 bg-[#07142e] overflow-hidden">
+    <section className="py-20 bg-white overflow-hidden">
       <div className="max-w-[1200px] mx-auto px-6 mb-12">
         <div ref={headRef} className="reveal text-center max-w-2xl mx-auto">
-          <span className="inline-block text-xs font-bold tracking-[0.2em] uppercase text-cyan-400/80 mb-4">
+          <span className="inline-block text-xs font-bold tracking-[0.2em] uppercase text-cyan-600/80 mb-4">
             Parcerias Estratégicas
           </span>
-          <h2 className="text-[clamp(24px,3vw,38px)] font-semibold text-white mb-3">
+          <h2 className="text-[clamp(24px,3vw,38px)] font-semibold text-[#07142e] mb-3">
             Trabalhamos com quem é referência.
           </h2>
-          <p className="text-white/50 text-[15px] leading-relaxed">
+          <p className="text-black/45 text-[15px] leading-relaxed">
             Parceiros homologados e marcas líderes que garantem qualidade e confiabilidade em cada projeto.
           </p>
         </div>
@@ -127,9 +127,9 @@ export default function Partners() {
       <div className="relative">
         {/* Fade edges */}
         <div className="absolute left-0 top-0 bottom-0 w-32 z-10 pointer-events-none"
-          style={{ background: 'linear-gradient(to right, #07142e, transparent)' }} />
+          style={{ background: 'linear-gradient(to right, white, transparent)' }} />
         <div className="absolute right-0 top-0 bottom-0 w-32 z-10 pointer-events-none"
-          style={{ background: 'linear-gradient(to left, #07142e, transparent)' }} />
+          style={{ background: 'linear-gradient(to left, white, transparent)' }} />
 
         {/* Arrows */}
         <ArrowBtn dir="left"

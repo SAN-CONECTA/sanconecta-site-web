@@ -22,3 +22,9 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Claude Code local settings
+.claude/settings.local.json
+
+# Reference material not used by the app
+src/assets/files consulta cnpj incluso/
