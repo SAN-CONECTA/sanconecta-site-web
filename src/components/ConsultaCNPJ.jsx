@@ -231,7 +231,9 @@ export default function ConsultaCNPJ() {
       await navigator.clipboard.writeText(JSON.stringify(result, null, 2))
       setCopied(true)
       setTimeout(() => setCopied(false), 2000)
-    } catch {}
+    } catch {
+      // sem permissao de area de transferencia: ignora
+    }
   }
 
   const resumeFields = fields ? [
