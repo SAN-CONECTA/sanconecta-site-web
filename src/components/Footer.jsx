@@ -67,6 +67,12 @@ export default function Footer() {
               >
                 WhatsApp · Contato SAN CONECTA
               </a>
+              <a
+                href="/diagnostico360/"
+                className="text-[14px] text-white/55 hover:text-[#f0c75c] transition-colors duration-200"
+              >
+                Área do cliente · Diagnóstico 360° de TI
+              </a>
               <p className="text-[14px] text-white/35">Sinop · Mato Grosso · Brasil</p>
             </div>
           </div>
