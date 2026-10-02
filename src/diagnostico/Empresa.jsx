@@ -38,7 +38,7 @@ function exportCsv(emp, itens) {
       fmtTs(d.updatedAt),
     ]
   })
-  const csv = `﻿${[head, ...rows].map((r) => r.map(csvCell).join(';')).join('\r\n')}`
+  const csv = `\uFEFF${[head, ...rows].map((r) => r.map(csvCell).join(';')).join('\r\n')}`
   const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }))
   const a = document.createElement('a')
   const slug = String(emp.nome || 'empresa').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
