@@ -35,6 +35,9 @@ ficariam misturados.
 2. **Authentication → Método de login:** ativar **E-mail/senha**.
 3. **Authentication → Configurações → Domínios autorizados:** adicionar `sanconecta.com`.
 4. **Authentication → Modelos:** ajustar o idioma para português nos e-mails de verificação e de redefinição de senha.
+   O link do e-mail é do Firebase (`<projeto>.firebaseapp.com`). Depois de confirmar, a tela dele mostra **Continuar** e leva a
+   `https://sanconecta.com/diagnostico360/` (o app envia essa página como destino). Na mensagem do modelo de verificação,
+   acrescente a linha: `Depois de confirmar, entre em https://sanconecta.com/diagnostico360/`.
 5. **Firestore Database → Criar banco de dados:** modo de **produção**, região `southamerica-east1` (São Paulo).
 6. **Firestore → Regras:** colar o conteúdo de `firestore.rules` e publicar.
 7. **Configurações do projeto → Seus apps → Web:** registrar o app e copiar a configuração para
