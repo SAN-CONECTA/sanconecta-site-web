@@ -1,0 +1,138 @@
+rules_version = '2';
+
+// Regras do Diagnóstico 360° de TI (SAN Conecta).
+//
+// Modelo:
+//   staff/{email}                         administradores da SAN (todas as empresas)
+//   empresas/{empresaId}                  dados da empresa cliente
+//   empresas/{empresaId}/itens/{itemId}   os 19 itens do diagnóstico ("1.1" a "5.3")
+//   membros/{empresaId}__{email}          quem acessa cada empresa (sempre com perfil de leitura)
+//
+// Princípios:
+//   - Tudo exige login com e-mail VERIFICADO. Criar conta sozinho não libera nenhum dado.
+//   - Cliente só enxerga a empresa em que o e-mail dele consta em "membros".
+//   - Só administradores SAN criam empresas, liberam usuários, preenchem os itens e alteram a equipe SAN.
+//   - Cliente tem apenas leitura da própria empresa. Não existe perfil de edição para cliente.
+//   - Empresas e itens não podem ser apagados.
+//   - O primeiro administrador SAN é criado à mão no console (staff/<email>), conforme docs/DIAGNOSTICO.md.
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() {
+      return request.auth != null
+        && request.auth.token.email_verified == true
+        && request.auth.token.email != null;
+    }
+
+    function me() {
+      return request.auth.token.email.lower();
+    }
+
+    function isStaff() {
+      return signedIn()
+        && exists(/databases/$(database)/documents/staff/$(me()));
+    }
+
+    function isMember(emp) {
+      return signedIn()
+        && exists(/databases/$(database)/documents/membros/$(emp + '__' + me()));
+    }
+
+    function shortStr(v, max) {
+      return v is string && v.size() <= max;
+    }
+
+    // Equipe SAN
+    match /staff/{email} {
+      allow read: if signedIn() && (isStaff() || email == me());
+      allow create: if isStaff()
+        && email == email.lower()
+        && request.resource.data.keys().hasOnly(['email', 'criadoEm', 'criadoPor'])
+        && request.resource.data.email == email
+        && request.resource.data.criadoPor == me()
+        && request.resource.data.criadoEm == request.time;
+      allow delete: if isStaff() && email != me();
+      allow update: if false;
+    }
+
+    // Empresas clientes
+    match /empresas/{emp} {
+      allow read: if isStaff() || isMember(emp);
+
+      allow create: if isStaff()
+        && request.resource.data.keys().hasOnly(['nome', 'cnpj', 'responsavel', 'inicio', 'prazo', 'arquivada', 'criadoEm', 'criadoPor'])
+        && request.resource.data.keys().hasAll(['nome', 'criadoEm', 'criadoPor'])
+        && shortStr(request.resource.data.nome, 120) && request.resource.data.nome.size() >= 2
+        && shortStr(request.resource.data.cnpj, 20)
+        && shortStr(request.resource.data.responsavel, 120)
+        && shortStr(request.resource.data.inicio, 10)
+        && shortStr(request.resource.data.prazo, 10)
+        && request.resource.data.arquivada is bool
+        && request.resource.data.criadoEm == request.time
+        && request.resource.data.criadoPor == me();
+
+      allow update: if isStaff()
+        && request.resource.data.keys().hasOnly(['nome', 'cnpj', 'responsavel', 'inicio', 'prazo', 'arquivada', 'criadoEm', 'criadoPor', 'atualizadoEm', 'atualizadoPor'])
+        && shortStr(request.resource.data.nome, 120) && request.resource.data.nome.size() >= 2
+        && shortStr(request.resource.data.cnpj, 20)
+        && shortStr(request.resource.data.responsavel, 120)
+        && shortStr(request.resource.data.inicio, 10)
+        && shortStr(request.resource.data.prazo, 10)
+        && request.resource.data.arquivada is bool
+        && request.resource.data.criadoEm == resource.data.criadoEm
+        && request.resource.data.criadoPor == resource.data.criadoPor
+        && request.resource.data.atualizadoEm == request.time
+        && request.resource.data.atualizadoPor == me();
+
+      // Empresas não são apagadas: use "arquivada".
+      allow delete: if false;
+
+      // Itens do diagnóstico
+      match /itens/{item} {
+        allow read: if isStaff() || isMember(emp);
+
+        allow create, update: if isStaff()
+          && item.matches('^[1-5]\\.[1-4]$')
+          && request.resource.data.keys().hasOnly(['status', 'risk', 'owner', 'due', 'findings', 'evidence', 'reco', 'updatedAt', 'updatedBy'])
+          && request.resource.data.keys().hasAll(['status', 'risk', 'owner', 'due', 'findings', 'evidence', 'reco', 'updatedAt', 'updatedBy'])
+          && request.resource.data.status in ['nao_iniciado', 'coleta', 'analise', 'concluido']
+          && request.resource.data.risk in ['sem', 'baixo', 'medio', 'alto', 'critico']
+          && shortStr(request.resource.data.owner, 80)
+          && shortStr(request.resource.data.due, 10)
+          && shortStr(request.resource.data.findings, 4000)
+          && shortStr(request.resource.data.evidence, 300)
+          && shortStr(request.resource.data.reco, 4000)
+          && request.resource.data.updatedAt == request.time
+          && request.resource.data.updatedBy == me();
+
+        allow delete: if false;
+      }
+    }
+
+    // Acesso por empresa. O id do documento é "<empresaId>__<email em minúsculas>".
+    match /membros/{id} {
+      // Cada pessoa lê só os próprios vínculos; a equipe SAN lê todos.
+      allow read: if signedIn() && (isStaff() || resource.data.email == me());
+
+      allow create, update: if isStaff()
+        && request.resource.data.keys().hasOnly(['empresaId', 'email', 'role', 'atualizadoEm', 'atualizadoPor'])
+        && request.resource.data.keys().hasAll(['empresaId', 'email', 'role', 'atualizadoEm', 'atualizadoPor'])
+        && request.resource.data.role == 'leitura'
+        && request.resource.data.email is string
+        && request.resource.data.email == request.resource.data.email.lower()
+        && request.resource.data.empresaId is string
+        && id == request.resource.data.empresaId + '__' + request.resource.data.email
+        && exists(/databases/$(database)/documents/empresas/$(request.resource.data.empresaId))
+        && request.resource.data.atualizadoEm == request.time
+        && request.resource.data.atualizadoPor == me();
+
+      allow delete: if isStaff();
+    }
+
+    // Todo o resto é negado.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
