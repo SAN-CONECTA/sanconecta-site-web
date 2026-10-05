@@ -11,6 +11,9 @@ import { auth } from './firebase'
 import { errMsg, isEmail, normEmail } from './util'
 import logo from '../assets/logo.png'
 
+// Depois de confirmar o e-mail (ou redefinir a senha), a tela do Firebase oferece "Continuar" para esta página.
+const continueSettings = () => ({ url: `${window.location.origin}/diagnostico360/` })
+
 function Frame({ children }) {
   return (
     <main className="dg-auth">
@@ -51,9 +54,9 @@ export function Login() {
         if (senha.length < 8) throw Object.assign(new Error('senha'), { code: 'auth/weak-password' })
         const cred = await createUserWithEmailAndPassword(auth, mail, senha)
         await updateProfile(cred.user, { displayName: nome.trim() })
-        await sendEmailVerification(cred.user)
+        await sendEmailVerification(cred.user, continueSettings())
       } else {
-        await sendPasswordResetEmail(auth, mail)
+        await sendPasswordResetEmail(auth, mail, continueSettings())
         setMsg({ kind: 'ok', text: 'Se este e-mail tiver conta, enviamos o link para criar uma nova senha. Olhe também o spam.' })
       }
     } catch (err) {
@@ -137,7 +140,7 @@ export function VerifyEmail({ user }) {
     setBusy(true)
     setMsg({ kind: '', text: '' })
     try {
-      await sendEmailVerification(user)
+      await sendEmailVerification(user, continueSettings())
       setMsg({ kind: 'ok', text: 'E-mail reenviado. Olhe também o spam.' })
     } catch (err) {
       setMsg({ kind: 'err', text: errMsg(err) })
