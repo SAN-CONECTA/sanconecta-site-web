@@ -78,6 +78,17 @@ export const ITEMS = [
     ]
   },
   {
+    "id": "1.5",
+    "p": 1,
+    "t": "Estações de trabalho e endpoints",
+    "d": "Parque de computadores, notebooks e celulares corporativos: idade, atualização, antivírus e controle de inventário.",
+    "q": [
+      "Existe inventário atualizado de computadores, notebooks e celulares, com idade e responsável?",
+      "Sistema operacional e antivírus estão atualizados e gerenciados de forma central?",
+      "Os discos dos notebooks são criptografados e há procedimento para perda ou roubo?"
+    ]
+  },
+  {
     "id": "2.1",
     "p": 2,
     "t": "Sistemas de gestão core (ERP, CRM, SaaS)",
