@@ -82,5 +82,6 @@ No Console (Firestore → Regras → Simulador de regras) ou no emulador, confir
 ## Versões
 
 - **v1.0** — Empresas, um ou mais usuários de leitura por empresa, administradores SAN, 19 itens com perguntas-guia, painel, exportação CSV.
+- **v1.1** — Maturidade de 0 a 5 por item (com a escala descrita na tela), situação da evidência (6 valores), 15 perguntas-guia novas vindas do Assessment de TI 2023, média de maturidade no painel e colunas novas no CSV. Os campos novos são opcionais nas regras: **publique as regras no console antes de publicar o código**.
 - Ideias para as próximas: histórico de alterações e comentários por item (v1.1), anexos de evidências (v1.2), plano de ação e
   matriz de risco (v1.3), relatório executivo (v2.0).

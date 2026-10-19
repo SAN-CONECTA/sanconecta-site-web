@@ -94,7 +94,7 @@ service cloud.firestore {
 
         allow create, update: if isStaff()
           && item.matches('^[1-5]\\.[1-4]$')
-          && request.resource.data.keys().hasOnly(['status', 'risk', 'owner', 'due', 'findings', 'evidence', 'reco', 'updatedAt', 'updatedBy'])
+          && request.resource.data.keys().hasOnly(['status', 'risk', 'owner', 'due', 'findings', 'evidence', 'reco', 'updatedAt', 'updatedBy', 'maturity', 'evidStatus'])
           && request.resource.data.keys().hasAll(['status', 'risk', 'owner', 'due', 'findings', 'evidence', 'reco', 'updatedAt', 'updatedBy'])
           && request.resource.data.status in ['nao_iniciado', 'coleta', 'analise', 'concluido']
           && request.resource.data.risk in ['sem', 'baixo', 'medio', 'alto', 'critico']
@@ -103,6 +103,11 @@ service cloud.firestore {
           && shortStr(request.resource.data.findings, 4000)
           && shortStr(request.resource.data.evidence, 300)
           && shortStr(request.resource.data.reco, 4000)
+          // Campos novos (v1.1), opcionais: maturidade 0 a 5 (ou null) e situação da evidência.
+          && (!('maturity' in request.resource.data) || request.resource.data.maturity == null
+              || (request.resource.data.maturity is int && request.resource.data.maturity >= 0 && request.resource.data.maturity <= 5))
+          && (!('evidStatus' in request.resource.data)
+              || request.resource.data.evidStatus in ['nao_solicitada', 'solicitada', 'parcial', 'recebida', 'nao_recebida', 'nao_aplica'])
           && request.resource.data.updatedAt == request.time
           && request.resource.data.updatedBy == me();
 
