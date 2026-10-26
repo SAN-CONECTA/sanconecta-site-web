@@ -1,13 +1,10 @@
 import Header from './components/Header'
 import Hero from './components/Hero'
 import About from './components/About'
-import WhatWeDo from './components/WhatWeDo'
-import Services from './components/Services'
-import Solutions from './components/Solutions'
-import Partners from './components/Partners'
-import ConsultaCNPJ from './components/ConsultaCNPJ'
-import Journey from './components/Journey'
-import Why from './components/Why'
+import TI360 from './components/TI360'
+import Frentes from './components/Frentes'
+import Segmentos from './components/Segmentos'
+import Modelos from './components/Modelos'
 import CTA from './components/CTA'
 import Footer from './components/Footer'
 
@@ -18,13 +15,10 @@ export default function App() {
       <main>
         <Hero />
         <About />
-        <WhatWeDo />
-        <Services />
-        <Solutions />
-        <Partners />
-        <ConsultaCNPJ />
-        <Journey />
-        <Why />
+        <TI360 />
+        <Frentes />
+        <Segmentos />
+        <Modelos />
         <CTA />
       </main>
       <Footer />
