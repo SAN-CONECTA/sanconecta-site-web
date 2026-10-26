@@ -13,10 +13,11 @@ export default function Header() {
 
   const navLinks = [
     { href: '#top', label: 'Início' },
-    { href: '#sobre', label: 'Sobre' },
-    { href: '#ti360', label: 'TI 360' },
-    { href: '#frentes', label: 'Soluções' },
-    { href: '#segmentos', label: 'Para seu negócio' },
+    { href: '#sobre', label: 'Sobre Nós' },
+    { href: '#servicos', label: 'Serviços' },
+    { href: '#solucoes', label: 'Soluções' },
+    { href: '#consulta', label: 'Consulta CNPJ' },
+    { href: '#contato', label: 'Contato' },
   ]
 
   return (
@@ -35,11 +36,11 @@ export default function Header() {
             className="w-12 h-12 rounded-full object-cover bg-white border border-white/20 shadow-[0_6px_20px_-6px_rgba(46,170,220,0.4)] transition-transform duration-300 group-hover:scale-105"
           />
           <span className="flex flex-col leading-none">
-            <strong className="font-['Fraunces',Georgia,serif] text-[18px] text-white font-semibold tracking-[0.02em]">
+            <strong className="font-['Fraunces',Georgia,serif] text-[18px] text-white font-semibold">
               SAN Conecta
             </strong>
-            <span className="text-[10.5px] text-[#f0c75c]/90 mt-1 tracking-[0.18em] uppercase font-semibold">
-              TI 360
+            <span className="text-[11px] text-cyan-400/80 mt-0.5 tracking-[0.12em] uppercase">
+              Conectando Empresas a Soluções
             </span>
           </span>
         </a>
@@ -57,7 +58,7 @@ export default function Header() {
           ))}
           <a
             href="#contato"
-            className="ml-3 px-5 py-2.5 text-sm font-semibold bg-[#d4a93a] hover:bg-[#f0c75c] text-[#07142e] rounded-xl transition-all duration-200 shadow-[0_4px_14px_-4px_rgba(212,169,58,0.5)] hover:shadow-[0_6px_20px_-4px_rgba(212,169,58,0.6)] hover:-translate-y-0.5"
+            className="ml-3 px-5 py-2.5 text-sm font-semibold bg-[#1f5fb0] hover:bg-[#2eaadc] text-white rounded-xl transition-all duration-200 shadow-[0_4px_14px_-4px_rgba(46,170,220,0.4)] hover:shadow-[0_6px_20px_-4px_rgba(46,170,220,0.5)] hover:-translate-y-0.5"
           >
             Falar com especialista
           </a>
@@ -95,7 +96,7 @@ export default function Header() {
             ))}
             <a
               href="#contato"
-              className="mt-2 px-5 py-3 text-sm font-semibold bg-[#d4a93a] hover:bg-[#f0c75c] text-[#07142e] rounded-xl transition-all duration-200 text-center"
+              className="mt-2 px-5 py-3 text-sm font-semibold bg-[#1f5fb0] hover:bg-[#2eaadc] text-white rounded-xl transition-all duration-200 text-center"
               onClick={() => setMenuOpen(false)}
             >
               Falar com especialista

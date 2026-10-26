@@ -14,46 +14,50 @@ export default function Footer() {
               <img
                 src={logo}
                 alt="SAN Conecta"
-                className="w-12 h-12 rounded-full object-cover bg-white border border-white/10 shadow-[0_6px_20px_-6px_rgba(212,169,58,0.3)]"
+                className="w-12 h-12 rounded-full object-cover bg-white border border-white/10 shadow-[0_6px_20px_-6px_rgba(46,170,220,0.3)]"
               />
               <span className="flex flex-col leading-none">
                 <strong className="font-['Fraunces',Georgia,serif] text-[17px] text-white font-semibold">SAN Conecta</strong>
-                <span className="text-[10.5px] text-[#f0c75c]/90 mt-1 tracking-[0.18em] uppercase font-semibold">TI 360</span>
+                <span className="text-[11px] text-cyan-400/70 mt-0.5 tracking-[0.14em] uppercase">Conectando Empresas a Soluções</span>
               </span>
             </a>
-            <p className="text-[13px] text-white/40 leading-relaxed max-w-[320px]">
-              Unidade de consultoria estratégica em tecnologia da SAN Tecnologia. Atendimento independente em Sinop/MT e região.
+            <p className="text-[13px] text-white/40 leading-relaxed max-w-[260px]">
+              Canal de vendas exclusivo TrustPanel · Canal autorizado EX Group. Uma unidade da SAN Tecnologia.
             </p>
           </div>
 
-          {/* Portfólio col */}
+          {/* Partners col */}
           <div>
-            <h5 className="text-[12px] font-bold tracking-[0.15em] uppercase text-[#f0c75c]/80 mb-4">Portfólio</h5>
+            <h5 className="text-[12px] font-bold tracking-[0.15em] uppercase text-white/30 mb-4">Parceiros</h5>
             <div className="flex flex-col gap-2.5">
-              <a href="#frentes" className="text-[14px] text-white/55 hover:text-white transition-colors duration-200">
-                Frente 01 · Diagnóstico
+              <a
+                href="https://trustpanel.com.br"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[14px] text-white/55 hover:text-cyan-400 transition-colors duration-200"
+              >
+                TrustPanel · Certificados A1
               </a>
-              <a href="#frentes" className="text-[14px] text-white/55 hover:text-white transition-colors duration-200">
-                Frente 02 · Proteção
+              <a
+                href="https://exsolucoestributarias.com.br"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[14px] text-white/55 hover:text-[#f0c75c] transition-colors duration-200"
+              >
+                EX · Soluções Tributárias
               </a>
-              <a href="#frentes" className="text-[14px] text-white/55 hover:text-white transition-colors duration-200">
-                Frente 03 · Eficiência
-              </a>
-              <a href="#frentes" className="text-[14px] text-white/55 hover:text-white transition-colors duration-200">
-                Frente 04 · Organização
-              </a>
-              <a href="#frentes" className="text-[14px] text-white/55 hover:text-white transition-colors duration-200">
-                Frente 05 · Decisões
-              </a>
-              <a href="#frentes" className="text-[14px] text-white/55 hover:text-white transition-colors duration-200">
-                Frente 06 · Inovação
+              <a
+                href="#jornada"
+                className="text-[14px] text-white/55 hover:text-white transition-colors duration-200"
+              >
+                Método Expert
               </a>
             </div>
           </div>
 
           {/* Contact col */}
           <div>
-            <h5 className="text-[12px] font-bold tracking-[0.15em] uppercase text-[#f0c75c]/80 mb-4">Contato</h5>
+            <h5 className="text-[12px] font-bold tracking-[0.15em] uppercase text-white/30 mb-4">Contato</h5>
             <div className="flex flex-col gap-2.5">
               <a
                 href="https://wa.me/5566996440184"
@@ -61,16 +65,15 @@ export default function Footer() {
                 rel="noopener noreferrer"
                 className="text-[14px] text-white/55 hover:text-[#25D366] transition-colors duration-200"
               >
-                WhatsApp · Falar com especialista
+                WhatsApp · Contato SAN CONECTA
               </a>
               <a
                 href="/diagnostico360/"
                 className="text-[14px] text-white/55 hover:text-[#f0c75c] transition-colors duration-200"
               >
-                Diagnóstico 360° de TI
+                Área do cliente · Diagnóstico 360° de TI
               </a>
               <p className="text-[14px] text-white/35">Sinop · Mato Grosso · Brasil</p>
-              <p className="text-[12px] text-white/25 mt-3">Uma unidade da SAN Tecnologia · desde 2005</p>
             </div>
           </div>
         </div>
