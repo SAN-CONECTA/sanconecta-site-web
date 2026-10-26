@@ -102,6 +102,21 @@ export default function Painel({ itens, emp, onPillar, onOpen }) {
         </section>
 
         <section className="dg-card">
+          <h2>Maturidade</h2>
+          {all.mAvg === null ? (
+            <p className="dg-muted">Nenhum item avaliado ainda. A nota vai de 0 (inexistente) a 5 (otimizado).</p>
+          ) : (
+            <p className="dg-big">
+              <span className="dg-num">{all.mAvg.toFixed(1).replace('.', ',')}</span>
+              <span className="dg-of">média de 0 a 5, em {all.mN} de {all.total} itens avaliados</span>
+            </p>
+          )}
+          <p className="dg-muted dg-small">
+            {all.evPend ? `${all.evPend} ${all.evPend === 1 ? 'item com evidência pendente' : 'itens com evidência pendente'}.` : 'Nenhuma evidência pendente.'}
+          </p>
+        </section>
+
+        <section className="dg-card">
           <h2>Prazo</h2>
           {dias === null ? (
             <p className="dg-muted">Prazo final não definido. A SAN define na aba Empresa e acessos.</p>
@@ -147,6 +162,7 @@ export default function Painel({ itens, emp, onPillar, onOpen }) {
               </span>
               <span className="dg-pnum">
                 {s.st[3]} de {s.total}
+                {s.mAvg !== null && <span className="dg-muted dg-small"> · mat. {s.mAvg.toFixed(1).replace('.', ',')}</span>}
               </span>
               <span className="dg-prisk">
                 {['critico', 'alto', 'medio']
