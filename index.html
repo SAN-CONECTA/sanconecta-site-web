@@ -13,6 +13,55 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <script>
+      // Captura erros ANTES do React montar. Se der erro no load do módulo,
+      // mostra na tela em vez de deixar o #root vazio.
+      (function () {
+        function render(title, msg, stack) {
+          var root = document.getElementById('root');
+          if (!root) return;
+          root.innerHTML =
+            '<div style="min-height:100vh;background:#07142e;color:#e9eef7;padding:48px 24px;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;font-size:14px;line-height:1.6">' +
+              '<div style="max-width:820px;margin:0 auto">' +
+                '<div style="display:inline-block;padding:6px 14px;background:rgba(255,138,138,.1);border:1px solid rgba(255,138,138,.4);border-radius:999px;color:#ff8a8a;font-size:11px;letter-spacing:.14em;text-transform:uppercase;font-weight:700;margin-bottom:18px">&#9888; SAN Conecta &mdash; erro antes do React montar</div>' +
+                '<h1 style="font-family:Georgia,serif;font-size:24px;color:#fff;margin:0 0 16px;font-weight:600">' + title + '</h1>' +
+                '<p style="color:rgba(233,238,247,.65);margin:0 0 16px">' + msg + '</p>' +
+                (stack ? '<pre style="background:rgba(0,0,0,.4);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:16px;overflow:auto;white-space:pre-wrap;word-break:break-word;color:rgba(233,238,247,.9)">' + stack + '</pre>' : '') +
+                '<a href="https://wa.me/5566996440184" style="display:inline-block;margin-top:24px;padding:12px 22px;background:#d4a93a;color:#07142e;border-radius:10px;font-weight:700;text-decoration:none;font-family:system-ui,sans-serif">Falar com especialista</a>' +
+              '</div>' +
+            '</div>';
+        }
+        function escape(s) {
+          return String(s == null ? '' : s).replace(/[&<>]/g, function (c) {
+            return c === '&' ? '&amp;' : c === '<' ? '&lt;' : '&gt;';
+          });
+        }
+        window.addEventListener('error', function (e) {
+          var msg = escape(e.message || 'erro desconhecido');
+          var where = escape((e.filename || '') + (e.lineno ? ':' + e.lineno : ''));
+          var stack = e.error && e.error.stack ? escape(e.error.stack) : '';
+          render(msg, 'Local: ' + where, stack);
+        });
+        window.addEventListener('unhandledrejection', function (e) {
+          var reason = e.reason;
+          var msg = escape((reason && (reason.message || reason.toString())) || 'promise rejeitada');
+          var stack = reason && reason.stack ? escape(reason.stack) : '';
+          render('Unhandled promise rejection', msg, stack);
+        });
+        // Fallback: se depois de 8s o #root ainda estiver vazio,
+        // é porque o módulo nem carregou.
+        setTimeout(function () {
+          var root = document.getElementById('root');
+          if (root && !root.children.length) {
+            render(
+              'O React nao carregou',
+              'O script de inicializacao foi referenciado mas nao produziu nenhum conteudo em 8s. Normalmente e um bundle .js que nao baixou (404) ou um erro silencioso no load do modulo. Abra o DevTools (F12) &rarr; aba Network, recarregue e procure requisicoes em vermelho.',
+              ''
+            );
+          }
+        }, 8000);
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>
