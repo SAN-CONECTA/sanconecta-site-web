@@ -1,4 +1,5 @@
 import logo from '../assets/logo.png'
+import TI360Diagram from './TI360Diagram'
 
 function ArrowIcon() {
   return (
@@ -91,46 +92,12 @@ export default function Hero() {
           </div>
         </div>
 
-        {/* Visual orb — mantido, sem tags de parceiros */}
+        {/* Diagrama TI 360 — 6 frentes orbitando o core */}
         <div
-          className="relative flex items-center justify-center animate-rise min-h-[400px]"
+          className="relative flex items-center justify-center animate-rise"
           style={{ animationDelay: '0.25s' }}
-          aria-hidden="true"
         >
-          {/* Outer ring */}
-          <div className="absolute w-[360px] h-[360px] rounded-full border border-dashed border-[#d4a93a]/20 animate-spin-slow" />
-          {/* Inner ring */}
-          <div className="absolute w-[290px] h-[290px] rounded-full border border-dashed border-[#5fd1e6]/20 animate-spin-reverse" />
-
-          {/* Glow */}
-          <div className="absolute w-[200px] h-[200px] rounded-full bg-[#d4a93a]/15 blur-3xl" />
-
-          {/* Center orb */}
-          <div className="relative w-[180px] h-[180px] rounded-full overflow-hidden border-2 border-white/10 shadow-[0_0_60px_-10px_rgba(212,169,58,0.4),inset_0_1px_1px_rgba(255,255,255,0.1)] bg-[#0a1c3a]">
-            <img src={logo} alt="SAN Conecta" className="w-full h-full object-cover" />
-          </div>
-
-          {/* Float label — TI 360 */}
-          <div className="absolute top-6 left-0 animate-float-1">
-            <div className="flex items-center gap-3 px-4 py-2.5 rounded-2xl bg-[#07142e]/90 border border-[#d4a93a]/30 backdrop-blur-md shadow-[0_8px_32px_-8px_rgba(0,0,0,0.5)]">
-              <span className="w-2 h-2 rounded-full bg-[#f0c75c] shadow-[0_0_8px_rgba(240,199,92,0.7)] flex-shrink-0" />
-              <div>
-                <div className="text-[11px] font-bold tracking-[0.14em] uppercase text-[#f0c75c]">TI 360</div>
-                <div className="text-[11px] text-white/60 mt-0.5">6 frentes · 18 soluções</div>
-              </div>
-            </div>
-          </div>
-
-          {/* Float label — MAPES */}
-          <div className="absolute bottom-6 right-0 animate-float-2">
-            <div className="flex items-center gap-3 px-4 py-2.5 rounded-2xl bg-[#07142e]/90 border border-[#5fd1e6]/30 backdrop-blur-md shadow-[0_8px_32px_-8px_rgba(0,0,0,0.5)]">
-              <span className="w-2 h-2 rounded-full bg-[#5fd1e6] shadow-[0_0_8px_rgba(95,209,230,0.7)] flex-shrink-0" />
-              <div>
-                <div className="text-[11px] font-bold tracking-[0.14em] uppercase text-[#5fd1e6]">Metodologia</div>
-                <div className="text-[11px] text-white/60 mt-0.5">MAPES</div>
-              </div>
-            </div>
-          </div>
+          <TI360Diagram />
         </div>
       </div>
 
