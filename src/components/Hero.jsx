@@ -42,11 +42,6 @@ export default function Hero() {
       <div className="max-w-[1200px] mx-auto px-6 py-24 w-full grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-8 items-center">
         {/* Text content */}
         <div className="animate-rise" style={{ animationDelay: '0.1s' }}>
-          <span className="inline-flex items-center gap-2 text-xs font-semibold text-[#f0c75c]/90 tracking-[0.18em] uppercase mb-5 px-3 py-1.5 rounded-full border border-[#d4a93a]/30 bg-[#d4a93a]/10">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#f0c75c] shadow-[0_0_8px_rgba(240,199,92,0.8)]" />
-            Consultoria independente em TI estratégica
-          </span>
-
           <h1 className="text-[clamp(32px,5.4vw,64px)] font-semibold text-white mb-6 leading-[1.1]">
             Tecnologia e inovação sustentando o{' '}
             <em className="not-italic text-transparent bg-clip-text bg-gradient-to-r from-[#f0c75c] to-[#d4a93a]">
