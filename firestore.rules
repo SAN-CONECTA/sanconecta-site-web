@@ -43,6 +43,24 @@ service cloud.firestore {
       return v is string && v.size() <= max;
     }
 
+    // Respostas por pergunta-guia (v1.5): mapa com chaves r0..r11 (posição da pergunta no item), texto até 2000.
+    function respOk(r) {
+      return r is map
+        && r.keys().hasOnly(['r0','r1','r2','r3','r4','r5','r6','r7','r8','r9','r10','r11'])
+        && (!('r0' in r) || shortStr(r['r0'], 2000))
+        && (!('r1' in r) || shortStr(r['r1'], 2000))
+        && (!('r2' in r) || shortStr(r['r2'], 2000))
+        && (!('r3' in r) || shortStr(r['r3'], 2000))
+        && (!('r4' in r) || shortStr(r['r4'], 2000))
+        && (!('r5' in r) || shortStr(r['r5'], 2000))
+        && (!('r6' in r) || shortStr(r['r6'], 2000))
+        && (!('r7' in r) || shortStr(r['r7'], 2000))
+        && (!('r8' in r) || shortStr(r['r8'], 2000))
+        && (!('r9' in r) || shortStr(r['r9'], 2000))
+        && (!('r10' in r) || shortStr(r['r10'], 2000))
+        && (!('r11' in r) || shortStr(r['r11'], 2000));
+    }
+
     // Equipe SAN
     match /staff/{email} {
       allow read: if signedIn() && (isStaff() || email == me());
@@ -94,7 +112,7 @@ service cloud.firestore {
 
         allow create, update: if isStaff()
           && item.matches('^([1-5]\\.[1-5]|([6-9]|10)\\.[1-3])$')
-          && request.resource.data.keys().hasOnly(['status', 'risk', 'owner', 'due', 'findings', 'evidence', 'reco', 'updatedAt', 'updatedBy', 'maturity', 'evidStatus'])
+          && request.resource.data.keys().hasOnly(['status', 'risk', 'owner', 'due', 'findings', 'evidence', 'reco', 'updatedAt', 'updatedBy', 'maturity', 'evidStatus', 'respostas'])
           && request.resource.data.keys().hasAll(['status', 'risk', 'owner', 'due', 'findings', 'evidence', 'reco', 'updatedAt', 'updatedBy'])
           && request.resource.data.status in ['nao_iniciado', 'coleta', 'analise', 'concluido']
           && request.resource.data.risk in ['sem', 'baixo', 'medio', 'alto', 'critico']
@@ -108,6 +126,7 @@ service cloud.firestore {
               || (request.resource.data.maturity is int && request.resource.data.maturity >= 0 && request.resource.data.maturity <= 5))
           && (!('evidStatus' in request.resource.data)
               || request.resource.data.evidStatus in ['nao_solicitada', 'solicitada', 'parcial', 'recebida', 'nao_recebida', 'nao_aplica'])
+          && (!('respostas' in request.resource.data) || respOk(request.resource.data.respostas))
           && request.resource.data.updatedAt == request.time
           && request.resource.data.updatedBy == me();
 

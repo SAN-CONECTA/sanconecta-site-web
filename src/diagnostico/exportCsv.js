@@ -9,7 +9,7 @@ function csvCell(v) {
 }
 
 export function exportCsv(emp, itens) {
-  const head = ['Área', 'Pilar', 'Código', 'Item', 'Status', 'Risco', 'Responsável', 'Prazo', 'Achados', 'Maturidade (0-5)', 'Situação da evidência', 'Fonte da evidência', 'Recomendação', 'Atualizado em']
+  const head = ['Área', 'Pilar', 'Código', 'Item', 'Status', 'Risco', 'Responsável', 'Prazo', 'Achados gerais', 'Respostas por pergunta', 'Maturidade (0-5)', 'Situação da evidência', 'Fonte da evidência', 'Recomendação', 'Atualizado em']
   const rows = ITEMS.map((it) => {
     const d = dataOf(itens, it.id)
     return [
@@ -22,6 +22,10 @@ export function exportCsv(emp, itens) {
       d.owner,
       fmtD(d.due),
       d.findings,
+      it.q
+        .map((q, i) => ((d.respostas || {})[`r${i}`] ? `${i + 1}) ${q} ${(d.respostas || {})[`r${i}`]}` : ''))
+        .filter(Boolean)
+        .join('\n'),
       mtKey(d.maturity) === null ? '' : String(d.maturity),
       labelOf(EVID, evKey(d.evidStatus)),
       d.evidence,

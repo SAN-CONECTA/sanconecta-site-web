@@ -36,6 +36,7 @@ function ItemDrawer({ empId, item, data, raw, canEdit, email, onClose }) {
     reco: data.reco,
     maturity: mtKey(data.maturity) === null ? '' : String(data.maturity),
     evidStatus: evKey(data.evidStatus),
+    respostas: data.respostas && typeof data.respostas === 'object' ? data.respostas : {},
   })
   const [openedAt] = useState(() => (raw && raw.updatedAt && raw.updatedAt.toMillis ? raw.updatedAt.toMillis() : 0))
   const [busy, setBusy] = useState(false)
@@ -44,6 +45,7 @@ function ItemDrawer({ empId, item, data, raw, canEdit, email, onClose }) {
   const nowAt = raw && raw.updatedAt && raw.updatedAt.toMillis ? raw.updatedAt.toMillis() : 0
   const changedByOther = nowAt !== openedAt && !busy
   const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }))
+  const setResp = (i) => (e) => setForm((f) => ({ ...f, respostas: { ...f.respostas, [`r${i}`]: e.target.value } }))
 
   async function save(e) {
     e.preventDefault()
@@ -51,6 +53,11 @@ function ItemDrawer({ empId, item, data, raw, canEdit, email, onClose }) {
     setBusy(true)
     setErr('')
     try {
+      const respostas = {}
+      item.q.forEach((_, i) => {
+        const v = String(form.respostas[`r${i}`] || '').trim()
+        if (v) respostas[`r${i}`] = v
+      })
       await setDoc(doc(db, 'empresas', empId, 'itens', item.id), {
         status: form.status,
         risk: form.risk,
@@ -61,6 +68,7 @@ function ItemDrawer({ empId, item, data, raw, canEdit, email, onClose }) {
         reco: form.reco.trim(),
         maturity: form.maturity === '' ? null : Number(form.maturity),
         evidStatus: form.evidStatus,
+        respostas,
         updatedAt: serverTimestamp(),
         updatedBy: email,
       })
@@ -83,14 +91,6 @@ function ItemDrawer({ empId, item, data, raw, canEdit, email, onClose }) {
         </p>
         <h2 id="dg-drawer-title">{item.t}</h2>
         <p className="dg-desc">{item.d}</p>
-        <div className="dg-guide">
-          <h3>Perguntas-guia</h3>
-          <ul>
-            {item.q.map((q) => (
-              <li key={q}>{q}</li>
-            ))}
-          </ul>
-        </div>
         {!canEdit && <p className="dg-warn">Você está no modo leitura. Só a equipe SAN edita os itens.</p>}
         {changedByOther && (
           <p className="dg-warn">
@@ -128,8 +128,24 @@ function ItemDrawer({ empId, item, data, raw, canEdit, email, onClose }) {
                 <input type="date" value={form.due} onChange={set('due')} />
               </label>
             </div>
+            <div className="dg-qa">
+              <h3>Perguntas-guia</h3>
+              {item.q.map((q, i) => (
+                <label className="dg-fld dg-q" key={`${item.id}-${q}`}>
+                  <span>
+                    <b className="dg-mono">{i + 1}.</b> {q}
+                  </span>
+                  <textarea
+                    value={form.respostas[`r${i}`] || ''}
+                    onChange={setResp(i)}
+                    maxLength={2000}
+                    placeholder="Resposta e evidência desta pergunta."
+                  />
+                </label>
+              ))}
+            </div>
             <label className="dg-fld">
-              <span>Achados</span>
+              <span>Achados gerais (resumo do item)</span>
               <textarea
                 value={form.findings}
                 onChange={set('findings')}
@@ -278,6 +294,9 @@ export default function Itens({ empId, itens, canEdit, user, flt, setFlt, openId
                   <span className="dg-meta">
                     <StatusPill k={d.status} />
                     <RiskPill k={d.risk} />
+                    <span className="dg-mono" title="Perguntas respondidas">
+                      {it.q.filter((_, i) => String((d.respostas || {})[`r${i}`] || '').trim()).length}/{it.q.length} resp.
+                    </span>
                     {mtKey(d.maturity) !== null && <span className="dg-mono">Mat. {d.maturity}/5</span>}
                     {d.owner && <span>{d.owner}</span>}
                     {d.due && (
