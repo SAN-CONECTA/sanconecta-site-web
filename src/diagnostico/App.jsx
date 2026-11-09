@@ -5,6 +5,7 @@ import { useSession } from './useSession'
 import { useRoute } from './util'
 import Empresas from './Empresas'
 import Empresa from './Empresa'
+import Versao from './Versao'
 import logo from '../assets/logo.png'
 
 function Setup() {
@@ -17,6 +18,7 @@ function Setup() {
           O Firebase ainda não foi configurado. Abra <code>src/diagnostico/firebaseConfig.js</code>, cole os dados do app
           Web do projeto e publique de novo. O passo a passo está em <code>docs/DIAGNOSTICO.md</code>.
         </p>
+        <Versao />
       </div>
     </main>
   )
@@ -51,6 +53,9 @@ export default function App() {
           <Empresas key={`${session.user.uid}-${session.staff}`} session={session} />
         )}
       </main>
+      <footer className="dg-foot">
+        <Versao />
+      </footer>
     </div>
   )
 }
