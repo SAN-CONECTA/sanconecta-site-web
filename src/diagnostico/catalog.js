@@ -37,7 +37,9 @@ export const ITEMS = [
     "q": [
       "Quais servidores e hipervisores existem, com modelo, versão e idade?",
       "Há redundância de hardware e de fonte de energia?",
-      "Garantia e suporte do fabricante estão vigentes?"
+      "Garantia e suporte do fabricante estão vigentes?",
+      "Qual a capacidade total de armazenamento e quanto está em uso?",
+      "Sistemas operacionais e serviços críticos dos servidores estão atualizados e com suporte?"
     ]
   },
   {
@@ -59,7 +61,9 @@ export const ITEMS = [
     "q": [
       "As regras de firewall foram revisadas e estão documentadas?",
       "Quem tem acesso remoto por VPN e como ele é controlado?",
-      "A rede de dados está segmentada em VLANs?"
+      "A rede de dados está segmentada em VLANs?",
+      "O firmware do firewall está atualizado? Existe rotina de atualização?",
+      "Os logs de segurança do perímetro são guardados e alguém os revisa?"
     ]
   },
   {
@@ -71,6 +75,17 @@ export const ITEMS = [
       "Qual a autonomia real dos no-breaks sob a carga atual?",
       "A climatização do rack ou sala é adequada e monitorada?",
       "Há redundância de energia (gerador, circuito duplo)?"
+    ]
+  },
+  {
+    "id": "1.5",
+    "p": 1,
+    "t": "Estações de trabalho e endpoints",
+    "d": "Parque de computadores, notebooks e celulares corporativos: idade, atualização, antivírus e controle de inventário.",
+    "q": [
+      "Existe inventário atualizado de computadores, notebooks e celulares, com idade e responsável?",
+      "Sistema operacional e antivírus estão atualizados e gerenciados de forma central?",
+      "Os discos dos notebooks são criptografados e há procedimento para perda ou roubo?"
     ]
   },
   {
@@ -114,7 +129,9 @@ export const ITEMS = [
     "q": [
       "Quais cargas rodam na nuvem e quanto custam por mês?",
       "Como as identidades e os acessos são governados?",
-      "Como a nuvem se conecta ao ambiente local?"
+      "Como a nuvem se conecta ao ambiente local?",
+      "As configurações de segurança da nuvem (acessos, MFA, exposição pública) foram revisadas?",
+      "Há monitoramento e alertas de falha, consumo e custo?"
     ]
   },
   {
@@ -147,7 +164,11 @@ export const ITEMS = [
     "q": [
       "Os privilégios são revisados com que frequência?",
       "Em quem o MFA está ativo?",
-      "Quais certificados e credenciais vencem nos próximos 90 dias?"
+      "Quais certificados e credenciais vencem nos próximos 90 dias?",
+      "Contas de quem saiu da empresa são desativadas no mesmo dia?",
+      "Quem tem perfil de administrador de domínio ou equivalente, e isso é revisado?",
+      "Senhas compartilhadas ficam em cofre de senhas?",
+      "Há registro da atividade dos usuários e por quanto tempo é guardado?"
     ]
   },
   {
@@ -158,7 +179,9 @@ export const ITEMS = [
     "q": [
       "Todos os endpoints têm antivírus ou EDR ativo?",
       "Qual o status de conformidade com a LGPD?",
-      "Quando foi o último teste de vulnerabilidade e como se trata um vazamento?"
+      "Quando foi o último teste de vulnerabilidade e como se trata um vazamento?",
+      "Os usuários recebem treinamento ou simulação de phishing?",
+      "Existe política de segurança da informação escrita e comunicada?"
     ]
   },
   {
@@ -202,7 +225,9 @@ export const ITEMS = [
     "q": [
       "Como os chamados fluem e quem os prioriza?",
       "Qual o tamanho do backlog e quais incidentes se repetem?",
-      "A liderança enxerga o volume real de problemas?"
+      "A liderança enxerga o volume real de problemas?",
+      "Há catálogo de serviços e acordo de nível de serviço com os usuários?",
+      "Incidentes recorrentes passam por análise de causa raiz?"
     ]
   },
   {
@@ -282,9 +307,34 @@ export const RISK = [
   }
 ]
 
-export const BLANK = { status: 'nao_iniciado', risk: 'sem', owner: '', due: '', findings: '', evidence: '', reco: '' }
+// Maturidade de 0 a 5 por item (escala do Assessment de TI 2023). null = ainda não avaliada.
+export const MATURITY = [
+  { k: 0, l: '0 · Inexistente', d: 'Não existe, ou ninguém sabe dizer.' },
+  { k: 1, l: '1 · Inicial', d: 'Existe de forma informal, depende de uma pessoa, sem registro.' },
+  { k: 2, l: '2 · Repetível', d: 'É feito com alguma regularidade, mas sem documentação nem revisão.' },
+  { k: 3, l: '3 · Definido', d: 'Há processo documentado e responsável definido.' },
+  { k: 4, l: '4 · Gerenciado', d: 'É medido e revisado periodicamente, com evidências.' },
+  { k: 5, l: '5 · Otimizado', d: 'Melhoria contínua, testado e auditável.' },
+]
+
+// Situação da evidência pedida ao cliente.
+export const EVID = [
+  { k: 'nao_solicitada', l: 'Não solicitada' },
+  { k: 'solicitada', l: 'Solicitada' },
+  { k: 'parcial', l: 'Recebida parcialmente' },
+  { k: 'recebida', l: 'Recebida' },
+  { k: 'nao_recebida', l: 'Não recebida' },
+  { k: 'nao_aplica', l: 'Não se aplica' },
+]
+
+export const BLANK = {
+  status: 'nao_iniciado', risk: 'sem', owner: '', due: '', findings: '', evidence: '', reco: '',
+  maturity: null, evidStatus: 'nao_solicitada',
+}
 
 export const labelOf = (arr, k) => (arr.find((x) => x.k === k) || {}).l || ''
 export const stIdx = (k) => Math.max(0, STATUS.findIndex((s) => s.k === k))
 export const rkKey = (k) => (RISK.some((r) => r.k === k) ? k : 'sem')
+export const mtKey = (v) => (Number.isInteger(v) && v >= 0 && v <= 5 ? v : null)
+export const evKey = (k) => (EVID.some((e) => e.k === k) ? k : 'nao_solicitada')
 export const rkRank = (k) => RISK.findIndex((r) => r.k === k)

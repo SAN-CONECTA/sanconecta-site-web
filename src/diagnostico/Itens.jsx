@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { doc, serverTimestamp, setDoc } from 'firebase/firestore'
 import { db } from './firebase'
-import { ITEMS, PILLARS, RISK, STATUS, labelOf, rkKey, stIdx } from './catalog'
+import { EVID, ITEMS, MATURITY, PILLARS, RISK, STATUS, evKey, labelOf, mtKey, rkKey, stIdx } from './catalog'
 import { dataOf } from './calc'
 import { errMsg, fmtD, fmtTs, normEmail, todayStr } from './util'
 
@@ -34,6 +34,8 @@ function ItemDrawer({ empId, item, data, raw, canEdit, email, onClose }) {
     findings: data.findings,
     evidence: data.evidence,
     reco: data.reco,
+    maturity: mtKey(data.maturity) === null ? '' : String(data.maturity),
+    evidStatus: evKey(data.evidStatus),
   })
   const [openedAt] = useState(() => (raw && raw.updatedAt && raw.updatedAt.toMillis ? raw.updatedAt.toMillis() : 0))
   const [busy, setBusy] = useState(false)
@@ -57,6 +59,8 @@ function ItemDrawer({ empId, item, data, raw, canEdit, email, onClose }) {
         findings: form.findings.trim(),
         evidence: form.evidence.trim(),
         reco: form.reco.trim(),
+        maturity: form.maturity === '' ? null : Number(form.maturity),
+        evidStatus: form.evidStatus,
         updatedAt: serverTimestamp(),
         updatedBy: email,
       })
@@ -133,6 +137,26 @@ function ItemDrawer({ empId, item, data, raw, canEdit, email, onClose }) {
                 placeholder="O que foi encontrado, com números e datas quando houver."
               />
             </label>
+            <div className="dg-two">
+              <label className="dg-fld">
+                <span>Maturidade (0 a 5)</span>
+                <select value={form.maturity} onChange={set('maturity')}>
+                  <option value="">Não avaliada</option>
+                  {MATURITY.map((m) => (
+                    <option key={m.k} value={String(m.k)}>{m.l}</option>
+                  ))}
+                </select>
+              </label>
+              <label className="dg-fld">
+                <span>Situação da evidência</span>
+                <select value={form.evidStatus} onChange={set('evidStatus')}>
+                  {EVID.map((e) => (
+                    <option key={e.k} value={e.k}>{e.l}</option>
+                  ))}
+                </select>
+              </label>
+            </div>
+            {form.maturity !== '' && <p className="dg-muted dg-small">{MATURITY[Number(form.maturity)].d}</p>}
             <label className="dg-fld">
               <span>Fonte da evidência</span>
               <input
@@ -242,6 +266,7 @@ export default function Itens({ empId, itens, canEdit, user, flt, setFlt, openId
                   <span className="dg-meta">
                     <StatusPill k={d.status} />
                     <RiskPill k={d.risk} />
+                    {mtKey(d.maturity) !== null && <span className="dg-mono">Mat. {d.maturity}/5</span>}
                     {d.owner && <span>{d.owner}</span>}
                     {d.due && (
                       <span className={late ? 'dg-late' : ''}>
