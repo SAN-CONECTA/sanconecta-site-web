@@ -12,7 +12,7 @@ function copyText(text) {
   return Promise.resolve(false)
 }
 
-function DadosEmpresa({ emp, email }) {
+export function DadosEmpresa({ emp, email }) {
   const [f, setF] = useState({
     nome: emp.nome || '',
     cnpj: emp.cnpj || '',
