@@ -187,9 +187,11 @@ fieldset:disabled input, fieldset:disabled select, fieldset:disabled textarea { 
 
 /* painel lateral */
 .dg-scrim { position: fixed; inset: 0; background: rgba(7, 20, 46, 0.55); z-index: 20; }
+/* Janela centralizada sobre o fundo escurecido (antes era um painel na lateral direita). */
 .dg-drawer {
-  position: fixed; top: 0; right: 0; bottom: 0; width: min(580px, 100%); background: var(--surface); z-index: 21;
-  box-shadow: 0 0 40px rgba(0, 0, 0, 0.35); overflow-y: auto; padding: 20px 16px 28px;
+  position: fixed; inset: 0; margin: auto; width: min(760px, calc(100% - 24px)); height: fit-content; max-height: calc(100vh - 32px);
+  background: var(--surface); z-index: 21; border-radius: 10px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4); overflow-y: auto; padding: 22px 24px 28px;
 }
 .dg-drawer h2 { font-size: 22px; margin: 2px 0 8px; }
 .dg-x { float: right; margin-left: 12px; }
@@ -199,8 +201,8 @@ fieldset:disabled input, fieldset:disabled select, fieldset:disabled textarea { 
 .dg-guide ul { margin: 0; padding-left: 18px; display: grid; gap: 4px; }
 .dg-upd { margin-top: 16px; }
 @media (prefers-reduced-motion: no-preference) {
-  .dg-drawer { animation: dg-slide 0.18s ease-out; }
-  @keyframes dg-slide { from { transform: translateX(24px); opacity: 0; } to { transform: none; opacity: 1; } }
+  .dg-drawer { animation: dg-pop 0.16s ease-out; }
+  @keyframes dg-pop { from { transform: scale(0.97); opacity: 0; } to { transform: none; opacity: 1; } }
 }
 
 /* tabelas e listas de equipe */
