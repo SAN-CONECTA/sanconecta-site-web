@@ -132,7 +132,7 @@ function Usuarios({ emp, email }) {
       await grava(mail)
       setNovo('')
       setConvite(
-        `Olá! A SAN Conecta liberou o seu acesso de consulta ao Diagnóstico 360° de TI da ${emp.nome}.\n` +
+        `Olá! A SAN Conecta liberou o seu acesso de consulta ao Diagnóstico 360° da ${emp.nome}.\n` +
           `1. Abra ${SITE_URL}\n2. Escolha Criar conta e use este e-mail: ${mail}\n3. Confirme o e-mail pelo link que você vai receber e entre.`,
       )
     } catch (er) {

@@ -19,8 +19,8 @@ function Frame({ children }) {
     <main className="dg-auth">
       <div className="dg-auth-card">
         <img className="dg-auth-logo" src={logo} alt="SAN Conecta" />
-        <p className="dg-eyebrow">Auditoria de tecnologia</p>
-        <h1>Diagnóstico 360° de TI</h1>
+        <p className="dg-eyebrow">Auditoria de tecnologia e gestão</p>
+        <h1>Diagnóstico 360°</h1>
         {children}
       </div>
     </main>
