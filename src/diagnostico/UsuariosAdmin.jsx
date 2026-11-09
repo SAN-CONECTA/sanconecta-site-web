@@ -102,13 +102,7 @@ function AcessosClientes({ email }) {
   }
 
   async function copia() {
-    let ok = false
-    try {
-      await navigator.clipboard.writeText(convite)
-      ok = true
-    } catch {
-      ok = false
-    }
+    const ok = await navigator.clipboard.writeText(convite).then(() => true, () => false)
     setMsg({ kind: ok ? 'ok' : 'err', text: ok ? 'Mensagem copiada.' : 'Não foi possível copiar. Selecione o texto e copie.' })
   }
 
