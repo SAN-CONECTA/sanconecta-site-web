@@ -10,6 +10,7 @@ import {
 import { auth } from './firebase'
 import { errMsg, isEmail, normEmail } from './util'
 import logo from '../assets/logo.png'
+import Versao from './Versao'
 
 // Depois de confirmar o e-mail (ou redefinir a senha), a tela do Firebase oferece "Continuar" para esta página.
 const continueSettings = () => ({ url: `${window.location.origin}/diagnostico360/` })
@@ -22,6 +23,7 @@ function Frame({ children }) {
         <p className="dg-eyebrow">Auditoria de tecnologia e gestão</p>
         <h1>Diagnóstico 360°</h1>
         {children}
+        <Versao />
       </div>
     </main>
   )
