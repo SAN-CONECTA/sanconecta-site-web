@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { doc, serverTimestamp, setDoc } from 'firebase/firestore'
 import { db } from './firebase'
-import { EVID, ITEMS, MATURITY, PILLARS, RISK, STATUS, evKey, labelOf, mtKey, rkKey, stIdx } from './catalog'
+import { AREAS, EVID, ITEMS, MATURITY, PILLARS, pad2, RISK, STATUS, evKey, labelOf, mtKey, rkKey, stIdx } from './catalog'
 import { dataOf } from './calc'
 import { errMsg, fmtD, fmtTs, normEmail, todayStr } from './util'
 
@@ -219,8 +219,12 @@ export default function Itens({ empId, itens, canEdit, user, flt, setFlt, openId
       <div className="dg-filters">
         <select aria-label="Filtrar por pilar" value={flt.p} onChange={(e) => setFlt({ ...flt, p: e.target.value })}>
           <option value="">Todos os pilares</option>
-          {PILLARS.map((p) => (
-            <option key={p.id} value={String(p.id)}>{`0${p.id} ${p.n}`}</option>
+          {AREAS.map((a) => (
+            <optgroup key={a.k} label={a.l}>
+              {PILLARS.filter((p) => p.a === a.k).map((p) => (
+                <option key={p.id} value={String(p.id)}>{`${pad2(p.id)} ${p.n}`}</option>
+              ))}
+            </optgroup>
           ))}
         </select>
         <select aria-label="Filtrar por status" value={flt.s} onChange={(e) => setFlt({ ...flt, s: e.target.value })}>
@@ -246,13 +250,16 @@ export default function Itens({ empId, itens, canEdit, user, flt, setFlt, openId
 
       {!rows.length && <div className="dg-empty">Nenhum item com esses filtros. Limpe a busca ou escolha outro status.</div>}
 
-      {PILLARS.map((p) => {
+      {AREAS.map((ar) => (
+        <section key={ar.k} aria-label={ar.l}>
+          {rows.some((it) => PILLARS[it.p - 1].a === ar.k) && <h2 className="dg-area">{ar.l}</h2>}
+          {PILLARS.filter((p) => p.a === ar.k).map((p) => {
         const r = rows.filter((it) => it.p === p.id)
         if (!r.length) return null
         return (
           <div className="dg-group" key={p.id}>
             <h2>
-              <span className="dg-mono dg-muted">0{p.id}</span>
+              <span className="dg-mono dg-muted">{pad2(p.id)}</span>
               {p.n}
               <span className="dg-tag">{p.t}</span>
             </h2>
@@ -281,6 +288,8 @@ export default function Itens({ empId, itens, canEdit, user, flt, setFlt, openId
           </div>
         )
       })}
+        </section>
+      ))}
 
       {openItem && (
         <ItemDrawer

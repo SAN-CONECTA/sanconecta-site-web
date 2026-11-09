@@ -1,4 +1,5 @@
-import { ITEMS, PILLARS, RISK, STATUS, labelOf, rkKey, rkRank } from './catalog'
+import { Fragment } from 'react'
+import { AREAS, ITEMS, PILLARS, pad2, RISK, STATUS, labelOf, rkKey, rkRank } from './catalog'
 import { dataOf, stats } from './calc'
 import { daysBetween, fmtD, todayStr } from './util'
 
@@ -111,6 +112,17 @@ export default function Painel({ itens, emp, onPillar, onOpen }) {
               <span className="dg-of">média de 0 a 5, em {all.mN} de {all.total} itens avaliados</span>
             </p>
           )}
+          <dl className="dg-dl">
+            {AREAS.map((a) => {
+              const sa = stats(itens, ITEMS.filter((it) => PILLARS[it.p - 1].a === a.k))
+              return (
+                <Fragment key={a.k}>
+                  <dt>{a.l}</dt>
+                  <dd>{sa.mAvg === null ? 'sem nota' : `${sa.mAvg.toFixed(1).replace('.', ',')} (${sa.mN} de ${sa.total})`}</dd>
+                </Fragment>
+              )
+            })}
+          </dl>
           <p className="dg-muted dg-small">
             {all.evPend ? `${all.evPend} ${all.evPend === 1 ? 'item com evidência pendente' : 'itens com evidência pendente'}.` : 'Nenhuma evidência pendente.'}
           </p>
@@ -147,13 +159,16 @@ export default function Painel({ itens, emp, onPillar, onOpen }) {
 
       <section className="dg-card">
         <h2>Andamento por pilar</h2>
-        {PILLARS.map((p) => {
+        {AREAS.map((ar) => (
+          <div key={ar.k}>
+            <h3 className="dg-area">{ar.l}</h3>
+            {PILLARS.filter((p) => p.a === ar.k).map((p) => {
           const s = stats(itens, ITEMS.filter((it) => it.p === p.id))
           return (
             <button type="button" className="dg-prow" key={p.id} onClick={() => onPillar(String(p.id))}>
               <span className="dg-pname">
                 <strong>
-                  <span className="dg-mono dg-muted">0{p.id}</span> {p.n}
+                  <span className="dg-mono dg-muted">{pad2(p.id)}</span> {p.n}
                 </strong>
                 <span className="dg-tag">{p.t}</span>
               </span>
@@ -176,7 +191,9 @@ export default function Painel({ itens, emp, onPillar, onOpen }) {
               </span>
             </button>
           )
-        })}
+            })}
+          </div>
+        ))}
       </section>
 
       <section className="dg-card">

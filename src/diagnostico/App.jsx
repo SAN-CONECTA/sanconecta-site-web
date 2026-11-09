@@ -12,7 +12,7 @@ function Setup() {
     <main className="dg-auth">
       <div className="dg-auth-card">
         <img className="dg-auth-logo" src={logo} alt="SAN Conecta" />
-        <h1>Diagnóstico 360° de TI</h1>
+        <h1>Diagnóstico 360°</h1>
         <p>
           O Firebase ainda não foi configurado. Abra <code>src/diagnostico/firebaseConfig.js</code>, cole os dados do app
           Web do projeto e publique de novo. O passo a passo está em <code>docs/DIAGNOSTICO.md</code>.
@@ -36,7 +36,7 @@ export default function App() {
       <header className="dg-top">
         <a className="dg-brand" href="#/">
           <img src={logo} alt="SAN Conecta" />
-          <span>Diagnóstico 360° de TI</span>
+          <span>Diagnóstico 360°</span>
         </a>
         <div className="dg-user">
           <span className="dg-small">{session.user.displayName || session.user.email}</span>

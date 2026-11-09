@@ -1,30 +1,73 @@
-// Modelo fixo do diagnóstico (v1.0): 5 pilares e 19 itens com perguntas-guia.
-// Os ids dos itens ("1.1" a 5.3) também são validados nas regras do Firestore.
+// Modelo fixo do diagnóstico: duas áreas (TI e Gestão do Negócio), 10 pilares e 31 itens com perguntas-guia.
+// Os ids dos itens ("1.1" a "10.2") também são validados nas regras do Firestore.
+// Duas áreas do diagnóstico: pilares 1 a 5 são de TI; 6 a 10 são de Gestão do Negócio.
+export const AREAS = [
+  { k: 'ti', l: 'Diagnóstico de TI' },
+  { k: 'gestao', l: 'Gestão do Negócio' },
+]
+
+export const pad2 = (n) => String(n).padStart(2, '0')
+
 export const PILLARS = [
   {
     "id": 1,
     "n": "Infraestrutura, redes e servidores",
-    "t": "Run & hardware"
+    "t": "Run & hardware",
+    "a": "ti"
   },
   {
     "id": 2,
     "n": "Sistemas, aplicações e banco de dados",
-    "t": "Plataformas"
+    "t": "Plataformas",
+    "a": "ti"
   },
   {
     "id": 3,
     "n": "Continuidade, proteção de dados e contingência",
-    "t": "Sustentação"
+    "t": "Sustentação",
+    "a": "ti"
   },
   {
     "id": 4,
     "n": "Pessoas, processos e conhecimento tácito",
-    "t": "Fator humano"
+    "t": "Fator humano",
+    "a": "ti"
   },
   {
     "id": 5,
     "n": "Escala e alinhamento estratégico",
-    "t": "Previsibilidade e escala"
+    "t": "Previsibilidade e escala",
+    "a": "ti"
+  },
+  {
+    "id": 6,
+    "n": "Estratégia e resultados",
+    "t": "Direção e mercado",
+    "a": "gestao"
+  },
+  {
+    "id": 7,
+    "n": "Finanças e controle",
+    "t": "Caixa e margem",
+    "a": "gestao"
+  },
+  {
+    "id": 8,
+    "n": "Comercial e clientes",
+    "t": "Receita",
+    "a": "gestao"
+  },
+  {
+    "id": 9,
+    "n": "Operações, compras e estoque",
+    "t": "Execução",
+    "a": "gestao"
+  },
+  {
+    "id": 10,
+    "n": "Pessoas, estrutura e conformidade",
+    "t": "Organização",
+    "a": "gestao"
   }
 ]
 
@@ -261,6 +304,128 @@ export const ITEMS = [
       "Dá para auditar e documentar os sistemas rapidamente?",
       "Dá para integrar ou desacoplar sistemas e infraestrutura?",
       "O que impediria uma transição de liderança sem perdas?"
+    ]
+  },
+  {
+    "id": "6.1",
+    "p": 6,
+    "t": "Metas, planejamento e indicadores",
+    "d": "Se a empresa sabe aonde quer chegar, como mede o caminho e quem acompanha.",
+    "q": [
+      "Existem metas escritas para o ano (faturamento, margem, clientes) e quem responde por cada uma?",
+      "Quais 3 a 5 indicadores o dono olha toda semana ou todo mês, e de onde vêm os números?",
+      "Há reunião periódica para rever resultados e decidir ações, com registro do que foi decidido?"
+    ]
+  },
+  {
+    "id": "6.2",
+    "p": 6,
+    "t": "Mercado, clientes-alvo e concorrência",
+    "d": "Clareza sobre quem é o cliente, por que ele escolhe a empresa e quem disputa o mesmo espaço.",
+    "q": [
+      "Quem é o cliente ideal e quais segmentos dão mais lucro, não só mais volume?",
+      "Por que o cliente compra da empresa e não do concorrente? Isso foi confirmado com clientes ou é percepção?",
+      "Que mudanças de mercado (concorrente novo, preço, sazonalidade, regulação) podem afetar os próximos 12 meses?"
+    ]
+  },
+  {
+    "id": "7.1",
+    "p": 7,
+    "t": "Fluxo de caixa e controle financeiro",
+    "d": "Previsibilidade do caixa, separação entre empresa e sócios e disciplina nos pagamentos.",
+    "q": [
+      "Existe projeção de caixa para as próximas semanas e meses, e ela é comparada com o realizado?",
+      "As contas da empresa e as dos sócios estão separadas (PJ e PF)?",
+      "Quem registra, quem aprova e quem paga? Há separação de funções nos pagamentos?",
+      "Em quantos dias o mês fecha (resultado e balancete) e quem lê esses números?"
+    ]
+  },
+  {
+    "id": "7.2",
+    "p": 7,
+    "t": "Custos, margem e preço",
+    "d": "Se a empresa sabe onde ganha e onde perde dinheiro e como forma o preço.",
+    "q": [
+      "A empresa conhece a margem por produto, serviço ou cliente, ou só o resultado geral?",
+      "Como o preço é definido: custo mais margem, concorrência ou intuição? Quando foi revisado pela última vez?",
+      "Quais custos fixos mais cresceram nos últimos 12 meses e por quê?"
+    ]
+  },
+  {
+    "id": "7.3",
+    "p": 7,
+    "t": "Crédito, endividamento e inadimplência",
+    "d": "Peso das dívidas no caixa, risco de vender a prazo e dependência de crédito para fechar o mês.",
+    "q": [
+      "Qual o total de dívidas, prazos e custo, e quanto do caixa mensal elas consomem?",
+      "Qual a fatia de vendas a prazo e a inadimplência, e quem cobra?",
+      "A empresa depende de um único banco, de capital de giro ou de antecipação de recebíveis para fechar o mês?"
+    ]
+  },
+  {
+    "id": "8.1",
+    "p": 8,
+    "t": "Carteira de clientes e concentração",
+    "d": "Quão distribuída e conhecida é a base de clientes e quanto a receita depende de poucos.",
+    "q": [
+      "Quantos clientes respondem por metade do faturamento? A perda do maior seria suportável?",
+      "Existe cadastro de clientes atualizado, com histórico de compras, fora da cabeça do vendedor?",
+      "Qual a taxa de clientes que voltam a comprar e quanto custa conquistar um novo?"
+    ]
+  },
+  {
+    "id": "8.2",
+    "p": 8,
+    "t": "Processo comercial e pós-venda",
+    "d": "Como nasce uma venda, como é conduzida e o que acontece depois do fechamento.",
+    "q": [
+      "Como surge uma venda: indicação, prospecção ativa, anúncio? Isso é medido?",
+      "Há etapas definidas de atendimento, proposta e fechamento, e se acompanha o que foi perdido e por quê?",
+      "O que acontece após a venda (entrega, garantia, reclamação, assistência) e a satisfação é medida?"
+    ]
+  },
+  {
+    "id": "9.1",
+    "p": 9,
+    "t": "Processos principais e padronização",
+    "d": "Se o trabalho que gera dinheiro (ou problema) está descrito, tem dono e roda sem improviso.",
+    "q": [
+      "Quais são os 3 a 5 processos que mais geram receita ou problema, e eles estão descritos?",
+      "Onde ocorrem os maiores retrabalhos, atrasos ou erros, e quanto custam?",
+      "Cada etapa tem responsável e prazo, e o dono fica sabendo de atrasos sem precisar perguntar?"
+    ]
+  },
+  {
+    "id": "9.2",
+    "p": 9,
+    "t": "Compras, estoque e fornecedores",
+    "d": "Disciplina para comprar, controlar o que está em estoque e depender menos de poucos fornecedores.",
+    "q": [
+      "Como se decide o que e quanto comprar? Há estoque parado ou falta frequente?",
+      "O estoque físico bate com o sistema? Quando foi o último inventário e qual a diferença encontrada?",
+      "Quais fornecedores são críticos, existe alternativa e as condições (preço e prazo) são comparadas?"
+    ]
+  },
+  {
+    "id": "10.1",
+    "p": 10,
+    "t": "Estrutura, papéis e liderança",
+    "d": "Se as responsabilidades são claras e se a empresa funciona sem depender de decisões do dono em tudo.",
+    "q": [
+      "Existe organograma com responsabilidades claras, ou cada pessoa faz de tudo um pouco?",
+      "Quantas decisões do dia a dia dependem do dono? O que para se ele ficar 15 dias fora?",
+      "Como se contrata, treina e avalia a equipe? Qual a rotatividade nos últimos 12 meses?"
+    ]
+  },
+  {
+    "id": "10.2",
+    "p": 10,
+    "t": "Obrigações legais, fiscais e trabalhistas",
+    "d": "Situação regular perante o fisco, a lei trabalhista e os contratos.",
+    "q": [
+      "Impostos, certidões, alvarás e licenças estão em dia, e quem controla os vencimentos?",
+      "O regime tributário foi revisado nos últimos anos por quem entende do assunto? Há passivos fiscais ou trabalhistas conhecidos?",
+      "Contratos com clientes, fornecedores e funcionários estão formalizados, guardados e com prazos de renovação controlados?"
     ]
   }
 ]

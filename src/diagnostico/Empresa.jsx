@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { collection, doc, getDoc, onSnapshot } from 'firebase/firestore'
 import { db } from './firebase'
-import { EVID, ITEMS, PILLARS, RISK, STATUS, evKey, labelOf, mtKey, rkKey } from './catalog'
+import { AREAS, EVID, ITEMS, PILLARS, RISK, STATUS, evKey, labelOf, mtKey, rkKey } from './catalog'
 import { dataOf } from './calc'
 import { fmtD, fmtTs, go, normEmail } from './util'
 import Painel from './Painel'
@@ -21,10 +21,11 @@ function csvCell(v) {
 }
 
 function exportCsv(emp, itens) {
-  const head = ['Pilar', 'Código', 'Item', 'Status', 'Risco', 'Responsável', 'Prazo', 'Achados', 'Maturidade (0-5)', 'Situação da evidência', 'Fonte da evidência', 'Recomendação', 'Atualizado em']
+  const head = ['Área', 'Pilar', 'Código', 'Item', 'Status', 'Risco', 'Responsável', 'Prazo', 'Achados', 'Maturidade (0-5)', 'Situação da evidência', 'Fonte da evidência', 'Recomendação', 'Atualizado em']
   const rows = ITEMS.map((it) => {
     const d = dataOf(itens, it.id)
     return [
+      labelOf(AREAS, PILLARS[it.p - 1].a),
       PILLARS[it.p - 1].n,
       it.id,
       it.t,
