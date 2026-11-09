@@ -1,4 +1,6 @@
 // Modelo fixo do diagnóstico: duas áreas (TI e Gestão do Negócio), 10 pilares e 31 itens com perguntas-guia.
+// ATENÇÃO: as respostas de cada pergunta são gravadas pela POSIÇÃO dela em "q" (r0, r1, ...). Perguntas novas só podem
+// entrar no FIM da lista de um item; mudar a ordem ou inserir no meio troca as respostas de lugar.
 // Os ids dos itens ("1.1" a "10.2") também são validados nas regras do Firestore.
 // Duas áreas do diagnóstico: pilares 1 a 5 são de TI; 6 a 10 são de Gestão do Negócio.
 export const AREAS = [
@@ -494,7 +496,7 @@ export const EVID = [
 
 export const BLANK = {
   status: 'nao_iniciado', risk: 'sem', owner: '', due: '', findings: '', evidence: '', reco: '',
-  maturity: null, evidStatus: 'nao_solicitada',
+  maturity: null, evidStatus: 'nao_solicitada', respostas: {},
 }
 
 export const labelOf = (arr, k) => (arr.find((x) => x.k === k) || {}).l || ''
