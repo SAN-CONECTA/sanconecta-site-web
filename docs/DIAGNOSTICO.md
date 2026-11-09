@@ -1,7 +1,7 @@
-# Diagnóstico 360° de TI (área /diagnostico360)
+# Diagnóstico 360° (área /diagnostico360)
 
 Área com login dentro do site da SAN Conecta, em `https://sanconecta.com/diagnostico360/`. A SAN preenche o diagnóstico de
-cada empresa cliente (31 itens em 10 pilares, em duas áreas (TI e Gestão do Negócio) pilares) e cada cliente entra só para consultar os dados da própria empresa. Uma
+cada empresa cliente (31 itens em 10 pilares, divididos em duas áreas: TI e Gestão do Negócio) e cada cliente entra só para consultar os dados da própria empresa. Uma
 empresa nunca enxerga os dados de outra. É uma pasta do mesmo site, não um subdomínio.
 
 ## Como funciona
@@ -84,5 +84,5 @@ No Console (Firestore → Regras → Simulador de regras) ou no emulador, confir
 - **v1.0** — Empresas, um ou mais usuários de leitura por empresa, administradores SAN, 19 itens com perguntas-guia, painel, exportação CSV.
 - **v1.1** — Novo item 1.5 (Estações de trabalho e endpoints), total de 20 itens. Maturidade de 0 a 5 por item (com a escala descrita na tela), situação da evidência (6 valores), 15 perguntas-guia novas vindas do Assessment de TI 2023, média de maturidade no painel e colunas novas no CSV. Os campos novos são opcionais nas regras: **publique as regras no console antes de publicar o código**.
 - **v1.2** — Diagnóstico dividido em duas áreas: TI (pilares 1 a 5) e Gestão do Negócio (pilares 6 a 10, 11 itens com perguntas-chave: estratégia, finanças, comercial, operações, pessoas e conformidade). O produto passa a se chamar "Diagnóstico 360°". As regras aceitam ids 1.1 a 10.3: **publique as regras no console antes de publicar o código**.
-- Ideias para as próximas: histórico de alterações e comentários por item (v1.1), anexos de evidências (v1.2), plano de ação e
+- Ideias para as próximas: histórico de alterações e comentários por item, anexos de evidências, plano de ação e
   matriz de risco (v1.3), relatório executivo (v2.0).
