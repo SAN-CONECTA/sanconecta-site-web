@@ -198,14 +198,19 @@ function ItemDrawer({ empId, item, data, raw, canEdit, email, onClose }) {
   )
 }
 
-export default function Itens({ empId, itens, canEdit, user, flt, setFlt, openId, setOpenId }) {
+export default function Itens({ empId, itens, canEdit, user, flt, setFlt, openId, setOpenId, area = null }) {
   const email = normEmail(user.email)
   const q = flt.q.trim().toLowerCase()
   const today = todayStr()
 
+  // Pilar escolhido em outra área (ao trocar de aba) é ignorado.
+  const pSel = flt.p && (!area || (PILLARS[Number(flt.p) - 1] || {}).a === area) ? flt.p : ''
+  const areasVisiveis = AREAS.filter((a) => !area || a.k === area)
+
   const rows = ITEMS.filter((it) => {
     const d = dataOf(itens, it.id)
-    if (flt.p && String(it.p) !== flt.p) return false
+    if (area && PILLARS[it.p - 1].a !== area) return false
+    if (pSel && String(it.p) !== pSel) return false
     if (flt.s && d.status !== flt.s) return false
     if (flt.r && rkKey(d.risk) !== flt.r) return false
     if (q && `${it.id} ${it.t} ${d.owner} ${d.findings}`.toLowerCase().indexOf(q) < 0) return false
@@ -217,9 +222,9 @@ export default function Itens({ empId, itens, canEdit, user, flt, setFlt, openId
   return (
     <div>
       <div className="dg-filters">
-        <select aria-label="Filtrar por pilar" value={flt.p} onChange={(e) => setFlt({ ...flt, p: e.target.value })}>
+        <select aria-label="Filtrar por pilar" value={pSel} onChange={(e) => setFlt({ ...flt, p: e.target.value })}>
           <option value="">Todos os pilares</option>
-          {AREAS.map((a) => (
+          {areasVisiveis.map((a) => (
             <optgroup key={a.k} label={a.l}>
               {PILLARS.filter((p) => p.a === a.k).map((p) => (
                 <option key={p.id} value={String(p.id)}>{`${pad2(p.id)} ${p.n}`}</option>
@@ -250,9 +255,9 @@ export default function Itens({ empId, itens, canEdit, user, flt, setFlt, openId
 
       {!rows.length && <div className="dg-empty">Nenhum item com esses filtros. Limpe a busca ou escolha outro status.</div>}
 
-      {AREAS.map((ar) => (
+      {areasVisiveis.map((ar) => (
         <section key={ar.k} aria-label={ar.l}>
-          {rows.some((it) => PILLARS[it.p - 1].a === ar.k) && <h2 className="dg-area">{ar.l}</h2>}
+          {!area && rows.some((it) => PILLARS[it.p - 1].a === ar.k) && <h2 className="dg-area">{ar.l}</h2>}
           {PILLARS.filter((p) => p.a === ar.k).map((p) => {
         const r = rows.filter((it) => it.p === p.id)
         if (!r.length) return null
