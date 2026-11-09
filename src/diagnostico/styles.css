@@ -242,3 +242,10 @@ td select { min-height: 34px; width: auto; }
   .dg-nav button[aria-current='page'] { border-bottom-color: var(--blue); }
   .dg-nav-csv { margin-top: 0; border-top: 0 !important; }
 }
+
+/* Administração SAN: linhas da lista de empresas */
+.dg-erow { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 16px; }
+.dg-erow strong { font-family: var(--font-serif); font-size: 17px; }
+.dg-erow p { margin: 2px 0 0; }
+.dg-erow-act { display: flex; flex-wrap: wrap; gap: 8px; }
+.dg-card .dg-card { box-shadow: none; margin: 12px 0 0; }

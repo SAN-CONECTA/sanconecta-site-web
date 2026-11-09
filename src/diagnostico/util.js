@@ -55,6 +55,7 @@ export function errMsg(e) {
 function parseHash() {
   const p = window.location.hash.replace(/^#\/?/, '').split('/').filter(Boolean)
   if (p[0] === 'e' && p[1]) return { name: 'empresa', id: p[1], tab: p[2] || 'painel' }
+  if (p[0] === 'usuarios') return { name: 'usuarios' }
   return { name: 'empresas' }
 }
 

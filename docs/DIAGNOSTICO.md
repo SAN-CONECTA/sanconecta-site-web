@@ -66,7 +66,7 @@ No Console (Firestore → Regras → Simulador de regras) ou no emulador, confir
 - Cliente da empresa A: lê os itens da A; **não** escreve na A; **não** lê nada da B; **não** cria empresa; **não** grava
   em `membros` nem em `staff` (nenhuma promoção por conta própria).
 - Usuário com e-mail **não verificado**: negado em tudo.
-- Qualquer usuário: **não** apaga empresa nem item.
+- Cliente: **não** apaga nada. Só a equipe SAN exclui, e apenas empresa já arquivada.
 - Administrador SAN: lê e escreve em todas as empresas e gere `membros` (só com `role` igual a `leitura`) e `staff`.
 
 ## Cuidados com os dados
@@ -86,5 +86,6 @@ No Console (Firestore → Regras → Simulador de regras) ou no emulador, confir
 - **v1.2** — Diagnóstico dividido em duas áreas: TI (pilares 1 a 5) e Gestão do Negócio (pilares 6 a 10, 11 itens com perguntas-chave: estratégia, finanças, comercial, operações, pessoas e conformidade). O produto passa a se chamar "Diagnóstico 360°". As regras aceitam ids 1.1 a 10.3: **publique as regras no console antes de publicar o código**.
 - **v1.2.1** — A versão aparece no rodapé do login e do sistema ("Versão 1.2.1 · data · código do commit"). O número vem do campo `version` do `package.json` (e do `package-lock.json`): ao fechar uma versão nova, altere os dois. A data e o código do commit são gravados sozinhos no build.
 - **v1.3.0** — Barra lateral na empresa: seletor de empresa (equipe SAN), Painel, Diagnóstico de TI, Gestão do Negócio, Empresa e acessos e Exportar CSV. No celular a barra vira uma faixa rolável no topo. Links antigos `#/e/<id>/itens` continuam funcionando.
+- **v1.4.0** — Área da equipe SAN com barra lateral: **Empresas** (criar, editar, arquivar e excluir definitivamente só empresa arquivada, com o nome digitado e CSV opcional antes) e **Usuários** (liberar e-mail de cliente em uma empresa, alterar a empresa, retirar o acesso, e gerir a equipe SAN). Exclusão de empresa apaga também os itens e os acessos dela. A conta de login do usuário não é apagada pelo sistema (só no console do Firebase, Authentication). **Regras novas: publique `firestore.rules` no console antes de publicar o código.**
 - Ideias para as próximas: histórico de alterações e comentários por item, anexos de evidências, plano de ação e
   matriz de risco (v1.3), relatório executivo (v2.0).

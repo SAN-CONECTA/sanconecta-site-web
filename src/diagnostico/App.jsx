@@ -2,7 +2,8 @@ import { signOut } from 'firebase/auth'
 import { auth, firebaseConfigured } from './firebase'
 import { Login, VerifyEmail } from './Auth'
 import { useSession } from './useSession'
-import { useRoute } from './util'
+import { normEmail, useRoute } from './util'
+import Admin from './Admin'
 import Empresas from './Empresas'
 import Empresa from './Empresa'
 import Versao from './Versao'
@@ -49,6 +50,8 @@ export default function App() {
       <main className="dg-main">
         {route.name === 'empresa' ? (
           <Empresa key={route.id} id={route.id} tab={route.tab} session={session} />
+        ) : session.staff ? (
+          <Admin view={route.name} email={normEmail(session.user.email)} />
         ) : (
           <Empresas key={`${session.user.uid}-${session.staff}`} session={session} />
         )}

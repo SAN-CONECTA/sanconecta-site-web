@@ -13,7 +13,7 @@ rules_version = '2';
 //   - Cliente só enxerga a empresa em que o e-mail dele consta em "membros".
 //   - Só administradores SAN criam empresas, liberam usuários, preenchem os itens e alteram a equipe SAN.
 //   - Cliente tem apenas leitura da própria empresa. Não existe perfil de edição para cliente.
-//   - Empresas e itens não podem ser apagados.
+//   - Empresas só são apagadas depois de arquivadas (e os itens delas junto); nunca por cliente.
 //   - O primeiro administrador SAN é criado à mão no console (staff/<email>), conforme docs/DIAGNOSTICO.md.
 
 service cloud.firestore {
@@ -85,8 +85,8 @@ service cloud.firestore {
         && request.resource.data.atualizadoEm == request.time
         && request.resource.data.atualizadoPor == me();
 
-      // Empresas não são apagadas: use "arquivada".
-      allow delete: if false;
+      // Só se apaga empresa que já foi arquivada (o primeiro passo é sempre arquivar).
+      allow delete: if isStaff() && resource.data.arquivada == true;
 
       // Itens do diagnóstico
       match /itens/{item} {
@@ -111,7 +111,9 @@ service cloud.firestore {
           && request.resource.data.updatedAt == request.time
           && request.resource.data.updatedBy == me();
 
-        allow delete: if false;
+        // Itens só podem ser apagados junto com a exclusão de uma empresa arquivada.
+        allow delete: if isStaff()
+          && get(/databases/$(database)/documents/empresas/$(emp)).data.arquivada == true;
       }
     }
 
