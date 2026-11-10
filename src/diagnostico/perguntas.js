@@ -826,10 +826,6 @@ export const ITEMS_RAW = [
             "t": "Quais sistemas operacionais estão instalados?"
           },
           {
-            "id": "q09",
-            "t": "Os sistemas operacionais ainda possuem suporte do fabricante?"
-          },
-          {
             "id": "q10",
             "t": "As atualizações de segurança são aplicadas centralmente?"
           },
@@ -997,10 +993,6 @@ export const ITEMS_RAW = [
           {
             "id": "q12",
             "t": "O sistema suporta o volume atual de operações?"
-          },
-          {
-            "id": "q13",
-            "t": "O sistema suporta o crescimento previsto?"
           }
         ]
       },
@@ -1447,10 +1439,6 @@ export const ITEMS_RAW = [
           {
             "id": "q12",
             "t": "Como os usuários e administradores acessam o ambiente?"
-          },
-          {
-            "id": "q13",
-            "t": "A autenticação multifator está habilitada?"
           },
           {
             "id": "q14",
@@ -2281,10 +2269,6 @@ export const ITEMS_RAW = [
             "t": "Existe inventário documentado de ativos?"
           },
           {
-            "id": "q03",
-            "t": "Existe diagrama atualizado da rede?"
-          },
-          {
             "id": "q04",
             "t": "Existe documentação dos servidores e máquinas virtuais?"
           },
@@ -2306,10 +2290,6 @@ export const ITEMS_RAW = [
           {
             "id": "q07",
             "t": "Existem procedimentos para backup e restauração?"
-          },
-          {
-            "id": "q08",
-            "t": "Existem procedimentos para resposta a incidentes?"
           },
           {
             "id": "q09",
@@ -2694,10 +2674,6 @@ export const ITEMS_RAW = [
           {
             "id": "q09",
             "t": "A equipe atual consegue suportar o crescimento?"
-          },
-          {
-            "id": "q10",
-            "t": "Quais processos dependem de trabalho manual?"
           },
           {
             "id": "q11",
@@ -3804,10 +3780,6 @@ export const ITEMS_RAW = [
         "t": "Automação e comunicação",
         "n": true,
         "q": [
-          {
-            "id": "q15",
-            "t": "Os processos dependem de planilhas ou controles manuais?"
-          },
           {
             "id": "q16",
             "t": "Os processos podem ser automatizados?"
