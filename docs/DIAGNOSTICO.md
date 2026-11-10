@@ -17,11 +17,11 @@ empresa nunca enxerga os dados de outra. É uma pasta do mesmo site, não um sub
 | Perfil | Onde fica | Pode |
 | --- | --- | --- |
 | Administrador SAN | coleção `staff` | Ver todas as empresas, criar empresas, liberar e remover usuários, gerir a equipe SAN, preencher os itens |
-| Cliente (leitura) | coleção `membros` (role `leitura`) | Só consultar a própria empresa |
+| Cliente | coleção `membros` (role `leitura`) | Consultar a própria empresa e gravar respostas e situação da evidência (v1.7) |
 
 ### Cadastro de usuários (fluxo)
 
-1. A SAN cria a empresa e, na aba **Empresa e acessos**, informa o e-mail do cliente (acesso de leitura).
+1. A SAN cria a empresa e, na aba **Empresa e acessos**, informa o e-mail do cliente (cliente).
 2. O sistema mostra uma mensagem pronta para enviar à pessoa. **Ele não envia e-mail de convite.**
 3. A pessoa abre `/diagnostico360/`, escolhe **Criar conta** com o mesmo e-mail e confirma o e-mail pelo link do Firebase.
 4. Ao entrar, ela vê só a empresa liberada. Criar conta sem convite não dá acesso a nenhum dado.
@@ -90,5 +90,6 @@ No Console (Firestore → Regras → Simulador de regras) ou no emulador, confir
 - **v1.4.1** — A ficha do item abre como janela no centro da tela (antes era um painel na lateral direita).
 - **v1.5.0** — Cada pergunta-guia tem o próprio campo de resposta na ficha do item (campo `respostas` no banco, chaves `r0`, `r1`… pela posição da pergunta). "Achados" virou "Achados gerais". O CSV ganhou a coluna "Respostas por pergunta" e a lista de itens mostra quantas perguntas já foram respondidas. **Perguntas novas só entram no fim da lista de um item** (a posição identifica a resposta). **Regras novas: publique `firestore.rules` no console ANTES de publicar o código; senão o Salvar falha em todos os itens.**
 - **v1.6.0** — Perguntas reestruturadas: 31 itens, 158 blocos temáticos e 704 perguntas (arquivo `src/diagnostico/perguntas.js`). Cada pergunta tem identificador fixo (`q01`…, nunca renumerar) e cada bloco também (`b1`…). A maturidade (escala 0 a 5 com os textos do anexo) é dada por bloco (campo `notas`); a do item é a média dos blocos. Blocos de levantamento de dados não têm nota. O CSV ganhou a maturidade por bloco. Respostas antigas (`r0`…) deixam de ser exibidas. **Regras novas: publique `firestore.rules` no console ANTES de publicar o código.**
+- **v1.7.0** — O usuário cliente vinculado à empresa passa a preencher as **respostas das perguntas e a situação da evidência** (nota de maturidade, risco, status, achados e recomendação seguem só da equipe SAN; empresa arquivada fica só leitura). Novo botão **Log de alterações** na barra lateral (só equipe SAN): cada gravação em item cria, no mesmo lote, um registro em `empresas/{id}/log` com e-mail, perfil, data/hora e o antes/depois de cada campo alterado; filtro por usuário e item e exportação em CSV. As regras exigem o registro junto de toda gravação e o tornam imutável; ele é apagado junto com a exclusão da empresa arquivada. Limite: o conteúdo do antes/depois é montado pelo navegador (sem servidor, plano Spark), então prova de autoria e horário é forte, mas o texto do registro não é verificado campo a campo. Não registra ainda ações administrativas (empresas e acessos). **Regras novas: publique `firestore.rules` no console ANTES de publicar o código.**
 - Ideias para as próximas: histórico de alterações e comentários por item, anexos de evidências, plano de ação e
   matriz de risco (v1.3), relatório executivo (v2.0).

@@ -2,7 +2,7 @@ import { AREAS, EVID, ITEMS, PILLARS, RISK, STATUS, evKey, labelOf, rkKey } from
 import { dataOf, fmtMat, matOf } from './calc'
 import { fmtD, fmtTs } from './util'
 
-function csvCell(v) {
+export function csvCell(v) {
   let s = String(v == null ? '' : v)
   if (/^[=+\-@\t\r]/.test(s)) s = `'${s}`
   return /[";\r\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s
@@ -42,12 +42,16 @@ export function exportCsv(emp, itens) {
       fmtTs(d.updatedAt),
     ]
   })
+  csvDownload(`diagnostico-360-${emp.nome}`, head, rows)
+}
+
+export function csvDownload(nome, head, rows) {
   const csv = `\uFEFF${[head, ...rows].map((r) => r.map(csvCell).join(';')).join('\r\n')}`
   const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }))
   const a = document.createElement('a')
-  const slug = String(emp.nome || 'empresa').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
+  const slug = String(nome || 'arquivo').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
   a.href = url
-  a.download = `diagnostico-360-ti-${slug || 'empresa'}.csv`
+  a.download = `${slug || 'arquivo'}.csv`
   document.body.appendChild(a)
   a.click()
   a.remove()

@@ -207,6 +207,9 @@ fieldset:disabled input, fieldset:disabled select, fieldset:disabled textarea { 
 
 /* tabelas e listas de equipe */
 .dg-tblwrap { overflow-x: auto; }
+.dg-log { min-width: 760px; font-size: 13px; }
+.dg-log td { vertical-align: top; }
+.dg-logv { white-space: pre-wrap; word-break: break-word; max-width: 280px; }
 table { border-collapse: collapse; width: 100%; min-width: 520px; }
 th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); vertical-align: middle; }
 th { font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); font-weight: 500; }

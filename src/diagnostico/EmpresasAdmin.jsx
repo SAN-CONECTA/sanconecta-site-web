@@ -80,8 +80,9 @@ const LOTE = 8
 
 async function excluirEmpresa(emp) {
   const itens = await getDocs(collection(db, 'empresas', emp.id, 'itens'))
+  const logs = await getDocs(collection(db, 'empresas', emp.id, 'log'))
   const membros = await getDocs(query(collection(db, 'membros'), where('empresaId', '==', emp.id)))
-  const refs = [...itens.docs.map((d) => d.ref), ...membros.docs.map((d) => d.ref), doc(db, 'empresas', emp.id)]
+  const refs = [...itens.docs.map((d) => d.ref), ...logs.docs.map((d) => d.ref), ...membros.docs.map((d) => d.ref), doc(db, 'empresas', emp.id)]
   for (let i = 0; i < refs.length; i += LOTE) {
     const batch = writeBatch(db)
     refs.slice(i, i + LOTE).forEach((r) => batch.delete(r))
@@ -125,7 +126,7 @@ function ExcluirEmpresa({ emp, onClose }) {
   return (
     <div className="dg-note dg-warn">
       <p>
-        <strong>Excluir definitivamente {emp.nome}?</strong> Isso apaga a empresa, todos os 31 itens preenchidos e os acessos
+        <strong>Excluir definitivamente {emp.nome}?</strong> Isso apaga a empresa, todos os 31 itens preenchidos, o log de alterações e os acessos
         dos clientes. Não há como desfazer e não existe cópia de segurança automática.
       </p>
       <p>
