@@ -108,7 +108,7 @@ function AcessosClientes({ email }) {
 
   return (
     <section className="dg-card">
-      <h2>Clientes com acesso de leitura</h2>
+      <h2>Clientes com acesso à empresa</h2>
       <p className="dg-muted">
         A pessoa cria a própria conta e senha na tela de login, usando o e-mail liberado aqui. Remover tira o acesso aos dados;
         a conta de login continua existindo e só o console do Firebase (Authentication) a apaga. Para trocar o e-mail de

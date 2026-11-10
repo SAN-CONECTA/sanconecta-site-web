@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { doc, serverTimestamp, setDoc } from 'firebase/firestore'
+import { collection, doc, serverTimestamp, writeBatch } from 'firebase/firestore'
 import { db } from './firebase'
 import { AREAS, EVID, ITEMS, MATURITY, PILLARS, pad2, RISK, STATUS, evKey, labelOf, mtKey, rkKey, stIdx } from './catalog'
 import { dataOf, fmtMat, matOf } from './calc'
@@ -25,7 +25,7 @@ function RiskPill({ k }) {
   )
 }
 
-function ItemDrawer({ empId, item, data, raw, canEdit, email, onClose }) {
+function ItemDrawer({ empId, item, data, raw, canEdit, canAnswer, email, onClose }) {
   const [form, setForm] = useState({
     status: data.status,
     risk: rkKey(data.risk),
@@ -55,12 +55,41 @@ function ItemDrawer({ empId, item, data, raw, canEdit, email, onClose }) {
     })
   const matAtual = matOf(item, { notas: form.notas, maturity: data.maturity })
 
+  // Lista o que mudou em relação ao que foi aberto (base do log de rastreio).
+  function mudancasDe() {
+    const out = []
+    const txt = (v) => (v === undefined || v === null ? '' : String(v))
+    const add = (c, de, para) => {
+      if (de !== para) out.push({ c, de, para })
+    }
+    if (canEdit) {
+      add('status', txt(data.status), form.status)
+      add('risk', rkKey(data.risk), form.risk)
+      add('owner', txt(data.owner), form.owner.trim())
+      add('due', txt(data.due), form.due)
+      add('findings', txt(data.findings), form.findings.trim())
+      add('evidence', txt(data.evidence), form.evidence.trim())
+      add('reco', txt(data.reco), form.reco.trim())
+      item.b.forEach((b) => {
+        if (b.n) add(`notas.${b.id}`, txt((data.notas || {})[b.id]), txt(form.notas[b.id]))
+      })
+    }
+    add('evidStatus', evKey(data.evidStatus), form.evidStatus)
+    item.q.forEach((q) => add(`respostas.${q.id}`, txt((data.respostas || {})[q.id]).trim(), String(form.respostas[q.id] || '').trim()))
+    return out
+  }
+
   async function save(e) {
     e.preventDefault()
-    if (!canEdit) return
+    if (!canAnswer) return
     setBusy(true)
     setErr('')
     try {
+      const mudancas = mudancasDe()
+      if (!mudancas.length) {
+        onClose()
+        return
+      }
       const respostas = {}
       item.q.forEach((q) => {
         const v = String(form.respostas[q.id] || '').trim()
@@ -71,29 +100,40 @@ function ItemDrawer({ empId, item, data, raw, canEdit, email, onClose }) {
         const v = form.notas[b.id]
         if (b.n && Number.isInteger(v) && v >= 0 && v <= 5) notas[b.id] = v
       })
-      await setDoc(doc(db, 'empresas', empId, 'itens', item.id), {
-        status: form.status,
-        risk: form.risk,
-        owner: form.owner.trim(),
-        due: form.due,
-        findings: form.findings.trim(),
-        evidence: form.evidence.trim(),
-        reco: form.reco.trim(),
-        maturity: mtKey(data.maturity),
-        evidStatus: form.evidStatus,
-        respostas,
-        notas,
-        updatedAt: serverTimestamp(),
-        updatedBy: email,
-      })
+      const logRef = doc(collection(db, 'empresas', empId, 'log'))
+      const itemRef = doc(db, 'empresas', empId, 'itens', item.id)
+      const batch = writeBatch(db)
+      if (canEdit) {
+        batch.set(itemRef, {
+          status: form.status,
+          risk: form.risk,
+          owner: form.owner.trim(),
+          due: form.due,
+          findings: form.findings.trim(),
+          evidence: form.evidence.trim(),
+          reco: form.reco.trim(),
+          maturity: mtKey(data.maturity),
+          evidStatus: form.evidStatus,
+          respostas,
+          notas,
+          logId: logRef.id,
+          updatedAt: serverTimestamp(),
+          updatedBy: email,
+        })
+      } else {
+        // Cliente: só respostas e situação da evidência. update (e não merge) para que respostas apagadas sumam.
+        const campos = { respostas, evidStatus: form.evidStatus, logId: logRef.id, updatedAt: serverTimestamp(), updatedBy: email }
+        if (raw) batch.update(itemRef, campos)
+        else batch.set(itemRef, campos)
+      }
+      batch.set(logRef, { item: item.id, email, papel: canEdit ? 'equipe' : 'cliente', quando: serverTimestamp(), mudancas })
+      await batch.commit()
       onClose()
     } catch (er) {
       setErr(errMsg(er))
       setBusy(false)
     }
   }
-
-  const dis = !canEdit
 
   return (
     <>
@@ -105,7 +145,13 @@ function ItemDrawer({ empId, item, data, raw, canEdit, email, onClose }) {
         </p>
         <h2 id="dg-drawer-title">{item.t}</h2>
         <p className="dg-desc">{item.d}</p>
-        {!canEdit && <p className="dg-warn">Você está no modo leitura. Só a equipe SAN edita os itens.</p>}
+        {!canEdit && canAnswer && (
+          <p className="dg-warn">
+            Você pode preencher as respostas e a situação da evidência. Nota de maturidade, risco, status e recomendação são da
+            equipe SAN. Cada gravação fica registrada com o seu e-mail, data e hora.
+          </p>
+        )}
+        {!canAnswer && <p className="dg-warn">Somente leitura.</p>}
         {changedByOther && (
           <p className="dg-warn">
             Outra pessoa alterou este item depois que você abriu. Feche e abra de novo para ver a versão atual. Se salvar
@@ -113,11 +159,11 @@ function ItemDrawer({ empId, item, data, raw, canEdit, email, onClose }) {
           </p>
         )}
         <form onSubmit={save}>
-          <fieldset disabled={dis}>
+          <fieldset>
             <div className="dg-two">
               <label className="dg-fld">
                 <span>Status da coleta</span>
-                <select value={form.status} onChange={set('status')}>
+                <select value={form.status} onChange={set('status')} disabled={!canEdit}>
                   {STATUS.map((s) => (
                     <option key={s.k} value={s.k}>{s.l}</option>
                   ))}
@@ -125,7 +171,7 @@ function ItemDrawer({ empId, item, data, raw, canEdit, email, onClose }) {
               </label>
               <label className="dg-fld">
                 <span>Nível de risco</span>
-                <select value={form.risk} onChange={set('risk')}>
+                <select value={form.risk} onChange={set('risk')} disabled={!canEdit}>
                   {RISK.map((r) => (
                     <option key={r.k} value={r.k}>{r.l}</option>
                   ))}
@@ -135,11 +181,11 @@ function ItemDrawer({ empId, item, data, raw, canEdit, email, onClose }) {
             <div className="dg-two">
               <label className="dg-fld">
                 <span>Responsável pela coleta</span>
-                <input value={form.owner} onChange={set('owner')} maxLength={80} />
+                <input value={form.owner} onChange={set('owner')} maxLength={80} disabled={!canEdit} />
               </label>
               <label className="dg-fld">
                 <span>Prazo</span>
-                <input type="date" value={form.due} onChange={set('due')} />
+                <input type="date" value={form.due} onChange={set('due')} disabled={!canEdit} />
               </label>
             </div>
             <div className="dg-qa">
@@ -164,7 +210,7 @@ function ItemDrawer({ empId, item, data, raw, canEdit, email, onClose }) {
                     {b.n ? (
                       <label className="dg-fld dg-nota">
                         <span>Maturidade do bloco</span>
-                        <select value={form.notas[b.id] === undefined ? '' : String(form.notas[b.id])} onChange={setNota(b.id)}>
+                        <select value={form.notas[b.id] === undefined ? '' : String(form.notas[b.id])} onChange={setNota(b.id)} disabled={!canEdit}>
                           <option value="">Não avaliado</option>
                           {MATURITY.map((m) => (
                             <option key={m.k} value={String(m.k)}>{m.l}</option>
@@ -186,6 +232,7 @@ function ItemDrawer({ empId, item, data, raw, canEdit, email, onClose }) {
                       <textarea
                         value={form.respostas[q.id] || ''}
                         onChange={setResp(q.id)}
+                        disabled={!canAnswer}
                         maxLength={2000}
                         placeholder="Resposta e evidência desta pergunta."
                       />
@@ -199,6 +246,7 @@ function ItemDrawer({ empId, item, data, raw, canEdit, email, onClose }) {
               <textarea
                 value={form.findings}
                 onChange={set('findings')}
+                disabled={!canEdit}
                 maxLength={4000}
                 placeholder="O que foi encontrado, com números e datas quando houver."
               />
@@ -209,7 +257,7 @@ function ItemDrawer({ empId, item, data, raw, canEdit, email, onClose }) {
             </p>
             <label className="dg-fld">
               <span>Situação da evidência</span>
-              <select value={form.evidStatus} onChange={set('evidStatus')}>
+              <select value={form.evidStatus} onChange={set('evidStatus')} disabled={!canAnswer}>
                 {EVID.map((e) => (
                   <option key={e.k} value={e.k}>{e.l}</option>
                 ))}
@@ -220,6 +268,7 @@ function ItemDrawer({ empId, item, data, raw, canEdit, email, onClose }) {
               <input
                 value={form.evidence}
                 onChange={set('evidence')}
+                disabled={!canEdit}
                 maxLength={300}
                 placeholder="Documento, entrevista, relatório ou console consultado"
               />
@@ -229,6 +278,7 @@ function ItemDrawer({ empId, item, data, raw, canEdit, email, onClose }) {
               <textarea
                 value={form.reco}
                 onChange={set('reco')}
+                disabled={!canEdit}
                 maxLength={4000}
                 placeholder="O que fazer a respeito e em que ordem."
               />
@@ -236,12 +286,12 @@ function ItemDrawer({ empId, item, data, raw, canEdit, email, onClose }) {
           </fieldset>
           <p className="dg-muted dg-small">Não registre senhas, chaves de acesso ou tokens. Descreva onde estão guardados.</p>
           <div className="dg-actions">
-            {canEdit && (
+            {canAnswer && (
               <button className="dg-btn dg-primary" type="submit" disabled={busy}>
                 {busy ? 'Salvando…' : 'Salvar'}
               </button>
             )}
-            <button className="dg-btn" type="button" onClick={onClose}>{canEdit ? 'Cancelar' : 'Fechar'}</button>
+            <button className="dg-btn" type="button" onClick={onClose}>{canAnswer ? 'Cancelar' : 'Fechar'}</button>
           </div>
           {err && <p className="dg-err" role="alert">{err}</p>}
         </form>
@@ -256,7 +306,7 @@ function ItemDrawer({ empId, item, data, raw, canEdit, email, onClose }) {
   )
 }
 
-export default function Itens({ empId, itens, canEdit, user, flt, setFlt, openId, setOpenId, area = null }) {
+export default function Itens({ empId, itens, canEdit, canAnswer, user, flt, setFlt, openId, setOpenId, area = null }) {
   const email = normEmail(user.email)
   const q = flt.q.trim().toLowerCase()
   const today = todayStr()
@@ -365,6 +415,7 @@ export default function Itens({ empId, itens, canEdit, user, flt, setFlt, openId
           data={dataOf(itens, openItem.id)}
           raw={itens && itens[openItem.id]}
           canEdit={canEdit}
+          canAnswer={canAnswer}
           email={email}
           onClose={() => setOpenId(null)}
         />

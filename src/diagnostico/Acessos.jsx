@@ -112,7 +112,7 @@ function Usuarios({ emp, email }) {
     )
   }, [emp.id])
 
-  // Clientes têm sempre perfil de leitura. Só a equipe SAN edita.
+  // Clientes têm o perfil único role=leitura: leem a empresa e gravam só respostas e situação da evidência.
   const grava = (mail) =>
     setDoc(doc(db, 'membros', `${emp.id}__${mail}`), {
       empresaId: emp.id,
@@ -166,7 +166,7 @@ function Usuarios({ emp, email }) {
       </p>
       <form onSubmit={add} className="dg-addrow">
         <label className="dg-fld">
-          <span>E-mail do usuário (acesso de leitura)</span>
+          <span>E-mail do usuário (cliente: lê e preenche respostas)</span>
           <input type="email" value={novo} onChange={(e) => setNovo(e.target.value)} />
         </label>
         <button className="dg-btn dg-primary" type="submit" disabled={busy}>Liberar acesso</button>
@@ -198,7 +198,7 @@ function Usuarios({ emp, email }) {
               {membros.map((m) => (
                 <tr key={m.id}>
                   <td>{m.email}</td>
-                  <td>Leitura</td>
+                  <td>Cliente</td>
                   <td className="dg-small dg-muted">{fmtTs(m.atualizadoEm)}</td>
                   <td>
                     {confirmDel === m.id ? (
@@ -226,7 +226,7 @@ export default function Acessos({ emp, staff, email }) {
       <section className="dg-card">
         <h2>Seu acesso</h2>
         <p>
-          Perfil nesta empresa: <strong>Leitura</strong>.
+          Perfil nesta empresa: <strong>Cliente</strong> (preenche as respostas).
         </p>
         <p className="dg-muted">
           Somente a SAN Conecta libera ou remove usuários e preenche os dados da empresa. Para incluir outra pessoa, peça à
