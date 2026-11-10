@@ -43,22 +43,67 @@ service cloud.firestore {
       return v is string && v.size() <= max;
     }
 
-    // Respostas por pergunta-guia (v1.5): mapa com chaves r0..r11 (posição da pergunta no item), texto até 2000.
+    // Respostas por pergunta (v1.6): chaves fixas q01..q40, texto até 2000. Notas de maturidade por bloco: chaves b1..b10, inteiro 0 a 5.
     function respOk(r) {
       return r is map
-        && r.keys().hasOnly(['r0','r1','r2','r3','r4','r5','r6','r7','r8','r9','r10','r11'])
-        && (!('r0' in r) || shortStr(r['r0'], 2000))
-        && (!('r1' in r) || shortStr(r['r1'], 2000))
-        && (!('r2' in r) || shortStr(r['r2'], 2000))
-        && (!('r3' in r) || shortStr(r['r3'], 2000))
-        && (!('r4' in r) || shortStr(r['r4'], 2000))
-        && (!('r5' in r) || shortStr(r['r5'], 2000))
-        && (!('r6' in r) || shortStr(r['r6'], 2000))
-        && (!('r7' in r) || shortStr(r['r7'], 2000))
-        && (!('r8' in r) || shortStr(r['r8'], 2000))
-        && (!('r9' in r) || shortStr(r['r9'], 2000))
-        && (!('r10' in r) || shortStr(r['r10'], 2000))
-        && (!('r11' in r) || shortStr(r['r11'], 2000));
+        && r.keys().hasOnly(['q01','q02','q03','q04','q05','q06','q07','q08','q09','q10','q11','q12','q13','q14','q15','q16','q17','q18','q19','q20','q21','q22','q23','q24','q25','q26','q27','q28','q29','q30','q31','q32','q33','q34','q35','q36','q37','q38','q39','q40'])
+        && (!('q01' in r) || shortStr(r['q01'], 2000))
+        && (!('q02' in r) || shortStr(r['q02'], 2000))
+        && (!('q03' in r) || shortStr(r['q03'], 2000))
+        && (!('q04' in r) || shortStr(r['q04'], 2000))
+        && (!('q05' in r) || shortStr(r['q05'], 2000))
+        && (!('q06' in r) || shortStr(r['q06'], 2000))
+        && (!('q07' in r) || shortStr(r['q07'], 2000))
+        && (!('q08' in r) || shortStr(r['q08'], 2000))
+        && (!('q09' in r) || shortStr(r['q09'], 2000))
+        && (!('q10' in r) || shortStr(r['q10'], 2000))
+        && (!('q11' in r) || shortStr(r['q11'], 2000))
+        && (!('q12' in r) || shortStr(r['q12'], 2000))
+        && (!('q13' in r) || shortStr(r['q13'], 2000))
+        && (!('q14' in r) || shortStr(r['q14'], 2000))
+        && (!('q15' in r) || shortStr(r['q15'], 2000))
+        && (!('q16' in r) || shortStr(r['q16'], 2000))
+        && (!('q17' in r) || shortStr(r['q17'], 2000))
+        && (!('q18' in r) || shortStr(r['q18'], 2000))
+        && (!('q19' in r) || shortStr(r['q19'], 2000))
+        && (!('q20' in r) || shortStr(r['q20'], 2000))
+        && (!('q21' in r) || shortStr(r['q21'], 2000))
+        && (!('q22' in r) || shortStr(r['q22'], 2000))
+        && (!('q23' in r) || shortStr(r['q23'], 2000))
+        && (!('q24' in r) || shortStr(r['q24'], 2000))
+        && (!('q25' in r) || shortStr(r['q25'], 2000))
+        && (!('q26' in r) || shortStr(r['q26'], 2000))
+        && (!('q27' in r) || shortStr(r['q27'], 2000))
+        && (!('q28' in r) || shortStr(r['q28'], 2000))
+        && (!('q29' in r) || shortStr(r['q29'], 2000))
+        && (!('q30' in r) || shortStr(r['q30'], 2000))
+        && (!('q31' in r) || shortStr(r['q31'], 2000))
+        && (!('q32' in r) || shortStr(r['q32'], 2000))
+        && (!('q33' in r) || shortStr(r['q33'], 2000))
+        && (!('q34' in r) || shortStr(r['q34'], 2000))
+        && (!('q35' in r) || shortStr(r['q35'], 2000))
+        && (!('q36' in r) || shortStr(r['q36'], 2000))
+        && (!('q37' in r) || shortStr(r['q37'], 2000))
+        && (!('q38' in r) || shortStr(r['q38'], 2000))
+        && (!('q39' in r) || shortStr(r['q39'], 2000))
+        && (!('q40' in r) || shortStr(r['q40'], 2000));
+    }
+    function notaOk(n, k) {
+      return !(k in n) || (n[k] is int && n[k] >= 0 && n[k] <= 5);
+    }
+    function notasOk(n) {
+      return n is map
+        && n.keys().hasOnly(['b1','b2','b3','b4','b5','b6','b7','b8','b9','b10'])
+        && notaOk(n, 'b1')
+        && notaOk(n, 'b2')
+        && notaOk(n, 'b3')
+        && notaOk(n, 'b4')
+        && notaOk(n, 'b5')
+        && notaOk(n, 'b6')
+        && notaOk(n, 'b7')
+        && notaOk(n, 'b8')
+        && notaOk(n, 'b9')
+        && notaOk(n, 'b10');
     }
 
     // Equipe SAN
@@ -112,7 +157,7 @@ service cloud.firestore {
 
         allow create, update: if isStaff()
           && item.matches('^([1-5]\\.[1-5]|([6-9]|10)\\.[1-3])$')
-          && request.resource.data.keys().hasOnly(['status', 'risk', 'owner', 'due', 'findings', 'evidence', 'reco', 'updatedAt', 'updatedBy', 'maturity', 'evidStatus', 'respostas'])
+          && request.resource.data.keys().hasOnly(['status', 'risk', 'owner', 'due', 'findings', 'evidence', 'reco', 'updatedAt', 'updatedBy', 'maturity', 'evidStatus', 'respostas', 'notas'])
           && request.resource.data.keys().hasAll(['status', 'risk', 'owner', 'due', 'findings', 'evidence', 'reco', 'updatedAt', 'updatedBy'])
           && request.resource.data.status in ['nao_iniciado', 'coleta', 'analise', 'concluido']
           && request.resource.data.risk in ['sem', 'baixo', 'medio', 'alto', 'critico']
@@ -127,6 +172,7 @@ service cloud.firestore {
           && (!('evidStatus' in request.resource.data)
               || request.resource.data.evidStatus in ['nao_solicitada', 'solicitada', 'parcial', 'recebida', 'nao_recebida', 'nao_aplica'])
           && (!('respostas' in request.resource.data) || respOk(request.resource.data.respostas))
+          && (!('notas' in request.resource.data) || notasOk(request.resource.data.notas))
           && request.resource.data.updatedAt == request.time
           && request.resource.data.updatedBy == me();
 
