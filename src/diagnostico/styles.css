@@ -257,4 +257,15 @@ td select { min-height: 34px; width: auto; }
 .dg-qa h3 { margin: 0 0 8px; font-family: var(--font-sans); font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
 .dg-q { margin-bottom: 12px; }
 .dg-q > span { font-weight: 600; }
+.dg-qt { white-space: pre-line; }
+.dg-blk { border-top: 1px solid var(--line, #d8d8d8); padding-top: 12px; margin-top: 14px; }
+.dg-blk-h { display: flex; justify-content: space-between; align-items: flex-end; gap: 12px; flex-wrap: wrap; margin-bottom: 8px; }
+.dg-blk-h h4 { margin: 0; font-size: 15px; flex: 1 1 240px; }
+.dg-nota { min-width: 200px; margin: 0; }
+.dg-scale { margin: 0 0 8px; font-size: 13px; }
+.dg-scale summary { cursor: pointer; font-weight: 600; }
+.dg-scale dl { margin: 8px 0 0; }
+.dg-scale dt { font-weight: 700; margin-top: 6px; }
+.dg-scale dd { margin: 0; color: var(--muted); }
+.dg-mat { margin: 4px 0 12px; }
 .dg-q textarea { min-height: 72px; background: var(--surface); }

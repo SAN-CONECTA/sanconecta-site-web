@@ -1,5 +1,5 @@
-import { AREAS, EVID, ITEMS, PILLARS, RISK, STATUS, evKey, labelOf, mtKey, rkKey } from './catalog'
-import { dataOf } from './calc'
+import { AREAS, EVID, ITEMS, PILLARS, RISK, STATUS, evKey, labelOf, rkKey } from './catalog'
+import { dataOf, fmtMat, matOf } from './calc'
 import { fmtD, fmtTs } from './util'
 
 function csvCell(v) {
@@ -9,7 +9,7 @@ function csvCell(v) {
 }
 
 export function exportCsv(emp, itens) {
-  const head = ['Área', 'Pilar', 'Código', 'Item', 'Status', 'Risco', 'Responsável', 'Prazo', 'Achados gerais', 'Respostas por pergunta', 'Maturidade (0-5)', 'Situação da evidência', 'Fonte da evidência', 'Recomendação', 'Atualizado em']
+  const head = ['Área', 'Pilar', 'Código', 'Item', 'Status', 'Risco', 'Responsável', 'Prazo', 'Achados gerais', 'Respostas por pergunta', 'Maturidade do item (média 0-5)', 'Maturidade por bloco', 'Situação da evidência', 'Fonte da evidência', 'Recomendação', 'Atualizado em']
   const rows = ITEMS.map((it) => {
     const d = dataOf(itens, it.id)
     return [
@@ -22,11 +22,20 @@ export function exportCsv(emp, itens) {
       d.owner,
       fmtD(d.due),
       d.findings,
-      it.q
-        .map((q, i) => ((d.respostas || {})[`r${i}`] ? `${i + 1}) ${q} ${(d.respostas || {})[`r${i}`]}` : ''))
+      it.b
+        .map((b) =>
+          b.q
+            .map((q, i) => ((d.respostas || {})[q.id] ? `${b.id}.${i + 1}) ${q.t.split('\n')[0]} ${(d.respostas || {})[q.id]}` : ''))
+            .filter(Boolean)
+            .join('\n'),
+        )
         .filter(Boolean)
         .join('\n'),
-      mtKey(d.maturity) === null ? '' : String(d.maturity),
+      fmtMat(matOf(it, d)),
+      it.b
+        .filter((b) => b.n && Number.isInteger((d.notas || {})[b.id]))
+        .map((b) => `${b.t}: ${d.notas[b.id]}`)
+        .join('\n'),
       labelOf(EVID, evKey(d.evidStatus)),
       d.evidence,
       d.reco,
