@@ -19,32 +19,32 @@ export default function Footer() {
                 TI 360
               </span>
             </a>
-            <p className="text-[13px] text-white/40 leading-relaxed max-w-[320px]">
-              Unidade de consultoria estratégica em tecnologia da SAN Tecnologia. Atendimento independente em Sinop/MT e região.
+            <p className="text-[13px] text-white/50 leading-relaxed max-w-[340px]">
+              Tecnologia e inovação sustentando o crescimento de Negócios.
+            </p>
+            <p className="text-[12px] text-white/35 leading-relaxed max-w-[340px] mt-3 italic">
+              Porque, para nós, não é sobre vender tecnologia. É sobre o que o seu negócio pode conquistar com ela.
             </p>
           </div>
 
           {/* Portfólio col */}
           <div>
-            <h5 className="text-[12px] font-bold tracking-[0.15em] uppercase text-[#1e5bff]/80 mb-4">Portfólio</h5>
+            <h5 className="text-[12px] font-bold tracking-[0.15em] uppercase text-[#1e5bff]/80 mb-4">Portfólio TI 360</h5>
             <div className="flex flex-col gap-2.5">
               <a href="#frentes" className="text-[14px] text-white/55 hover:text-white transition-colors duration-200">
-                Frente 01 · Diagnóstico
+                01 · Diagnóstico Tecnológico
               </a>
               <a href="#frentes" className="text-[14px] text-white/55 hover:text-white transition-colors duration-200">
-                Frente 02 · Proteção
+                02 · Proteção e Continuidade
               </a>
               <a href="#frentes" className="text-[14px] text-white/55 hover:text-white transition-colors duration-200">
-                Frente 03 · Eficiência
+                03 · Eficiência Operacional
               </a>
               <a href="#frentes" className="text-[14px] text-white/55 hover:text-white transition-colors duration-200">
-                Frente 04 · Organização
+                04 · Organização e Controle
               </a>
               <a href="#frentes" className="text-[14px] text-white/55 hover:text-white transition-colors duration-200">
-                Frente 05 · Decisões
-              </a>
-              <a href="#frentes" className="text-[14px] text-white/55 hover:text-white transition-colors duration-200">
-                Frente 06 · Inovação
+                05 · Consultoria Tecnológica
               </a>
             </div>
           </div>
@@ -68,7 +68,7 @@ export default function Footer() {
                 Diagnóstico 360° de TI
               </a>
               <p className="text-[14px] text-white/35">Sinop · Mato Grosso · Brasil</p>
-              <p className="text-[12px] text-white/25 mt-3">Uma unidade da SAN Tecnologia · desde 2005</p>
+              <p className="text-[12px] text-white/25 mt-3">SAN Conecta · desde 2009</p>
             </div>
           </div>
         </div>
@@ -78,7 +78,7 @@ export default function Footer() {
           <p className="text-[13px] text-white/30">
             © {year} SAN Conecta. Todos os direitos reservados.
           </p>
-          <p className="text-[13px] text-white/20">SAN Tecnologia · Sinop / MT</p>
+          <p className="text-[13px] text-white/20">Sinop · Mato Grosso · Brasil</p>
         </div>
       </div>
     </footer>

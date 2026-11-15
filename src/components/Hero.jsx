@@ -14,10 +14,10 @@ export default function Hero() {
       id="top"
       className="relative min-h-[90vh] flex items-center overflow-hidden"
       style={{
-        background: 'radial-gradient(ellipse 80% 60% at 50% -10%, rgba(31,95,176,0.35) 0%, transparent 70%), #07142e',
+        background: 'radial-gradient(ellipse 80% 60% at 50% -10%, rgba(3,58,202,0.35) 0%, transparent 70%), #07142e',
       }}
     >
-      {/* Background watermark — logo 3D sutil */}
+      {/* Watermark 3D sutil */}
       <div
         className="absolute inset-0 pointer-events-none select-none"
         aria-hidden="true"
@@ -43,16 +43,16 @@ export default function Hero() {
       <div className="max-w-[1200px] mx-auto px-6 py-24 w-full grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-8 items-center">
         {/* Text content */}
         <div className="animate-rise" style={{ animationDelay: '0.1s' }}>
-          <h1 className="text-[clamp(32px,5.4vw,64px)] font-semibold text-white mb-6 leading-[1.1]">
+          <h1 className="text-[clamp(32px,5.4vw,60px)] font-semibold text-white mb-6 leading-[1.1]">
             Tecnologia e inovação sustentando o{' '}
-            <em className="not-italic text-transparent bg-clip-text bg-gradient-to-r from-[#1e5bff] to-[#033aca]">
-              crescimento do seu negócio
+            <em className="not-italic text-transparent bg-clip-text bg-gradient-to-r from-[#4a7dff] to-[#1e5bff]">
+              crescimento de Negócios
             </em>
             .
           </h1>
 
-          <p className="text-[17px] text-white/65 leading-relaxed mb-8 max-w-[520px]">
-            A SAN Conecta é a unidade de consultoria estratégica em tecnologia da SAN Tecnologia. Atuamos de forma independente para que empresas cresçam com continuidade, eficiência e segurança nas decisões.
+          <p className="text-[17px] text-white/70 leading-relaxed mb-8 max-w-[540px]">
+            Porque, para nós, <strong className="text-white font-semibold">não é sobre vender tecnologia</strong>. É sobre o que o seu negócio <strong className="text-white font-semibold">pode conquistar com ela</strong>.
           </p>
 
           <div className="flex flex-wrap items-center gap-3">
@@ -77,22 +77,22 @@ export default function Hero() {
           <div className="mt-14 pt-8 border-t border-white/10 flex flex-wrap gap-x-10 gap-y-4">
             <div>
               <div className="font-['Fraunces',Georgia,serif] italic font-semibold text-[2rem] text-[#1e5bff] leading-none tabular-nums">
-                21<span className="text-base">+</span>
+                2009
               </div>
-              <div className="text-[11px] text-white/60 tracking-[0.14em] uppercase mt-1.5">anos de atuação</div>
+              <div className="text-[11px] text-white/60 tracking-[0.14em] uppercase mt-1.5">início da trajetória</div>
             </div>
             <div>
-              <div className="font-['Fraunces',Georgia,serif] italic font-semibold text-[2rem] text-[#1e5bff] leading-none tabular-nums">06</div>
-              <div className="text-[11px] text-white/60 tracking-[0.14em] uppercase mt-1.5">frentes estratégicas</div>
+              <div className="font-['Fraunces',Georgia,serif] italic font-semibold text-[2rem] text-[#1e5bff] leading-none tabular-nums">05</div>
+              <div className="text-[11px] text-white/60 tracking-[0.14em] uppercase mt-1.5">frentes do TI 360</div>
             </div>
             <div>
-              <div className="font-['Fraunces',Georgia,serif] italic font-semibold text-[2rem] text-[#1e5bff] leading-none tabular-nums">18</div>
+              <div className="font-['Fraunces',Georgia,serif] italic font-semibold text-[2rem] text-[#1e5bff] leading-none tabular-nums">15</div>
               <div className="text-[11px] text-white/60 tracking-[0.14em] uppercase mt-1.5">soluções no portfólio</div>
             </div>
           </div>
         </div>
 
-        {/* Diagrama TI 360 — 6 frentes orbitando o core */}
+        {/* Diagrama TI 360 */}
         <div
           className="relative flex items-center justify-center animate-rise"
           style={{ animationDelay: '0.25s' }}

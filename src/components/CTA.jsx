@@ -103,31 +103,37 @@ export default function CTA() {
                 Vamos conversar
               </span>
 
-              <h2 className="text-[clamp(24px,3vw,38px)] font-semibold text-white mb-4 leading-tight">
-                Pronto para o{' '}
-                <em className="not-italic text-transparent bg-clip-text bg-gradient-to-r from-[#1e5bff] to-[#033aca]">
-                  próximo passo
+              <h2 className="text-[clamp(24px,3vw,36px)] font-semibold text-white mb-5 leading-tight">
+                Sobre o{' '}
+                <em className="not-italic text-transparent bg-clip-text bg-gradient-to-r from-[#1e5bff] to-[#4a7dff]">
+                  futuro do seu negócio
                 </em>
                 ?
               </h2>
 
-              <p className="text-white/50 text-[15px] leading-relaxed mb-8">
-                Começamos pelo seu contexto, não por nossa oferta. Conte onde a tecnologia pode fortalecer seu negócio e vamos construir uma proposta sob medida.
-              </p>
+              <div className="space-y-3 text-white/70 text-[14.5px] leading-relaxed mb-8">
+                <p>Cada empresa possui desafios e oportunidades que merecem ser compreendidos.</p>
+                <p>A SAN Conecta está preparada para contribuir com soluções de tecnologia e inovação <strong className="text-white font-semibold">alinhadas às prioridades</strong> da sua organização.</p>
+              </div>
 
-              <div className="flex flex-col gap-3 text-[14px] text-white/40">
-                <div className="flex items-center gap-2.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#1e5bff]/70 flex-shrink-0" />
-                  Resposta em até 2 horas úteis
-                </div>
-                <div className="flex items-center gap-2.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#1e5bff]/70 flex-shrink-0" />
-                  Primeira conversa sem compromisso
-                </div>
-                <div className="flex items-center gap-2.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#1e5bff]/70 flex-shrink-0" />
-                  Atendimento local em Sinop / MT
-                </div>
+              <div className="grid grid-cols-2 gap-3 mb-6">
+                {[
+                  { icon: (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></svg>), label: 'Operações mais seguras' },
+                  { icon: (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3" /><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" /></svg>), label: 'Maior eficiência' },
+                  { icon: (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 11l3 3 8-8" /><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" /></svg>), label: 'Melhores decisões' },
+                  { icon: (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21V9l6-3v15" /><path d="M9 14h6" /></svg>), label: 'Novas oportunidades' },
+                ].map((p) => (
+                  <div key={p.label} className="flex items-center gap-2.5 p-2.5 rounded-lg bg-white/[0.03] border border-white/10">
+                    <span className="flex-shrink-0 w-7 h-7 rounded-md bg-[#033aca]/15 text-[#4a7dff] flex items-center justify-center">
+                      <span className="w-4 h-4 block">{p.icon}</span>
+                    </span>
+                    <span className="text-white/85 text-[0.8rem] font-medium leading-tight">{p.label}</span>
+                  </div>
+                ))}
+              </div>
+
+              <div className="text-[12px] text-white/40 pt-4 border-t border-white/[0.06]">
+                Atendimento local em Sinop / MT · Resposta em até 2 horas úteis
               </div>
             </div>
 
