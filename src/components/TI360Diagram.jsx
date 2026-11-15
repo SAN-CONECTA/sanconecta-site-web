@@ -145,18 +145,18 @@ function Node({ frente }) {
   return (
     <g>
       {/* Glow sutil */}
-      <circle cx={pos.x} cy={pos.y} r={NODE_R + 8} fill="rgba(212,169,58,0.08)" />
+      <circle cx={pos.x} cy={pos.y} r={NODE_R + 8} fill="rgba(3,58,202,0.08)" />
       {/* Node circle */}
       <circle
         cx={pos.x}
         cy={pos.y}
         r={NODE_R}
         fill="url(#nodeGrad)"
-        stroke="rgba(212,169,58,0.5)"
+        stroke="rgba(3,58,202,0.5)"
         strokeWidth="1.5"
       />
       {/* Icon centrado no node (ícones são 34x34, centraliza em -17 do centro) */}
-      <g transform={`translate(${pos.x - 17}, ${pos.y - 17})`} color="#f0c75c">
+      <g transform={`translate(${pos.x - 17}, ${pos.y - 17})`} color="#1e5bff">
         {frente.icon}
       </g>
       {/* Number */}
@@ -168,7 +168,7 @@ function Node({ frente }) {
         fontStyle="italic"
         fontWeight="600"
         fontSize="38"
-        fill="#f0c75c"
+        fill="#1e5bff"
       >
         {frente.num}
       </text>
@@ -256,7 +256,7 @@ export default function TI360Diagram() {
               cy={CENTER.y}
               r={CORE_R}
               fill="url(#coreGrad)"
-              stroke="rgba(212,169,58,0.4)"
+              stroke="rgba(3,58,202,0.4)"
               strokeWidth="2"
             />
           </g>
@@ -270,7 +270,7 @@ export default function TI360Diagram() {
             fill="#ffffff"
             letterSpacing="-0.02em"
           >
-            TI <tspan fill="#f0c75c">360</tspan>
+            TI <tspan fill="#1e5bff">360</tspan>
           </text>
 
           {/* 6 Nodes */}
@@ -283,10 +283,10 @@ export default function TI360Diagram() {
       {/* Mobile: lista empilhada com ícones (SVG não funciona bem em telas estreitas) */}
       <div className="md:hidden">
         <div className="relative mx-auto w-32 h-32 mb-8">
-          <div className="absolute inset-0 rounded-full bg-gradient-to-br from-[#1f5fb0]/80 to-[#07142e] border-2 border-[#d4a93a]/40 shadow-[0_0_40px_rgba(212,169,58,0.2)]" />
+          <div className="absolute inset-0 rounded-full bg-gradient-to-br from-[#1f5fb0]/80 to-[#07142e] border-2 border-[#033aca]/40 shadow-[0_0_40px_rgba(3,58,202,0.2)]" />
           <div className="absolute inset-0 flex items-center justify-center">
             <span className="font-['Fraunces',Georgia,serif] font-bold text-white text-2xl leading-none">
-              TI<span className="text-[#f0c75c]"> 360</span>
+              TI<span className="text-[#1e5bff]"> 360</span>
             </span>
           </div>
         </div>
@@ -296,12 +296,12 @@ export default function TI360Diagram() {
               key={f.num}
               className="flex items-center gap-4 p-3.5 rounded-2xl bg-white/[0.03] border border-white/10"
             >
-              <div className="relative flex-shrink-0 w-12 h-12 rounded-full bg-gradient-to-br from-[#112a55] to-[#0a1c3a] border border-[#d4a93a]/40 flex items-center justify-center">
+              <div className="relative flex-shrink-0 w-12 h-12 rounded-full bg-gradient-to-br from-[#112a55] to-[#0a1c3a] border border-[#033aca]/40 flex items-center justify-center">
                 <svg
                   viewBox="0 0 34 34"
                   width="22"
                   height="22"
-                  style={{ color: '#f0c75c' }}
+                  style={{ color: '#1e5bff' }}
                   aria-hidden="true"
                 >
                   {f.icon}
@@ -309,7 +309,7 @@ export default function TI360Diagram() {
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-baseline gap-2">
-                  <span className="font-['Fraunces',Georgia,serif] italic font-semibold text-[#f0c75c] text-xl leading-none">
+                  <span className="font-['Fraunces',Georgia,serif] italic font-semibold text-[#1e5bff] text-xl leading-none">
                     {f.num}
                   </span>
                   <span className="text-white font-semibold text-[0.95rem] leading-tight">

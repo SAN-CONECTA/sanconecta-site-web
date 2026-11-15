@@ -2,20 +2,38 @@
 <html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/jpeg" href="/favicon.jpg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#0a1c3a" />
-    <meta name="description" content="SAN Conecta — consultoria independente em TI estratégica. Portfólio TI 360: 6 frentes e 18 soluções que apoiam empresas a crescerem com continuidade, eficiência e segurança nas decisões. Sinop/MT." />
-    <meta property="og:title" content="SAN Conecta — Tecnologia e Inovação sustentando o crescimento de Negócios" />
-    <meta property="og:description" content="Consultoria independente em TI estratégica. Portfólio TI 360: 6 frentes, 18 soluções sob medida para o seu negócio." />
-    <meta property="og:type" content="website" />
+    <meta name="theme-color" content="#07142e" />
+
+    <!-- Favicons / app icons -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+
+    <!-- Primary meta -->
     <title>SAN Conecta — TI 360</title>
+    <meta name="description" content="SAN Conecta — consultoria independente em TI estratégica. Portfólio TI 360: 6 frentes e 18 soluções que apoiam empresas a crescerem com continuidade, eficiência e segurança nas decisões. Sinop/MT." />
+
+    <!-- Open Graph / WhatsApp / LinkedIn -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="SAN Conecta — Tecnologia e inovação sustentando o crescimento de Negócios" />
+    <meta property="og:description" content="Consultoria independente em TI estratégica. Portfólio TI 360: 6 frentes, 18 soluções sob medida para o seu negócio." />
+    <meta property="og:image" content="https://sanconecta.com/assets/og-image.jpg" />
+    <meta property="og:url" content="https://sanconecta.com/" />
+    <meta property="og:site_name" content="SAN Conecta" />
+    <meta property="og:locale" content="pt_BR" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="SAN Conecta — TI 360" />
+    <meta name="twitter:description" content="Consultoria independente em TI estratégica. Portfólio TI 360: 6 frentes, 18 soluções." />
+    <meta name="twitter:image" content="https://sanconecta.com/assets/og-image.jpg" />
+
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
     <script>
-      // Captura erros ANTES do React montar. Se der erro no load do módulo,
-      // mostra na tela em vez de deixar o #root vazio.
+      // Captura erros ANTES do React montar.
       (function () {
         function render(title, msg, stack) {
           var root = document.getElementById('root');
@@ -27,7 +45,7 @@
                 '<h1 style="font-family:Georgia,serif;font-size:24px;color:#fff;margin:0 0 16px;font-weight:600">' + title + '</h1>' +
                 '<p style="color:rgba(233,238,247,.65);margin:0 0 16px">' + msg + '</p>' +
                 (stack ? '<pre style="background:rgba(0,0,0,.4);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:16px;overflow:auto;white-space:pre-wrap;word-break:break-word;color:rgba(233,238,247,.9)">' + stack + '</pre>' : '') +
-                '<a href="https://wa.me/5566996440184" style="display:inline-block;margin-top:24px;padding:12px 22px;background:#d4a93a;color:#07142e;border-radius:10px;font-weight:700;text-decoration:none;font-family:system-ui,sans-serif">Falar com especialista</a>' +
+                '<a href="https://wa.me/5566996440184" style="display:inline-block;margin-top:24px;padding:12px 22px;background:#033aca;color:#fff;border-radius:10px;font-weight:700;text-decoration:none;font-family:system-ui,sans-serif">Falar com especialista</a>' +
               '</div>' +
             '</div>';
         }
@@ -48,14 +66,12 @@
           var stack = reason && reason.stack ? escape(reason.stack) : '';
           render('Unhandled promise rejection', msg, stack);
         });
-        // Fallback: se depois de 8s o #root ainda estiver vazio,
-        // é porque o módulo nem carregou.
         setTimeout(function () {
           var root = document.getElementById('root');
           if (root && !root.children.length) {
             render(
               'O React nao carregou',
-              'O script de inicializacao foi referenciado mas nao produziu nenhum conteudo em 8s. Normalmente e um bundle .js que nao baixou (404) ou um erro silencioso no load do modulo. Abra o DevTools (F12) &rarr; aba Network, recarregue e procure requisicoes em vermelho.',
+              'O script de inicializacao foi referenciado mas nao produziu nenhum conteudo em 8s. Abra o DevTools (F12) &rarr; aba Network, recarregue e procure requisicoes em vermelho.',
               ''
             );
           }

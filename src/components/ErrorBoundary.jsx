@@ -63,7 +63,7 @@ export default class ErrorBoundary extends Component {
             <details open style={{ marginBottom: 24 }}>
               <summary style={{
                 cursor: 'pointer',
-                color: '#f0c75c',
+                color: '#1e5bff',
                 fontWeight: 700,
                 marginBottom: 10,
               }}>Stack do erro</summary>
@@ -82,7 +82,7 @@ export default class ErrorBoundary extends Component {
               <details open>
                 <summary style={{
                   cursor: 'pointer',
-                  color: '#f0c75c',
+                  color: '#1e5bff',
                   fontWeight: 700,
                   marginBottom: 10,
                 }}>Component stack (qual componente React falhou)</summary>
@@ -104,7 +104,7 @@ export default class ErrorBoundary extends Component {
                 display: 'inline-block',
                 marginTop: 32,
                 padding: '12px 22px',
-                background: '#d4a93a',
+                background: '#033aca',
                 color: '#07142e',
                 borderRadius: 10,
                 fontWeight: 700,

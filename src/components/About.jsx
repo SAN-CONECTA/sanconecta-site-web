@@ -10,14 +10,14 @@ export default function About() {
   return (
     <section id="sobre" className="relative py-24 lg:py-32 bg-[#0a1c3a]">
       <div className="max-w-[1200px] mx-auto px-6">
-        <span className="inline-flex items-center gap-2.5 text-xs font-bold text-[#f0c75c] tracking-[0.22em] uppercase mb-5">
-          <span className="w-7 h-px bg-[#d4a93a]" />
+        <span className="inline-flex items-center gap-2.5 text-xs font-bold text-[#1e5bff] tracking-[0.22em] uppercase mb-5">
+          <span className="w-7 h-px bg-[#033aca]" />
           Quem somos
         </span>
 
         <h2 className="text-[clamp(28px,3.6vw,44px)] font-semibold text-white mb-4 max-w-[820px] text-balance leading-[1.15]">
           Uma consultoria independente, dentro de uma empresa com{' '}
-          <em className="not-italic text-[#f0c75c] font-medium">21 anos de estrada</em>.
+          <em className="not-italic text-[#1e5bff] font-medium">21 anos de estrada</em>.
         </h2>
 
         <div className="mt-14 grid grid-cols-1 lg:grid-cols-[1.1fr_1fr] gap-12 lg:gap-16 items-start">
@@ -34,8 +34,8 @@ export default function About() {
           </div>
 
           <aside className="relative bg-gradient-to-b from-white/[0.04] to-white/[0.01] border border-white/15 rounded-3xl p-9">
-            <span className="absolute left-0 top-9 bottom-9 w-[3px] bg-[#d4a93a] rounded-r" />
-            <h4 className="font-['Fraunces',Georgia,serif] italic text-[#f0c75c] text-[1.15rem] mb-5">
+            <span className="absolute left-0 top-9 bottom-9 w-[3px] bg-[#033aca] rounded-r" />
+            <h4 className="font-['Fraunces',Georgia,serif] italic text-[#1e5bff] text-[1.15rem] mb-5">
               O que nos define
             </h4>
             <ul className="list-none p-0 m-0">

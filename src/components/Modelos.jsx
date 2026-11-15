@@ -25,14 +25,14 @@ export default function Modelos() {
   return (
     <section className="relative py-24 lg:py-32 bg-[#0a1c3a]">
       <div className="max-w-[1200px] mx-auto px-6">
-        <span className="inline-flex items-center gap-2.5 text-xs font-bold text-[#f0c75c] tracking-[0.22em] uppercase mb-5">
-          <span className="w-7 h-px bg-[#d4a93a]" />
+        <span className="inline-flex items-center gap-2.5 text-xs font-bold text-[#1e5bff] tracking-[0.22em] uppercase mb-5">
+          <span className="w-7 h-px bg-[#033aca]" />
           Como trabalhamos
         </span>
 
         <h2 className="text-[clamp(28px,3.6vw,44px)] font-semibold text-white mb-4 max-w-[820px] text-balance leading-[1.15]">
           Três formas de contratação.{' '}
-          <em className="not-italic text-[#f0c75c] font-medium">Uma só abordagem</em>.
+          <em className="not-italic text-[#1e5bff] font-medium">Uma só abordagem</em>.
         </h2>
         <p className="text-[17px] text-white/65 leading-relaxed max-w-[680px] mb-14">
           Partimos sempre do seu contexto e dos resultados que você busca. Depois identificamos as soluções pertinentes e construímos uma proposta sob medida.
@@ -53,7 +53,7 @@ export default function Modelos() {
               </h3>
               <p className="text-white/65 text-[0.94rem] leading-relaxed mb-6">{m.desc}</p>
               <div className="pt-5 border-t border-white/[0.08] text-white/50 text-[0.82rem] leading-relaxed">
-                <strong className="text-[#f0c75c] font-semibold">Exemplo: </strong>
+                <strong className="text-[#1e5bff] font-semibold">Exemplo: </strong>
                 {m.exemplo}
               </div>
             </div>

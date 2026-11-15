@@ -1,5 +1,3 @@
-import logo from '../assets/logo.png'
-
 export default function Footer() {
   const year = new Date().getFullYear()
 
@@ -10,15 +8,15 @@ export default function Footer() {
 
           {/* Brand col */}
           <div>
-            <a href="#top" className="flex items-center gap-3 mb-4 group w-fit">
+            <a href="#top" className="inline-flex items-center gap-3 mb-5 group" aria-label="SAN Conecta">
               <img
-                src={logo}
+                src="/assets/logo-horizontal.png"
                 alt="SAN Conecta"
-                className="w-12 h-12 rounded-full object-cover bg-white border border-white/10 shadow-[0_6px_20px_-6px_rgba(212,169,58,0.3)]"
+                className="h-9 w-auto object-contain"
+                style={{ filter: 'brightness(0) invert(1)' }}
               />
-              <span className="flex flex-col leading-none">
-                <strong className="font-['Fraunces',Georgia,serif] text-[17px] text-white font-semibold">SAN Conecta</strong>
-                <span className="text-[10.5px] text-[#f0c75c]/90 mt-1 tracking-[0.18em] uppercase font-semibold">TI 360</span>
+              <span className="inline-flex items-center px-2 py-1 rounded-md bg-[#033aca]/15 border border-[#033aca]/40 text-[10px] text-[#4a7dff] font-bold tracking-[0.18em] uppercase">
+                TI 360
               </span>
             </a>
             <p className="text-[13px] text-white/40 leading-relaxed max-w-[320px]">
@@ -28,7 +26,7 @@ export default function Footer() {
 
           {/* Portfólio col */}
           <div>
-            <h5 className="text-[12px] font-bold tracking-[0.15em] uppercase text-[#f0c75c]/80 mb-4">Portfólio</h5>
+            <h5 className="text-[12px] font-bold tracking-[0.15em] uppercase text-[#1e5bff]/80 mb-4">Portfólio</h5>
             <div className="flex flex-col gap-2.5">
               <a href="#frentes" className="text-[14px] text-white/55 hover:text-white transition-colors duration-200">
                 Frente 01 · Diagnóstico
@@ -53,7 +51,7 @@ export default function Footer() {
 
           {/* Contact col */}
           <div>
-            <h5 className="text-[12px] font-bold tracking-[0.15em] uppercase text-[#f0c75c]/80 mb-4">Contato</h5>
+            <h5 className="text-[12px] font-bold tracking-[0.15em] uppercase text-[#1e5bff]/80 mb-4">Contato</h5>
             <div className="flex flex-col gap-2.5">
               <a
                 href="https://wa.me/5566996440184"
@@ -65,7 +63,7 @@ export default function Footer() {
               </a>
               <a
                 href="/diagnostico360/"
-                className="text-[14px] text-white/55 hover:text-[#f0c75c] transition-colors duration-200"
+                className="text-[14px] text-white/55 hover:text-[#1e5bff] transition-colors duration-200"
               >
                 Diagnóstico 360° de TI
               </a>

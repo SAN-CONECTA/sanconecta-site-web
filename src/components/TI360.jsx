@@ -53,14 +53,14 @@ export default function TI360() {
     <section id="ti360" className="relative py-24 lg:py-32 bg-[#07142e]">
       <div className="max-w-[1200px] mx-auto px-6">
         <div className="max-w-[780px]">
-          <div className="inline-flex items-center gap-2.5 px-4 py-2 bg-[#d4a93a]/10 border border-[#d4a93a]/30 rounded-xl mb-6">
-            <span className="text-[#f0c75c] font-bold text-[13px] tracking-[0.22em] uppercase">
+          <div className="inline-flex items-center gap-2.5 px-4 py-2 bg-[#033aca]/10 border border-[#033aca]/30 rounded-xl mb-6">
+            <span className="text-[#1e5bff] font-bold text-[13px] tracking-[0.22em] uppercase">
               ◆ Portfólio TI 360
             </span>
           </div>
 
           <h2 className="text-[clamp(28px,3.6vw,44px)] font-semibold text-white mb-5 leading-[1.15] text-balance">
-            Uma arquitetura. <em className="not-italic text-[#f0c75c] font-medium">6 frentes</em>. 18 soluções.
+            Uma arquitetura. <em className="not-italic text-[#1e5bff] font-medium">6 frentes</em>. 18 soluções.
           </h2>
           <p className="text-[17px] text-white/65 leading-relaxed max-w-[680px] mb-10">
             O TI 360 não é um pacote fechado. É a arquitetura comercial que organiza nosso portfólio de consultoria em frentes estratégicas, cada uma com soluções que podem ser contratadas isoladamente, combinadas ou executadas como projetos integrados — sempre partindo da realidade do seu negócio.
@@ -74,7 +74,7 @@ export default function TI360() {
               { v: '2', l: 'recorrentes' },
             ].map((s) => (
               <div key={s.l} className="text-[12.5px] text-white/50 tracking-[0.08em] uppercase">
-                <strong className="text-[#f0c75c] text-[15px] tracking-normal mr-1.5">{s.v}</strong>
+                <strong className="text-[#1e5bff] text-[15px] tracking-normal mr-1.5">{s.v}</strong>
                 {s.l}
               </div>
             ))}
@@ -89,13 +89,13 @@ export default function TI360() {
           {benefits.map((b, i) => (
             <div
               key={b.title}
-              className="group bg-white/[0.03] border border-white/10 rounded-2xl p-6 transition-all duration-300 hover:border-[#d4a93a]/50 hover:-translate-y-1 animate-rise"
+              className="group bg-white/[0.03] border border-white/10 rounded-2xl p-6 transition-all duration-300 hover:border-[#033aca]/50 hover:-translate-y-1 animate-rise"
               style={{ animationDelay: `${0.1 + i * 0.08}s` }}
             >
-              <div className="w-10 h-10 rounded-xl bg-[#d4a93a]/10 flex items-center justify-center text-[#f0c75c] mb-5">
+              <div className="w-10 h-10 rounded-xl bg-[#033aca]/10 flex items-center justify-center text-[#1e5bff] mb-5">
                 <span className="w-5 h-5 block">{b.icon}</span>
               </div>
-              <h4 className="font-['Montserrat',system-ui,sans-serif] font-extrabold text-[12.5px] tracking-[0.14em] uppercase text-[#f0c75c] mb-2.5">
+              <h4 className="font-['Montserrat',system-ui,sans-serif] font-extrabold text-[12.5px] tracking-[0.14em] uppercase text-[#1e5bff] mb-2.5">
                 {b.title}
               </h4>
               <p className="text-[0.88rem] text-white/70 leading-relaxed">{b.desc}</p>

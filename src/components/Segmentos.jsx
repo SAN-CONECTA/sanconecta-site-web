@@ -64,7 +64,7 @@ const segmentos = {
 function Column({ title, items }) {
   return (
     <div>
-      <h4 className="font-['Montserrat',system-ui,sans-serif] font-extrabold text-[#f0c75c] text-[11.5px] tracking-[0.16em] uppercase mb-4 pb-3 border-b border-white/10">
+      <h4 className="font-['Montserrat',system-ui,sans-serif] font-extrabold text-[#1e5bff] text-[11.5px] tracking-[0.16em] uppercase mb-4 pb-3 border-b border-white/10">
         {title}
       </h4>
       <ul className="list-none p-0 m-0 flex flex-col gap-3">
@@ -74,7 +74,7 @@ function Column({ title, items }) {
             className="text-white/90 text-[0.92rem] leading-[1.5] pl-5 relative"
           >
             <span
-              className="absolute left-0 top-[11px] w-2.5 h-px bg-[#d4a93a]"
+              className="absolute left-0 top-[11px] w-2.5 h-px bg-[#033aca]"
               aria-hidden="true"
             />
             {item}
@@ -92,14 +92,14 @@ export default function Segmentos() {
   return (
     <section id="segmentos" className="relative py-24 lg:py-32 bg-[#07142e]">
       <div className="max-w-[1200px] mx-auto px-6">
-        <span className="inline-flex items-center gap-2.5 text-xs font-bold text-[#f0c75c] tracking-[0.22em] uppercase mb-5">
-          <span className="w-7 h-px bg-[#d4a93a]" />
+        <span className="inline-flex items-center gap-2.5 text-xs font-bold text-[#1e5bff] tracking-[0.22em] uppercase mb-5">
+          <span className="w-7 h-px bg-[#033aca]" />
           Para seu negócio
         </span>
 
         <h2 className="text-[clamp(28px,3.6vw,44px)] font-semibold text-white mb-4 max-w-[820px] text-balance leading-[1.15]">
           A mesma proposta de valor,{' '}
-          <em className="not-italic text-[#f0c75c] font-medium">contextualizada</em> ao seu segmento.
+          <em className="not-italic text-[#1e5bff] font-medium">contextualizada</em> ao seu segmento.
         </h2>
         <p className="text-[17px] text-white/65 leading-relaxed max-w-[680px] mb-10">
           A SAN Conecta mantém uma proposta de valor institucional única, mas adapta a conversa aos objetivos e preocupações de cada tipo de empresa. Comece pelo seu.
@@ -118,7 +118,7 @@ export default function Segmentos() {
               aria-selected={active === key}
               className={`font-['Montserrat',system-ui,sans-serif] text-[12.5px] font-bold tracking-[0.08em] uppercase px-6 py-2.5 rounded-full transition-colors ${
                 active === key
-                  ? 'bg-[#d4a93a] text-[#07142e]'
+                  ? 'bg-[#033aca] text-white'
                   : 'text-white/60 hover:text-white'
               }`}
             >
@@ -135,13 +135,13 @@ export default function Segmentos() {
         </div>
 
         {/* Proposta de valor contextualizada */}
-        <div className="mt-10 p-8 lg:px-10 bg-gradient-to-br from-[#d4a93a]/10 to-[#d4a93a]/[0.02] border border-[#d4a93a]/30 rounded-3xl">
-          <div className="text-[10.5px] font-bold tracking-[0.22em] text-[#f0c75c] uppercase mb-3">
+        <div className="mt-10 p-8 lg:px-10 bg-gradient-to-br from-[#033aca]/10 to-[#033aca]/[0.02] border border-[#033aca]/30 rounded-3xl">
+          <div className="text-[10.5px] font-bold tracking-[0.22em] text-[#1e5bff] uppercase mb-3">
             Proposta de valor contextualizada
           </div>
           <p className="font-['Fraunces',Georgia,serif] text-[clamp(1.1rem,2vw,1.45rem)] text-white font-medium leading-[1.4] text-balance">
             {data.proposta.pre}{' '}
-            <em className="italic text-[#f0c75c]">{data.proposta.destaque}</em>
+            <em className="italic text-[#1e5bff]">{data.proposta.destaque}</em>
             {data.proposta.pos}
           </p>
         </div>
