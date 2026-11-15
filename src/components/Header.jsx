@@ -11,11 +11,11 @@ export default function Header() {
   }, [])
 
   const navLinks = [
-    { href: '#top', label: 'Início' },
+    { href: '#desafios', label: 'Desafios' },
     { href: '#sobre', label: 'Sobre' },
     { href: '#ti360', label: 'TI 360' },
     { href: '#frentes', label: 'Soluções' },
-    { href: '#segmentos', label: 'Para seu negócio' },
+    { href: '#parceria', label: 'Como atuamos' },
   ]
 
   return (

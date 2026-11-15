@@ -3,158 +3,115 @@ import { useState } from 'react'
 const frentes = [
   {
     num: '01',
-    title: 'Diagnóstico e Planejamento',
-    purpose: 'Clareza sobre as condições tecnológicas, riscos e oportunidades para orientar decisões e investimentos.',
-    meta: '2 soluções · pontuais',
+    title: 'Diagnóstico Tecnológico e Inovação',
+    purpose: 'Clareza sobre as condições tecnológicas atuais, os riscos, as oportunidades e a preparação para o crescimento.',
+    meta: '2 soluções',
     solutions: [
       {
-        name: 'Diagnóstico Tecnológico',
-        type: 'pontual',
-        desc: 'Avaliação das condições do ambiente tecnológico — infraestrutura, sistemas, conectividade e proteção — com plano de ação orientado à redução de riscos.',
+        name: 'Diagnóstico de Eficiência Tecnológica',
+        desc: 'Avaliação dos recursos tecnológicos existentes e de sua capacidade de atender às necessidades operacionais. Identifica gargalos, limitações e oportunidades de melhoria, orientando adequações que promovam maior eficiência, estabilidade e aproveitamento dos investimentos existentes.',
       },
       {
-        name: 'Diagnóstico de Maturidade MAPES',
-        type: 'pontual',
-        desc: 'Avaliação estratégica da maturidade tecnológica, capacidade de inovação e preparação da estrutura para sustentar o crescimento, usando a metodologia MAPES.',
+        name: 'Diagnóstico de Maturidade Tecnológica para o Crescimento Empresarial',
+        desc: 'Avaliação estratégica dos recursos tecnológicos, de sua capacidade de atender às necessidades atuais e de sua preparação para acompanhar as demandas futuras previstas pela gestão. Identifica limitações, oportunidades de inovação e necessidades de evolução, alinhando a tecnologia aos objetivos de crescimento.',
       },
     ],
   },
   {
     num: '02',
-    title: 'Proteção e Continuidade',
+    title: 'Proteção Empresarial e Continuidade dos Negócios',
     purpose: 'Proteger informações, sistemas e operações essenciais, reduzindo riscos de interrupção e perdas empresariais.',
-    meta: '5 soluções · pontuais',
+    meta: '5 soluções',
     solutions: [
       {
-        name: 'Backup e Continuidade',
-        type: 'pontual',
-        desc: 'Soluções de backup, armazenamento e recuperação de informações para reduzir riscos de perda de dados e interrupções.',
+        name: 'Proteção de Dados Empresariais',
+        tech: 'Implantação e configuração de soluções de backup',
+        desc: 'Proteção das informações empresariais por meio de soluções de backup, permitindo sua recuperação em situações de falha, perda de dados ou interrupções.',
       },
       {
-        name: 'Segmentação de Rede',
-        type: 'pontual',
-        desc: 'Proteção e segmentação da rede corporativa (VLANs), reduzindo acessos indevidos e propagação de ameaças.',
+        name: 'Estruturação da Rede Lógica',
+        tech: 'Configuração de VLANs',
+        desc: 'Organização e segmentação da rede corporativa para controlar a comunicação entre ambientes, melhorar a segurança e reduzir riscos operacionais.',
       },
       {
-        name: 'Firewall Corporativo',
-        type: 'pontual',
-        desc: 'Implantação e configuração de firewall Fortinet e mecanismos especializados de proteção digital.',
+        name: 'Proteção da Rede contra Ameaças Digitais',
+        tech: 'Firewall',
+        desc: 'Implantação e configuração de firewall para controlar o tráfego da rede, proteger as conexões corporativas e reduzir a exposição a acessos indevidos e ameaças externas.',
       },
       {
-        name: 'Segurança Cibernética',
-        type: 'pontual',
-        desc: 'Prevenção, identificação e mitigação de ameaças cibernéticas, protegendo ativos digitais e operações.',
+        name: 'Proteção de Equipamentos e Sistemas',
+        tech: 'Antivírus',
+        desc: 'Implantação e configuração de soluções de antivírus para proteger computadores e servidores contra programas maliciosos, reduzindo riscos às informações e às operações.',
       },
       {
         name: 'Gestão de Licenças',
-        type: 'pontual',
-        desc: 'Adequação do licenciamento de softwares, otimização de custos e redução de riscos.',
+        tech: 'Orientação e configuração de licenças',
+        desc: 'Avaliação e organização do licenciamento de softwares empresariais, orientando sua utilização adequada, a conformidade e o melhor aproveitamento dos investimentos.',
       },
     ],
   },
   {
     num: '03',
-    title: 'Eficiência Operacional',
-    purpose: 'Melhorar o desempenho e a confiabilidade dos recursos tecnológicos, preparando a estrutura para novas demandas.',
-    meta: '3 soluções · pontuais',
+    title: 'Eficiência Operacional e Preparação para o Crescimento',
+    purpose: 'Melhorar o desempenho, a confiabilidade e a capacidade de expansão dos recursos tecnológicos.',
+    meta: '3 soluções',
     solutions: [
       {
-        name: 'Infraestrutura Física de Rede',
-        type: 'pontual',
-        desc: 'Modernização da infraestrutura física de conectividade, promovendo organização, confiabilidade e capacidade de expansão.',
+        name: 'Infraestrutura de Rede Empresarial',
+        tech: 'Retrofit ou Implantação',
+        desc: 'Adequação da estrutura física de conectividade para reduzir falhas, melhorar a confiabilidade das operações e acompanhar as necessidades de crescimento da empresa.',
       },
       {
-        name: 'Reestruturação Lógica de Rede',
-        type: 'pontual',
-        desc: 'Reorganização da comunicação entre sistemas e ambientes, reduzindo falhas e gargalos de desempenho.',
+        name: 'Desempenho e Disponibilidade de Servidores',
+        tech: 'Implantação, Configuração e Modernização de Servidores',
+        desc: 'Adequação dos ambientes físicos e virtuais para proporcionar maior estabilidade, capacidade de processamento e disponibilidade dos sistemas essenciais ao negócio.',
       },
       {
-        name: 'Servidores e Virtualização',
-        type: 'pontual',
-        desc: 'Implantação e otimização de servidores e ambientes de processamento (Hyper-V, Cluster, Storage).',
+        name: 'Proteção e Estabilidade Energética',
+        tech: 'Implantação e Configuração de Nobreaks (UPS)',
+        desc: 'Proteção dos equipamentos tecnológicos contra oscilações e interrupções no fornecimento de energia, reduzindo riscos de danos, indisponibilidade dos sistemas e paralisações operacionais.',
       },
     ],
   },
   {
     num: '04',
-    title: 'Organização, Controle e Segurança',
+    title: 'Organização, Controle e Segurança Empresarial',
     purpose: 'Estabelecer controles, responsabilidades e procedimentos que fortaleçam a organização e a segurança das operações.',
-    meta: '4 soluções · 1 recorrente',
+    meta: '2 soluções',
     solutions: [
       {
-        name: 'Controle de Acessos',
-        type: 'pontual',
-        desc: 'Definição e aprimoramento dos controles sobre quem pode acessar sistemas, ambientes e informações.',
+        name: 'Governança e Padronização de TI',
+        tech: 'Revisão de Acessos, Definição de Políticas de TI e Criação de POPs',
+        desc: 'Estruturação de regras, permissões e responsabilidades para o uso da tecnologia, com definição de normas e procedimentos operacionais padrão, reduzindo falhas e acessos indevidos e promovendo maior controle, segurança e organização nas operações empresariais.',
       },
       {
-        name: 'Políticas e Normas de TI',
-        type: 'pontual',
-        desc: 'Estruturação de normas e diretrizes para o uso responsável e seguro da tecnologia.',
-      },
-      {
-        name: 'Procedimentos Operacionais (POPs)',
-        type: 'pontual',
-        desc: 'Elaboração de procedimentos padrão, manuais e documentação de processos tecnológicos.',
-      },
-      {
-        name: 'LGPD San',
-        type: 'recorrente',
-        desc: 'Gestão continuada da conformidade com a LGPD, com plataforma de apoio, execução mensal e reuniões de acompanhamento.',
+        name: 'Proteção de Dados Pessoais e Conformidade com a LGPD',
+        tech: 'Implantação e Acompanhamento do Programa LGPD SAN',
+        desc: 'Implementação e acompanhamento de práticas de proteção de dados pessoais, integrando tecnologia, processos e orientação consultiva para identificar riscos, organizar responsabilidades e evidências e acompanhar a evolução das ações de adequação. Contribui para reduzir riscos legais e operacionais e fortalecer a confiança nas relações empresariais.',
       },
     ],
   },
   {
     num: '05',
-    title: 'Segurança nas Decisões',
-    purpose: 'Oferecer à liderança uma visão independente sobre investimentos, riscos e prioridades estratégicas.',
-    meta: '2 soluções · pontuais',
+    title: 'Consultoria e Gestão Tecnológica de Negócios',
+    purpose: 'Visão estratégica para novas oportunidades. Apoio consultivo e independente para decisões de evolução e expansão empresarial.',
+    meta: '3 soluções',
     solutions: [
       {
-        name: 'Governança de Investimentos em TI',
-        type: 'pontual',
-        desc: 'Consultoria para planejamento, avaliação e acompanhamento de iniciativas e investimentos estratégicos em tecnologia.',
+        name: 'Aconselhamento Executivo em Tecnologia e Inovação',
+        desc: 'Orientação independente para apoiar empresários e executivos em decisões sobre tecnologia, inovação e transformação digital, contribuindo para antecipar riscos, identificar oportunidades e direcionar investimentos alinhados aos objetivos e ao crescimento do negócio.',
       },
       {
-        name: 'Governança de Riscos Tecnológicos',
-        type: 'pontual',
-        desc: 'Identificação, avaliação e priorização de riscos tecnológicos, com orientação sobre seu tratamento.',
-      },
-    ],
-  },
-  {
-    num: '06',
-    title: 'Inovação e Crescimento',
-    purpose: 'Apoiar a liderança na inovação, evolução empresarial e preparação para novos ciclos de crescimento.',
-    meta: '2 soluções · 1 recorrente',
-    solutions: [
-      {
-        name: 'Aconselhamento Executivo',
-        type: 'recorrente',
-        desc: 'Aconselhamento estratégico contínuo e independente à alta liderança sobre tecnologia, inovação, investimentos e crescimento.',
+        name: 'Avaliação Tecnológica para Aquisições e Expansão Empresarial',
+        desc: 'Avaliação independente dos riscos, sistemas, infraestrutura e dependências tecnológicas envolvidos em aquisições, integrações e projetos de expansão, oferecendo recomendações para decisões mais seguras e maior previsibilidade na continuidade das operações.',
       },
       {
-        name: 'Due Diligence Tecnológica',
-        type: 'pontual',
-        desc: 'Avaliação independente de riscos e desafios tecnológicos em aquisições, integrações e expansão empresarial.',
+        name: 'Gestão de Projetos Tecnológicos',
+        desc: 'Apoio independente na definição das necessidades tecnológicas da empresa, estruturando as soluções e especificações para orientar investimentos e contratações. Inclui avaliação de propostas, qualificação de fornecedores, acompanhamento da execução e verificação da qualidade das entregas, proporcionando maior controle sobre custos, prazos e resultados, com liberdade para contratar produtos e serviços de diferentes fornecedores.',
       },
     ],
   },
 ]
-
-function TypeBadge({ type }) {
-  if (type === 'recorrente') {
-    return (
-      <span className="inline-block text-[10px] font-bold tracking-[0.12em] px-2.5 py-1 rounded-full uppercase bg-[#5fd1e6]/15 text-[#5fd1e6]">
-        Recorrente
-      </span>
-    )
-  }
-  return (
-    <span className="inline-block text-[10px] font-bold tracking-[0.12em] px-2.5 py-1 rounded-full uppercase bg-white/[0.06] text-white/50">
-      Pontual
-    </span>
-  )
-}
 
 export default function Frentes() {
   const [openIdx, setOpenIdx] = useState(null)
@@ -168,10 +125,10 @@ export default function Frentes() {
         </span>
 
         <h2 className="text-[clamp(28px,3.6vw,44px)] font-semibold text-white mb-4 max-w-[820px] text-balance leading-[1.15]">
-          As <em className="not-italic text-[#1e5bff] font-medium">6 frentes</em> do TI 360.
+          As <em className="not-italic text-[#1e5bff] font-medium">5 frentes</em> do TI 360.
         </h2>
-        <p className="text-[17px] text-white/65 leading-relaxed max-w-[680px] mb-14">
-          Clique em uma frente para ver as soluções que ela organiza. Cada solução pode ser contratada individualmente ou combinada com outras conforme a necessidade identificada.
+        <p className="text-[17px] text-white/65 leading-relaxed max-w-[720px] mb-14">
+          Clique em uma frente para ver as soluções que ela organiza. Cada solução pode ser contratada individualmente ou combinada com outras conforme a realidade e as prioridades do seu negócio.
         </p>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -236,13 +193,17 @@ export default function Frentes() {
                       {f.solutions.map((s) => (
                         <li
                           key={s.name}
-                          className="py-4 border-b border-white/[0.08] last:border-b-0 grid grid-cols-[1fr_auto] gap-y-1.5 gap-x-4 items-baseline"
+                          className="py-4 border-b border-white/[0.08] last:border-b-0"
                         >
-                          <span className="text-white font-semibold text-[0.95rem]">{s.name}</span>
-                          <TypeBadge type={s.type} />
-                          <span className="col-span-full text-white/65 text-[0.85rem] leading-relaxed">
+                          <div className="text-white font-semibold text-[0.95rem] mb-1">{s.name}</div>
+                          {s.tech && (
+                            <div className="text-[#5fd1e6] text-[0.78rem] font-semibold tracking-[0.04em] mb-2">
+                              Entrega técnica: <span className="text-[#5fd1e6]/90">{s.tech}</span>
+                            </div>
+                          )}
+                          <div className="text-white/65 text-[0.85rem] leading-relaxed">
                             {s.desc}
-                          </span>
+                          </div>
                         </li>
                       ))}
                     </ul>

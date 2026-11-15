@@ -1,17 +1,13 @@
 /**
- * Diagrama TI 360 — recria o infográfico das 6 frentes orbitando um
- * círculo central, inteiro em SVG + React. Clicável, responsivo,
- * tema dark alinhado ao site.
- *
- * Desktop (≥720px): 2 colunas de 3 nodes com conectores curvos.
- * Mobile: colapsa para lista empilhada com ícones.
+ * Diagrama TI 360 — 5 frentes orbitando o círculo central.
+ * Desktop (≥720px): SVG completo. Mobile: lista empilhada.
  */
 
 const frentes = [
   {
     num: '01',
-    title: 'Diagnóstico e',
-    titleBreak: 'Planejamento',
+    title: 'Diagnóstico',
+    titleBreak: 'Tecnológico e Inovação',
     side: 'left',
     row: 0,
     icon: (
@@ -25,8 +21,8 @@ const frentes = [
   },
   {
     num: '02',
-    title: 'Proteção e',
-    titleBreak: 'Continuidade',
+    title: 'Proteção Empresarial',
+    titleBreak: 'e Continuidade',
     side: 'left',
     row: 1,
     icon: (
@@ -54,8 +50,8 @@ const frentes = [
   },
   {
     num: '04',
-    title: 'Organização,',
-    titleBreak: 'Controle e Segurança',
+    title: 'Organização, Controle',
+    titleBreak: 'e Segurança',
     side: 'right',
     row: 0,
     icon: (
@@ -72,21 +68,8 @@ const frentes = [
   },
   {
     num: '05',
-    title: 'Segurança',
-    titleBreak: 'nas Decisões',
-    side: 'right',
-    row: 1,
-    icon: (
-      <g>
-        <path d="M17 4a13 13 0 100 26 13 13 0 000-26z" fill="none" stroke="currentColor" strokeWidth="2" />
-        <path d="M17 4v13l9 9" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-      </g>
-    ),
-  },
-  {
-    num: '06',
-    title: 'Inovação e',
-    titleBreak: 'Crescimento',
+    title: 'Consultoria e Gestão',
+    titleBreak: 'Tecnológica',
     side: 'right',
     row: 2,
     icon: (
@@ -112,18 +95,15 @@ const NODE_POSITIONS = {
   'left-0': { x: 100, y: 110 },
   'left-1': { x: 70, y: 300 },
   'left-2': { x: 100, y: 490 },
-  'right-0': { x: 700, y: 110 },
-  'right-1': { x: 730, y: 300 },
-  'right-2': { x: 700, y: 490 },
+  'right-0': { x: 700, y: 170 },
+  'right-2': { x: 700, y: 430 },
 }
 
 function Connector({ from, to }) {
-  // Curva Bézier do node até o centro
   const dx = to.x - from.x
   const dy = to.y - from.y
   const midX = from.x + dx * 0.5
   const midY = from.y + dy * 0.5
-  // Puxa o controle da curva pra criar swoop sutil
   const ctrlX = midX + dy * 0.08
   const ctrlY = midY - dx * 0.08
   return (
@@ -144,22 +124,18 @@ function Node({ frente }) {
 
   return (
     <g>
-      {/* Glow sutil */}
-      <circle cx={pos.x} cy={pos.y} r={NODE_R + 8} fill="rgba(3,58,202,0.08)" />
-      {/* Node circle */}
+      <circle cx={pos.x} cy={pos.y} r={NODE_R + 8} fill="rgba(3,58,202,0.12)" />
       <circle
         cx={pos.x}
         cy={pos.y}
         r={NODE_R}
         fill="url(#nodeGrad)"
-        stroke="rgba(3,58,202,0.5)"
+        stroke="rgba(3,58,202,0.6)"
         strokeWidth="1.5"
       />
-      {/* Icon centrado no node (ícones são 34x34, centraliza em -17 do centro) */}
       <g transform={`translate(${pos.x - 17}, ${pos.y - 17})`} color="#1e5bff">
         {frente.icon}
       </g>
-      {/* Number */}
       <text
         x={textAnchorX}
         y={pos.y - 10}
@@ -172,7 +148,6 @@ function Node({ frente }) {
       >
         {frente.num}
       </text>
-      {/* Title */}
       <text
         x={textAnchorX}
         y={pos.y + 14}
@@ -209,12 +184,12 @@ export default function TI360Diagram() {
           xmlns="http://www.w3.org/2000/svg"
           className="w-full h-auto"
           role="img"
-          aria-label="Diagrama TI 360 com as 6 frentes do portfólio"
+          aria-label="Diagrama TI 360 com as 5 frentes do portfólio"
         >
           <defs>
             <radialGradient id="coreGrad" cx="50%" cy="50%" r="50%">
-              <stop offset="0%" stopColor="#1f5fb0" stopOpacity="0.9" />
-              <stop offset="60%" stopColor="#0a1c3a" stopOpacity="1" />
+              <stop offset="0%" stopColor="#033aca" stopOpacity="0.95" />
+              <stop offset="60%" stopColor="#021d6b" stopOpacity="1" />
               <stop offset="100%" stopColor="#07142e" stopOpacity="1" />
             </radialGradient>
             <radialGradient id="nodeGrad" cx="50%" cy="50%" r="50%">
@@ -230,10 +205,9 @@ export default function TI360Diagram() {
             </filter>
           </defs>
 
-          {/* Conectores dos 6 nodes até o core */}
+          {/* Conectores dos 5 nodes até o core */}
           {frentes.map((f) => {
             const pos = NODE_POSITIONS[`${f.side}-${f.row}`]
-            // Ponto de conexão na borda do core (direção do node)
             const dx = pos.x - CENTER.x
             const dy = pos.y - CENTER.y
             const dist = Math.sqrt(dx * dx + dy * dy)
@@ -241,7 +215,6 @@ export default function TI360Diagram() {
               x: CENTER.x + (dx / dist) * CORE_R,
               y: CENTER.y + (dy / dist) * CORE_R,
             }
-            // Ponto de conexão na borda do node (direção do core)
             const nodeEdge = {
               x: pos.x - (dx / dist) * NODE_R,
               y: pos.y - (dy / dist) * NODE_R,
@@ -249,14 +222,14 @@ export default function TI360Diagram() {
             return <Connector key={f.num} from={nodeEdge} to={coreEdge} />
           })}
 
-          {/* Core circle com TI 360 */}
+          {/* Core */}
           <g filter="url(#softGlow)">
             <circle
               cx={CENTER.x}
               cy={CENTER.y}
               r={CORE_R}
               fill="url(#coreGrad)"
-              stroke="rgba(3,58,202,0.4)"
+              stroke="rgba(30,91,255,0.5)"
               strokeWidth="2"
             />
           </g>
@@ -270,23 +243,22 @@ export default function TI360Diagram() {
             fill="#ffffff"
             letterSpacing="-0.02em"
           >
-            TI <tspan fill="#1e5bff">360</tspan>
+            TI <tspan fill="#4a7dff">360</tspan>
           </text>
 
-          {/* 6 Nodes */}
           {frentes.map((f) => (
             <Node key={f.num} frente={f} />
           ))}
         </svg>
       </div>
 
-      {/* Mobile: lista empilhada com ícones (SVG não funciona bem em telas estreitas) */}
+      {/* Mobile */}
       <div className="md:hidden">
         <div className="relative mx-auto w-32 h-32 mb-8">
-          <div className="absolute inset-0 rounded-full bg-gradient-to-br from-[#1f5fb0]/80 to-[#07142e] border-2 border-[#033aca]/40 shadow-[0_0_40px_rgba(3,58,202,0.2)]" />
+          <div className="absolute inset-0 rounded-full bg-gradient-to-br from-[#033aca] to-[#07142e] border-2 border-[#4a7dff]/50 shadow-[0_0_40px_rgba(30,91,255,0.3)]" />
           <div className="absolute inset-0 flex items-center justify-center">
             <span className="font-['Fraunces',Georgia,serif] font-bold text-white text-2xl leading-none">
-              TI<span className="text-[#1e5bff]"> 360</span>
+              TI<span className="text-[#4a7dff]"> 360</span>
             </span>
           </div>
         </div>
@@ -296,7 +268,7 @@ export default function TI360Diagram() {
               key={f.num}
               className="flex items-center gap-4 p-3.5 rounded-2xl bg-white/[0.03] border border-white/10"
             >
-              <div className="relative flex-shrink-0 w-12 h-12 rounded-full bg-gradient-to-br from-[#112a55] to-[#0a1c3a] border border-[#033aca]/40 flex items-center justify-center">
+              <div className="relative flex-shrink-0 w-12 h-12 rounded-full bg-gradient-to-br from-[#112a55] to-[#0a1c3a] border border-[#033aca]/50 flex items-center justify-center">
                 <svg
                   viewBox="0 0 34 34"
                   width="22"
