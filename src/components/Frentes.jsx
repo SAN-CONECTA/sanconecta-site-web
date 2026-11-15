@@ -162,13 +162,13 @@ export default function Frentes() {
   return (
     <section id="frentes" className="relative py-24 lg:py-32 bg-[#050a18]">
       <div className="max-w-[1200px] mx-auto px-6">
-        <span className="inline-flex items-center gap-2.5 text-xs font-bold text-[#f0c75c] tracking-[0.22em] uppercase mb-5">
-          <span className="w-7 h-px bg-[#d4a93a]" />
+        <span className="inline-flex items-center gap-2.5 text-xs font-bold text-[#1e5bff] tracking-[0.22em] uppercase mb-5">
+          <span className="w-7 h-px bg-[#033aca]" />
           O portfólio
         </span>
 
         <h2 className="text-[clamp(28px,3.6vw,44px)] font-semibold text-white mb-4 max-w-[820px] text-balance leading-[1.15]">
-          As <em className="not-italic text-[#f0c75c] font-medium">6 frentes</em> do TI 360.
+          As <em className="not-italic text-[#1e5bff] font-medium">6 frentes</em> do TI 360.
         </h2>
         <p className="text-[17px] text-white/65 leading-relaxed max-w-[680px] mb-14">
           Clique em uma frente para ver as soluções que ela organiza. Cada solução pode ser contratada individualmente ou combinada com outras conforme a necessidade identificada.
@@ -181,7 +181,7 @@ export default function Frentes() {
               <div
                 key={f.num}
                 className={`bg-gradient-to-b from-white/[0.03] to-white/[0.01] border rounded-2xl overflow-hidden transition-colors ${
-                  isOpen ? 'border-[#d4a93a]/60' : 'border-white/15'
+                  isOpen ? 'border-[#033aca]/60' : 'border-white/15'
                 }`}
               >
                 <button
@@ -194,7 +194,7 @@ export default function Frentes() {
                   aria-expanded={isOpen}
                 >
                   <span
-                    className="font-['Fraunces',Georgia,serif] italic font-semibold text-[2.75rem] text-[#f0c75c] leading-none tabular-nums self-center"
+                    className="font-['Fraunces',Georgia,serif] italic font-semibold text-[2.75rem] text-[#1e5bff] leading-none tabular-nums self-center"
                     style={{ gridArea: 'num' }}
                   >
                     {f.num}
@@ -220,7 +220,7 @@ export default function Frentes() {
                   <span
                     className={`w-6 h-6 rounded-full flex items-center justify-center self-center transition-all duration-200 text-lg leading-none ${
                       isOpen
-                        ? 'bg-[#d4a93a] text-[#07142e] rotate-45'
+                        ? 'bg-[#033aca] text-white rotate-45'
                         : 'bg-white/[0.06] text-white/60'
                     }`}
                     style={{ gridArea: 'chev' }}

@@ -6,10 +6,17 @@
   --color-ink-3: #112a55;
   --color-cyan: #5fd1e6;
   --color-cyan-dim: rgba(95, 209, 230, 0.15);
-  --color-gold: #d4a93a;
-  --color-gold-bright: #f0c75c;
-  --color-gold-deep: #b8902a;
-  --color-gold-dim: rgba(212, 169, 58, 0.15);
+  /* Brand — azul royal da logo SAN Conecta (substitui o antigo dourado) */
+  --color-brand: #033aca;
+  --color-brand-bright: #1e5bff;
+  --color-brand-deep: #021d6b;
+  --color-brand-soft: #4a7dff;
+  --color-brand-dim: rgba(3, 58, 202, 0.15);
+  /* Aliases mantidos para compatibilidade (apontam para o novo brand) */
+  --color-gold: #033aca;
+  --color-gold-bright: #1e5bff;
+  --color-gold-deep: #021d6b;
+  --color-gold-dim: rgba(3, 58, 202, 0.15);
   --color-blue: #1f5fb0;
   --color-blue-bright: #2eaadc;
   --color-paper: #f4f7fb;

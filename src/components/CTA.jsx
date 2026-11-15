@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { useReveal } from '../hooks/useReveal'
-import logo from '../assets/logo.png'
 
 const WHATSAPP_NUMBER = '5566996440184'
 
@@ -35,7 +34,7 @@ function buildWhatsAppMessage({ empresa, nome, email, mensagem }) {
 }
 
 const inputClass =
-  'w-full px-4 py-3.5 rounded-2xl bg-black/40 border border-white/[0.08] text-white placeholder-white/25 text-[15px] outline-none focus:border-[#d4a93a]/50 focus:bg-black/50 focus:shadow-[0_0_0_3px_rgba(212,169,58,0.1)] transition-all duration-200'
+  'w-full px-4 py-3.5 rounded-2xl bg-black/40 border border-white/[0.08] text-white placeholder-white/25 text-[15px] outline-none focus:border-[#033aca]/50 focus:bg-black/50 focus:shadow-[0_0_0_3px_rgba(3,58,202,0.1)] transition-all duration-200'
 
 const labelClass =
   'block text-[11px] font-bold tracking-[0.18em] uppercase text-white/35 mb-2'
@@ -75,38 +74,38 @@ export default function CTA() {
           ref={ref}
           className="reveal relative rounded-3xl border border-white/[0.08] overflow-hidden"
           style={{
-            background: 'radial-gradient(ellipse 80% 50% at 50% 0%, rgba(212,169,58,0.15) 0%, transparent 65%), #07142e',
+            background: 'radial-gradient(ellipse 80% 50% at 50% 0%, rgba(3,58,202,0.15) 0%, transparent 65%), #07142e',
           }}
         >
           {/* Top glow line */}
-          <div className="absolute top-0 left-16 right-16 h-px bg-gradient-to-r from-transparent via-[#d4a93a]/40 to-transparent" />
+          <div className="absolute top-0 left-16 right-16 h-px bg-gradient-to-r from-transparent via-[#033aca]/40 to-transparent" />
 
           <div className="grid grid-cols-1 lg:grid-cols-2">
 
             {/* Left — brand/info */}
             <div className="px-10 py-14 lg:py-16 flex flex-col justify-center border-b lg:border-b-0 lg:border-r border-white/[0.06]">
-              <div className="flex items-center gap-3 mb-8" aria-hidden="true">
+              <div className="flex items-center gap-3 mb-8">
                 <div className="relative flex-shrink-0">
-                  <div className="absolute inset-0 rounded-full bg-[#d4a93a]/20 blur-xl scale-[2]" />
+                  <div className="absolute inset-0 rounded-full bg-[#033aca]/30 blur-2xl scale-[1.8]" />
                   <img
-                    src={logo}
+                    src="/assets/logo-icon.png"
                     alt="SAN Conecta"
-                    className="relative w-14 h-14 rounded-full object-cover border-2 border-white/10 shadow-[0_0_30px_rgba(212,169,58,0.25)]"
+                    className="relative w-14 h-14 object-contain"
                   />
                 </div>
                 <div className="flex flex-col leading-none">
                   <span className="font-['Fraunces',Georgia,serif] text-[18px] font-semibold text-white">SAN Conecta</span>
-                  <span className="text-[10.5px] text-[#f0c75c]/90 mt-1 tracking-[0.18em] uppercase font-semibold">TI 360</span>
+                  <span className="text-[10.5px] text-[#4a7dff] mt-1 tracking-[0.18em] uppercase font-semibold">TI 360</span>
                 </div>
               </div>
 
-              <span className="inline-block text-xs font-bold tracking-[0.2em] uppercase text-[#f0c75c]/90 mb-3">
+              <span className="inline-block text-xs font-bold tracking-[0.2em] uppercase text-[#1e5bff]/90 mb-3">
                 Vamos conversar
               </span>
 
               <h2 className="text-[clamp(24px,3vw,38px)] font-semibold text-white mb-4 leading-tight">
                 Pronto para o{' '}
-                <em className="not-italic text-transparent bg-clip-text bg-gradient-to-r from-[#f0c75c] to-[#d4a93a]">
+                <em className="not-italic text-transparent bg-clip-text bg-gradient-to-r from-[#1e5bff] to-[#033aca]">
                   próximo passo
                 </em>
                 ?
@@ -118,15 +117,15 @@ export default function CTA() {
 
               <div className="flex flex-col gap-3 text-[14px] text-white/40">
                 <div className="flex items-center gap-2.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#f0c75c]/70 flex-shrink-0" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#1e5bff]/70 flex-shrink-0" />
                   Resposta em até 2 horas úteis
                 </div>
                 <div className="flex items-center gap-2.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#f0c75c]/70 flex-shrink-0" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#1e5bff]/70 flex-shrink-0" />
                   Primeira conversa sem compromisso
                 </div>
                 <div className="flex items-center gap-2.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#f0c75c]/70 flex-shrink-0" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#1e5bff]/70 flex-shrink-0" />
                   Atendimento local em Sinop / MT
                 </div>
               </div>
@@ -205,7 +204,7 @@ export default function CTA() {
 
                 <button
                   type="submit"
-                  className="group w-full flex items-center justify-center gap-2.5 px-6 py-4 rounded-2xl bg-[#d4a93a] text-[#07142e] font-bold text-[15px] hover:bg-[#f0c75c] transition-all duration-200 hover:shadow-[0_8px_28px_-6px_rgba(212,169,58,0.4)] hover:-translate-y-0.5 mt-1"
+                  className="group w-full flex items-center justify-center gap-2.5 px-6 py-4 rounded-2xl bg-[#033aca] text-white font-bold text-[15px] hover:bg-[#1e5bff] transition-all duration-200 hover:shadow-[0_8px_28px_-6px_rgba(3,58,202,0.4)] hover:-translate-y-0.5 mt-1"
                 >
                   <span className="text-[#25D366]">
                     <WhatsAppIcon size={20} />

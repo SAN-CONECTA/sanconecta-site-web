@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react'
-import logo from '../assets/logo.png'
 
 export default function Header() {
   const [scrolled, setScrolled] = useState(false)
@@ -23,22 +22,35 @@ export default function Header() {
     <header
       className={`sticky top-0 z-50 border-b transition-all duration-300 ${
         scrolled
-          ? 'bg-[#07142e]/90 backdrop-blur-[18px] border-white/10 shadow-[0_4px_24px_-8px_rgba(0,0,0,0.5)]'
-          : 'bg-[#07142e]/70 backdrop-blur-[18px] border-white/[0.06]'
+          ? 'bg-[#07142e]/92 backdrop-blur-[18px] border-white/10 shadow-[0_4px_24px_-8px_rgba(0,0,0,0.5)]'
+          : 'bg-[#07142e]/75 backdrop-blur-[18px] border-white/[0.06]'
       }`}
     >
       <div className="max-w-[1200px] mx-auto px-6 flex items-center justify-between py-3.5">
-        <a href="#top" className="flex items-center gap-3.5 group">
+        <a href="#top" className="flex items-center gap-3 group" aria-label="SAN Conecta">
+          {/* Glifo (mobile + fallback) */}
           <img
-            src={logo}
-            alt="SAN Conecta"
-            className="w-12 h-12 rounded-full object-cover bg-white border border-white/20 shadow-[0_6px_20px_-6px_rgba(46,170,220,0.4)] transition-transform duration-300 group-hover:scale-105"
+            src="/assets/logo-icon.png"
+            alt=""
+            className="md:hidden w-10 h-10 object-contain transition-transform duration-300 group-hover:scale-105"
           />
-          <span className="flex flex-col leading-none">
-            <strong className="font-['Fraunces',Georgia,serif] text-[18px] text-white font-semibold tracking-[0.02em]">
+          {/* Logo horizontal (desktop) */}
+          <img
+            src="/assets/logo-horizontal.png"
+            alt="SAN Conecta"
+            className="hidden md:block h-9 w-auto object-contain transition-transform duration-300 group-hover:scale-105"
+            style={{ filter: 'brightness(0) invert(1)' }}
+          />
+          {/* Pílula TI 360 ao lado */}
+          <span className="hidden md:inline-flex items-center px-2 py-1 rounded-md bg-[#033aca]/15 border border-[#033aca]/40 text-[10px] text-[#4a7dff] font-bold tracking-[0.18em] uppercase">
+            TI 360
+          </span>
+          {/* Nome mobile */}
+          <span className="md:hidden flex flex-col leading-none">
+            <strong className="font-['Fraunces',Georgia,serif] text-[16px] text-white font-semibold tracking-[0.02em]">
               SAN Conecta
             </strong>
-            <span className="text-[10.5px] text-[#f0c75c]/90 mt-1 tracking-[0.18em] uppercase font-semibold">
+            <span className="text-[10px] text-[#4a7dff]/90 mt-1 tracking-[0.18em] uppercase font-semibold">
               TI 360
             </span>
           </span>
@@ -57,7 +69,7 @@ export default function Header() {
           ))}
           <a
             href="#contato"
-            className="ml-3 px-5 py-2.5 text-sm font-semibold bg-[#d4a93a] hover:bg-[#f0c75c] text-[#07142e] rounded-xl transition-all duration-200 shadow-[0_4px_14px_-4px_rgba(212,169,58,0.5)] hover:shadow-[0_6px_20px_-4px_rgba(212,169,58,0.6)] hover:-translate-y-0.5"
+            className="ml-3 px-5 py-2.5 text-sm font-semibold bg-[#033aca] hover:bg-[#1e5bff] text-white rounded-xl transition-all duration-200 shadow-[0_4px_14px_-4px_rgba(3,58,202,0.5)] hover:shadow-[0_6px_20px_-4px_rgba(3,58,202,0.7)] hover:-translate-y-0.5"
           >
             Falar com especialista
           </a>
@@ -95,7 +107,7 @@ export default function Header() {
             ))}
             <a
               href="#contato"
-              className="mt-2 px-5 py-3 text-sm font-semibold bg-[#d4a93a] hover:bg-[#f0c75c] text-[#07142e] rounded-xl transition-all duration-200 text-center"
+              className="mt-2 px-5 py-3 text-sm font-semibold bg-[#033aca] hover:bg-[#1e5bff] text-white rounded-xl transition-all duration-200 text-center"
               onClick={() => setMenuOpen(false)}
             >
               Falar com especialista
