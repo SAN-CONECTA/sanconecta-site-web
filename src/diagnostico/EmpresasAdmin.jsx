@@ -81,8 +81,9 @@ const LOTE = 8
 async function excluirEmpresa(emp) {
   const itens = await getDocs(collection(db, 'empresas', emp.id, 'itens'))
   const logs = await getDocs(collection(db, 'empresas', emp.id, 'log'))
+  const blocos = await getDocs(collection(db, 'empresas', emp.id, 'blocos'))
   const membros = await getDocs(query(collection(db, 'membros'), where('empresaId', '==', emp.id)))
-  const refs = [...itens.docs.map((d) => d.ref), ...logs.docs.map((d) => d.ref), ...membros.docs.map((d) => d.ref), doc(db, 'empresas', emp.id)]
+  const refs = [...itens.docs.map((d) => d.ref), ...logs.docs.map((d) => d.ref), ...blocos.docs.map((d) => d.ref), ...membros.docs.map((d) => d.ref), doc(db, 'empresas', emp.id)]
   for (let i = 0; i < refs.length; i += LOTE) {
     const batch = writeBatch(db)
     refs.slice(i, i + LOTE).forEach((r) => batch.delete(r))
@@ -99,12 +100,15 @@ function ExcluirEmpresa({ emp, onClose }) {
   async function baixaCsv() {
     setErr('')
     try {
-      const s = await getDocs(collection(db, 'empresas', emp.id, 'itens'))
-      const m = {}
-      s.docs.forEach((d) => {
-        m[d.id] = d.data()
-      })
-      exportCsv(emp, m)
+      const mapa = async (col) => {
+        const s = await getDocs(collection(db, 'empresas', emp.id, col))
+        const m = {}
+        s.docs.forEach((d) => {
+          m[d.id] = d.data()
+        })
+        return m
+      }
+      exportCsv(emp, await mapa('blocos'), await mapa('itens'))
     } catch (er) {
       setErr(errMsg(er))
     }
@@ -126,7 +130,7 @@ function ExcluirEmpresa({ emp, onClose }) {
   return (
     <div className="dg-note dg-warn">
       <p>
-        <strong>Excluir definitivamente {emp.nome}?</strong> Isso apaga a empresa, todos os 31 itens preenchidos, o log de alterações e os acessos
+        <strong>Excluir definitivamente {emp.nome}?</strong> Isso apaga a empresa, todas as respostas e blocos preenchidos, o log de alterações e os acessos
         dos clientes. Não há como desfazer e não existe cópia de segurança automática.
       </p>
       <p>

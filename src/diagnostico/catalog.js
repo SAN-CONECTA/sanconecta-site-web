@@ -1,25 +1,47 @@
-// Modelo fixo do diagnóstico: duas áreas (TI e Gestão do Negócio), 10 pilares, 31 itens, blocos e perguntas-guia.
-// Perguntas e blocos moram em perguntas.js e têm ids fixos (as respostas e as notas são gravadas por esses ids).
-// Os ids dos itens ("1.1" a "10.2") também são validados nas regras do Firestore.
-import { ITEMS_RAW, PILLAR_TEXT } from './perguntas'
+// Modelo do diagnóstico (v1.8): três rodadas, cada uma com blocos que reúnem perguntas de vários itens.
+// As perguntas moram em perguntas.js (ids fixos q01..) e o destino de cada uma em destinos.js.
+// As respostas continuam gravadas por item/id da pergunta; status, risco, nota e demais campos são gravados por BLOCO.
+import { ITEMS_RAW } from './perguntas'
+import { BLOCOS_META, DESTINOS } from './destinos'
 
-export const AREAS = [
-  { k: 'ti', l: 'Diagnóstico de TI' },
-  { k: 'gestao', l: 'Gestão do Negócio' },
+export const RODADAS = [
+  {
+    k: 'ti',
+    n: 'Maturidade de TI',
+    p: 'A TI conhece, protege, opera e recupera o ambiente de forma consistente?',
+    quem: 'Equipe de TI e prestadores responsáveis pela operação.',
+  },
+  {
+    k: 'al',
+    n: 'Alinhamento entre TI e negócio',
+    p: 'A capacidade e as prioridades da TI atendem às necessidades e à estratégia da empresa?',
+    quem: 'Liderança de TI, direção e responsáveis pelas áreas de negócio.',
+  },
+  {
+    k: 'ge',
+    n: 'Maturidade de gestão empresarial',
+    p: 'A empresa possui processos, controles, indicadores e responsabilidades para alcançar seus objetivos?',
+    quem: 'Direção e responsáveis por financeiro, comercial, operações, pessoas e conformidade.',
+  },
 ]
 
-export const pad2 = (n) => String(n).padStart(2, '0')
+const ITEM_BY_ID = Object.fromEntries(ITEMS_RAW.map((it) => [it.id, it]))
 
-// Pilares 1 a 5: TI. Pilares 6 a 10: Gestão do Negócio. Textos em perguntas.js.
-export const PILLARS = Array.from({ length: 10 }, (_, i) => ({
-  id: i + 1,
-  n: PILLAR_TEXT[String(i + 1)].n,
-  t: PILLAR_TEXT[String(i + 1)].t,
-  a: i < 5 ? 'ti' : 'gestao',
-}))
+// Pergunta com a origem (item e bloco original) para exibir agrupada.
+function perguntaDe([itemId, qid]) {
+  const it = ITEM_BY_ID[itemId]
+  const bk = it.b.find((b) => b.q.some((q) => q.id === qid))
+  const q = bk.q.find((x) => x.id === qid)
+  return { i: itemId, id: qid, t: q.t, it: it.t, o: bk.t }
+}
 
-// Cada item tem blocos (it.b) e a lista plana de perguntas (it.q = [{ id, t }]).
-export const ITEMS = ITEMS_RAW.map((it) => ({ ...it, q: it.b.flatMap((b) => b.q) }))
+// Blocos sem perguntas (reservados para perguntas novas) não aparecem.
+export const BLOCOS = Object.keys(DESTINOS)
+  .filter((id) => DESTINOS[id].length)
+  .map((id) => ({ id, ...BLOCOS_META[id], q: DESTINOS[id].map(perguntaDe) }))
+
+export const BLOCO_BY_ID = Object.fromEntries(BLOCOS.map((b) => [b.id, b]))
+export const blocosDe = (r) => BLOCOS.filter((b) => b.r === r)
 
 export const STATUS = [
   {
@@ -63,7 +85,7 @@ export const RISK = [
   }
 ]
 
-// Escala de maturidade 0 a 5, aplicada por BLOCO de perguntas (a nota do item é a média dos blocos).
+// Escala de maturidade 0 a 5, aplicada por bloco; a maturidade da rodada é a média das notas dos blocos.
 export const MATURITY = [
   { k: 0, l: '0 · Inexistente', d: 'Não existe processo, controle ou registro. Ninguém sabe informar com segurança.' },
   { k: 1, l: '1 · Inicial', d: 'Existe de maneira informal, depende de uma pessoa e não possui registro confiável.' },
@@ -83,9 +105,10 @@ export const EVID = [
   { k: 'nao_aplica', l: 'Não se aplica' },
 ]
 
+// Campos de cada bloco (documento empresas/{id}/blocos/{codigo}).
 export const BLANK = {
   status: 'nao_iniciado', risk: 'sem', owner: '', due: '', findings: '', evidence: '', reco: '',
-  maturity: null, evidStatus: 'nao_solicitada', respostas: {}, notas: {},
+  nota: null, evidStatus: 'nao_solicitada',
 }
 
 export const labelOf = (arr, k) => (arr.find((x) => x.k === k) || {}).l || ''

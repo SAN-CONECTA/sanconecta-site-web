@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { collection, limit, onSnapshot, orderBy, query } from 'firebase/firestore'
 import { db } from './firebase'
-import { EVID, ITEMS, RISK, STATUS, evKey, labelOf, rkKey } from './catalog'
+import { BLOCO_BY_ID, EVID, RISK, STATUS, evKey, labelOf, rkKey } from './catalog'
 import { csvDownload } from './exportCsv'
 import { errMsg, fmtTs } from './util'
 
@@ -10,26 +10,21 @@ const CAMPOS = {
   risk: 'Nível de risco',
   owner: 'Responsável pela coleta',
   due: 'Prazo',
-  findings: 'Achados gerais',
+  findings: 'Achados',
+  nota: 'Maturidade do bloco',
   evidence: 'Fonte da evidência',
   reco: 'Recomendação',
   evidStatus: 'Situação da evidência',
 }
 
-function campoLabel(itemId, c) {
+function campoLabel(blocoId, c) {
   if (CAMPOS[c]) return CAMPOS[c]
-  const it = ITEMS.find((x) => x.id === itemId)
-  if (!it) return c
-  if (c.startsWith('notas.')) {
-    const b = it.b.find((x) => x.id === c.slice(6))
-    return b ? `Maturidade do bloco: ${b.t}` : c
-  }
   if (c.startsWith('respostas.')) {
-    const id = c.slice(10)
-    for (let bi = 0; bi < it.b.length; bi += 1) {
-      const qi = it.b[bi].q.findIndex((q) => q.id === id)
-      if (qi >= 0) return `Pergunta ${bi + 1}.${qi + 1} (${it.b[bi].t}): ${it.b[bi].q[qi].t.split('\n')[0]}`
-    }
+    const [, itemId, qid] = c.split('.')
+    const b = BLOCO_BY_ID[blocoId]
+    const qi = b ? b.q.findIndex((q) => q.i === `${itemId}` && q.id === qid) : -1
+    if (qi >= 0) return `Pergunta ${qi + 1} [${itemId}] ${b.q[qi].t.split('\n')[0]}`
+    return `Resposta ${itemId} ${qid}`
   }
   return c
 }
@@ -75,11 +70,11 @@ export default function Log({ empId, emp }) {
   }, [docs])
 
   const usuarios = [...new Set(linhas.map((l) => l.email))].sort()
-  const itensLog = [...new Set(linhas.map((l) => l.item))].sort((a, b) => a.localeCompare(b, 'pt-BR', { numeric: true }))
+  const blocosLog = [...new Set(linhas.map((l) => l.item))].sort((a, b) => a.localeCompare(b, 'pt-BR', { numeric: true }))
   const vis = linhas.filter((l) => (!fU || l.email === fU) && (!fI || l.item === fI))
 
   function baixar() {
-    const head = ['Data e hora', 'Usuário', 'Perfil', 'Item', 'Campo', 'Antes', 'Depois']
+    const head = ['Data e hora', 'Usuário', 'Perfil', 'Bloco', 'Campo', 'Antes', 'Depois']
     const rows = vis.map((l) => [l.quando, l.email, l.papel === 'equipe' ? 'Equipe SAN' : 'Cliente', l.item, campoLabel(l.item, l.c), valorLabel(l.c, l.de), valorLabel(l.c, l.para)])
     csvDownload(`log-diagnostico-360-${emp.nome}`, head, rows)
   }
@@ -90,7 +85,7 @@ export default function Log({ empId, emp }) {
   return (
     <div>
       <p className="dg-muted">
-        Cada gravação em um item registra quem fez, quando e o que mudou (antes e depois). Os registros não podem ser editados.
+        Cada gravação em um bloco registra quem fez, quando e o que mudou (antes e depois). Os registros não podem ser editados.
         Só a equipe SAN vê esta tela.
       </p>
       <div className="dg-filters">
@@ -100,9 +95,9 @@ export default function Log({ empId, emp }) {
             <option key={u} value={u}>{u}</option>
           ))}
         </select>
-        <select aria-label="Filtrar por item" value={fI} onChange={(e) => setFI(e.target.value)}>
-          <option value="">Todos os itens</option>
-          {itensLog.map((i) => (
+        <select aria-label="Filtrar por bloco" value={fI} onChange={(e) => setFI(e.target.value)}>
+          <option value="">Todos os blocos</option>
+          {blocosLog.map((i) => (
             <option key={i} value={i}>{i}</option>
           ))}
         </select>
@@ -116,7 +111,7 @@ export default function Log({ empId, emp }) {
               <tr>
                 <th>Data e hora</th>
                 <th>Usuário</th>
-                <th>Item</th>
+                <th>Bloco</th>
                 <th>Campo</th>
                 <th>Antes</th>
                 <th>Depois</th>
