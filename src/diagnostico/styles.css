@@ -289,3 +289,11 @@ td select { min-height: 34px; width: auto; }
 .dg-fase dt { font-weight: 600; }
 .dg-alerta { display: flex; flex-direction: column; gap: 2px; padding: 12px 14px; margin-bottom: 12px; border-radius: 10px; border: 1px solid #e0b4b4; background: #fbeaea; color: #7a1f1f; }
 .dg-alerta.a-gestao, .dg-alerta.a-ti { border-color: #e6d28a; background: #fbf4dc; color: #6b5200; }
+
+.dg-gq-h { display: flex; align-items: center; gap: 10px; width: 100%; padding: 8px 4px; border: 0; background: none; text-align: left; font: inherit; cursor: pointer; color: inherit; flex-wrap: wrap; }
+.dg-gq-h:hover { background: #f3f6f9; }
+.dg-gq-seta { width: 14px; }
+.dg-gq-t { font-weight: 600; flex: 1 1 200px; }
+.dg-gq-st { font-size: 12px; color: #6b7785; }
+.dg-gq-st.ok { color: #1f7a4d; font-weight: 600; }
+.dg-gq-corpo { padding: 6px 4px 6px 24px; }
