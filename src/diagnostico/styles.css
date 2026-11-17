@@ -184,7 +184,7 @@ fieldset:disabled input, fieldset:disabled select, fieldset:disabled textarea { 
 .dg-group h2 .dg-tag { display: inline; font-family: var(--font-sans); }
 .dg-row { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; width: 100%; text-align: left; background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 10px 12px; cursor: pointer; margin-bottom: 6px; }
 .dg-row:hover { border-color: var(--blue); }
-.dg-code { flex: 0 0 3ch; color: var(--muted); }
+.dg-code { flex: 0 0 auto; white-space: nowrap; color: var(--muted); }
 .dg-rt { flex: 1 1 220px; min-width: 0; font-weight: 500; }
 .dg-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; color: var(--muted); font-size: 12px; }
 .dg-pill { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; line-height: 1.4; border: 1px solid var(--line); border-radius: 999px; padding: 1px 9px; white-space: nowrap; background: var(--surface); color: var(--text); }
@@ -245,8 +245,8 @@ td select { min-height: 34px; width: auto; }
 .dg-nav-n { margin-left: auto; font-size: 11px; color: var(--muted); }
 .dg-nav-csv { margin-top: 8px; border-top: 1px solid var(--line) !important; border-radius: 0 0 6px 6px !important; }
 @media (max-width: 860px) {
-  .dg-shell { grid-template-columns: 1fr; gap: 16px; }
-  .dg-side { position: static; }
+  .dg-shell { grid-template-columns: minmax(0, 1fr); gap: 16px; }
+  .dg-side { min-width: 0; position: static; }
   .dg-nav { flex-direction: row; overflow-x: auto; gap: 4px; }
   .dg-nav button { width: auto; white-space: nowrap; border-left: 0; border-bottom: 3px solid transparent; border-radius: 6px 6px 0 0; }
   .dg-nav button[aria-current='page'] { border-bottom-color: var(--blue); }
@@ -317,3 +317,30 @@ td select { min-height: 34px; width: auto; }
 .dg-bar-t i.risco { background: #b3361f; }
 .dg-bar-t i.ok { background: #1f7a4d; }
 @media (max-width: 640px) { .dg-bar { grid-template-columns: 1fr; gap: 2px; } }
+
+/* Celular (≈390px): menos respiro, alvos de toque maiores, janelas em tela cheia */
+@media (max-width: 600px) {
+  body { font-size: 15px; }
+  .dg-top { padding: 8px 12px; }
+  .dg-brand { font-size: 15px; gap: 8px; }
+  .dg-brand img { height: 26px; }
+  .dg-user { width: 100%; justify-content: space-between; }
+  .dg-main { padding: 14px 12px 40px; }
+  .dg-card { padding: 14px 12px; }
+  h1 { font-size: 22px; overflow-wrap: anywhere; }
+  .dg-btn, .dg-nav button, .dg-filters select, .dg-filters input { min-height: 44px; }
+  .dg-filters select { flex: 1 1 100%; width: 100%; }
+  .dg-nav button { padding: 8px 10px; }
+  .dg-drawer { inset: 0; width: 100%; max-height: none; height: 100%; border-radius: 0; padding: 16px 14px 28px; }
+  .dg-row { padding: 12px; }
+  .dg-erow-act { width: 100%; }
+  .dg-erow-act > * { flex: 1 1 auto; }
+  .dg-gop { grid-template-columns: auto 1fr; }
+  .dg-gop > :nth-child(3) { grid-column: 1 / -1; }
+  .dg-sim-in { width: 120px; }
+  .dg-two, .dg-grid3 { grid-template-columns: minmax(0, 1fr); }
+  .dg-tblwrap { margin-inline: -4px; }
+  .dg-t-param { min-width: 0; }
+  .dg-t-param th:nth-child(2), .dg-t-param td:nth-child(2) { display: none; }
+  .dg-sim-in { width: 110px; }
+}
