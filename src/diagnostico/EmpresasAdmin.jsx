@@ -6,7 +6,7 @@ import { exportCsv } from './exportCsv'
 import { errMsg, fmtD, go } from './util'
 
 function NovaEmpresa({ email, onCreated, onCancel }) {
-  const [f, setF] = useState({ nome: '', cnpj: '', responsavel: '', inicio: '', prazo: '' })
+  const [f, setF] = useState({ nome: '', cnpj: '', responsavel: '', inicio: '', prazo: '', modo: 'completo' })
   const [busy, setBusy] = useState(false)
   const [err, setErr] = useState('')
   const set = (k) => (e) => setF((x) => ({ ...x, [k]: e.target.value }))
@@ -23,6 +23,7 @@ function NovaEmpresa({ email, onCreated, onCancel }) {
         responsavel: f.responsavel.trim(),
         inicio: f.inicio,
         prazo: f.prazo,
+        modo: f.modo,
         arquivada: false,
         criadoEm: serverTimestamp(),
         criadoPor: email,
@@ -64,6 +65,13 @@ function NovaEmpresa({ email, onCreated, onCancel }) {
             </label>
           </div>
         </div>
+        <label className="dg-fld">
+          <span>Tipo de diagnóstico</span>
+          <select value={f.modo} onChange={set('modo')}>
+            <option value="completo">Completo: 3 rodadas, 29 blocos e 704 perguntas de campo</option>
+            <option value="rapido">Rápido (GEMI): 15 perguntas, nota 0 a 4, alertas e faixa de classificação</option>
+          </select>
+        </label>
         {err && <p className="dg-err" role="alert">{err}</p>}
         <div className="dg-actions">
           <button className="dg-btn dg-primary" type="submit" disabled={busy}>{busy ? 'Criando…' : 'Criar e liberar usuários'}</button>
@@ -82,8 +90,9 @@ async function excluirEmpresa(emp) {
   const itens = await getDocs(collection(db, 'empresas', emp.id, 'itens'))
   const logs = await getDocs(collection(db, 'empresas', emp.id, 'log'))
   const blocos = await getDocs(collection(db, 'empresas', emp.id, 'blocos'))
+  const gemi = await getDocs(collection(db, 'empresas', emp.id, 'gemi'))
   const membros = await getDocs(query(collection(db, 'membros'), where('empresaId', '==', emp.id)))
-  const refs = [...itens.docs.map((d) => d.ref), ...logs.docs.map((d) => d.ref), ...blocos.docs.map((d) => d.ref), ...membros.docs.map((d) => d.ref), doc(db, 'empresas', emp.id)]
+  const refs = [...itens.docs.map((d) => d.ref), ...logs.docs.map((d) => d.ref), ...blocos.docs.map((d) => d.ref), ...gemi.docs.map((d) => d.ref), ...membros.docs.map((d) => d.ref), doc(db, 'empresas', emp.id)]
   for (let i = 0; i < refs.length; i += LOTE) {
     const batch = writeBatch(db)
     refs.slice(i, i + LOTE).forEach((r) => batch.delete(r))
@@ -108,7 +117,7 @@ function ExcluirEmpresa({ emp, onClose }) {
         })
         return m
       }
-      exportCsv(emp, await mapa('blocos'), await mapa('itens'))
+      exportCsv(emp, await mapa('blocos'), await mapa('itens'), await mapa('gemi'))
     } catch (er) {
       setErr(errMsg(er))
     }

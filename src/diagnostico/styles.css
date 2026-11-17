@@ -275,3 +275,17 @@ td select { min-height: 34px; width: auto; }
 .dg-scale dd { margin: 0; color: var(--muted); }
 .dg-mat { margin: 4px 0 12px; }
 .dg-q textarea { min-height: 72px; background: var(--surface); }
+
+/* Diagnóstico rápido (GEMI) */
+.dg-gq { border-top: 1px solid var(--line, #d8d8d8); padding: 14px 0; }
+.dg-gq h4 { margin: 0 0 6px; font-size: 15px; }
+.dg-gp { margin: 0 0 10px; font-weight: 600; }
+.dg-gops { display: grid; gap: 6px; margin-bottom: 8px; }
+.dg-gop { display: grid; grid-template-columns: auto 52px 1fr; gap: 8px; align-items: start; padding: 8px 10px; border: 1px solid var(--line, #d8d8d8); border-radius: 8px; cursor: pointer; }
+.dg-gop.on { border-color: #1f7a4d; background: #e8f4ec; }
+.dg-gop input { margin-top: 3px; }
+.dg-gbar { display: block; height: 6px; margin-top: 4px; border-radius: 3px; background: #e3e8ee; overflow: hidden; }
+.dg-gbar i { display: block; height: 100%; background: #1f7a4d; }
+.dg-fase dt { font-weight: 600; }
+.dg-alerta { display: flex; flex-direction: column; gap: 2px; padding: 12px 14px; margin-bottom: 12px; border-radius: 10px; border: 1px solid #e0b4b4; background: #fbeaea; color: #7a1f1f; }
+.dg-alerta.a-gestao, .dg-alerta.a-ti { border-color: #e6d28a; background: #fbf4dc; color: #6b5200; }

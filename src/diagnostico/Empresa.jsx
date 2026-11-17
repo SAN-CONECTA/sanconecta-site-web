@@ -7,11 +7,14 @@ import { go, normEmail } from './util'
 import { exportCsv } from './exportCsv'
 import Painel from './Painel'
 import Rodada from './Rodada'
+import Gemi from './Gemi'
+import PainelGemi from './PainelGemi'
 import Acessos from './Acessos'
 import Log from './Log'
 
 const TABS = [
   ['painel', 'Painel'],
+  ['gemi', 'Diagnóstico rápido'],
   ['ti', 'Maturidade de TI'],
   ['al', 'Alinhamento entre TI e negócio'],
   ['ge', 'Maturidade de gestão empresarial'],
@@ -22,10 +25,13 @@ const NAV = TABS
 // Endereços antigos (v1.7) continuam levando ao lugar certo.
 const ANTIGAS = { gestao: 'ge', itens: 'painel' }
 const SO_STAFF = ['log']
+const DO_RAPIDO = ['painel', 'gemi', 'acessos', 'log']
+const DO_COMPLETO = ['painel', 'ti', 'al', 'ge', 'acessos', 'log']
 
 const ICONS = {
   painel: <><rect x="3" y="3" width="7" height="7" /><rect x="14" y="3" width="7" height="7" /><rect x="14" y="14" width="7" height="7" /><rect x="3" y="14" width="7" height="7" /></>,
   ti: <><rect x="2" y="3" width="20" height="14" rx="2" /><path d="M8 21h8M12 17v4" /></>,
+  gemi: <><path d="M13 2 3 14h9l-1 8 10-12h-9z" /></>,
   al: <><path d="M16 3h5v5M4 20 21 3M21 16v5h-5M15 15l6 6M4 4l5 5" /></>,
   ge: <><rect x="2" y="7" width="20" height="14" rx="2" /><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2" /></>,
   acessos: <><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" /></>,
@@ -47,6 +53,7 @@ export default function Empresa({ id, tab, session }) {
   const [emp, setEmp] = useState(undefined)
   const [itens, setItens] = useState(null)
   const [blocos, setBlocos] = useState(null)
+  const [gemi, setGemi] = useState(null)
   const [papel, setPapel] = useState(staff ? 'staff' : undefined)
   const [flt, setFlt] = useState({ s: '', r: '', q: '' })
   const [openId, setOpenId] = useState(null)
@@ -78,6 +85,7 @@ export default function Empresa({ id, tab, session }) {
     }
     const offItens = onSnapshot(collection(db, 'empresas', id, 'itens'), mapa(setItens), onErr)
     const offBlocos = onSnapshot(collection(db, 'empresas', id, 'blocos'), mapa(setBlocos), onErr)
+    const offGemi = onSnapshot(collection(db, 'empresas', id, 'gemi'), mapa(setGemi), onErr)
     if (!staff) {
       getDoc(doc(db, 'membros', `${id}__${email}`))
         .then((s) => setPapel(s.exists() ? s.data().role : null))
@@ -87,16 +95,19 @@ export default function Empresa({ id, tab, session }) {
       offEmp()
       offItens()
       offBlocos()
+      offGemi()
     }
   }, [id, staff, email])
 
   const tabReal = ANTIGAS[tab] || tab
-  const activeTab = TABS.some((t) => t[0] === tabReal && (staff || !SO_STAFF.includes(t[0]))) ? tabReal : 'painel'
+  const rapido = !!emp && emp.modo === 'rapido'
+  const abas = rapido ? DO_RAPIDO : DO_COMPLETO
+  const activeTab = abas.includes(tabReal) && (staff || !SO_STAFF.includes(tabReal)) ? tabReal : 'painel'
   const canEdit = staff
   // Cliente vinculado à empresa preenche respostas e situação da evidência (v1.7), exceto em empresa arquivada.
   const canAnswer = !!emp && (staff || (papel === 'leitura' && !emp.arquivada))
 
-  if (emp === undefined || ((itens === null || blocos === null) && emp !== null) || papel === undefined) {
+  if (emp === undefined || ((itens === null || blocos === null || gemi === null) && emp !== null) || papel === undefined) {
     return <p className="dg-muted">Carregando empresa…</p>
   }
   if (emp === null || (!staff && !papel)) {
@@ -138,14 +149,14 @@ export default function Empresa({ id, tab, session }) {
           <a className="dg-side-all" href="#/">← Todas as empresas</a>
         </div>
         <nav className="dg-nav" aria-label="Seções">
-          {NAV.filter(([k]) => staff || !SO_STAFF.includes(k)).map(([k, l]) => (
+          {NAV.filter(([k]) => abas.includes(k) && (staff || !SO_STAFF.includes(k))).map(([k, l]) => (
             <button key={k} type="button" aria-current={activeTab === k ? 'page' : undefined} onClick={() => go(`/e/${id}/${k}`)}>
               <Icon k={k} />
               <span>{l}</span>
               {countOf(k) && <span className="dg-nav-n dg-mono" title="Blocos concluídos">{countOf(k)}</span>}
             </button>
           ))}
-          <button type="button" className="dg-nav-csv" onClick={() => exportCsv(emp, blocos, itens)}>
+          <button type="button" className="dg-nav-csv" onClick={() => exportCsv(emp, blocos, itens, gemi)}>
             <Icon k="csv" />
             <span>Exportar CSV</span>
           </button>
@@ -163,7 +174,8 @@ export default function Empresa({ id, tab, session }) {
           </div>
         </header>
 
-        {activeTab === 'painel' && (
+        {activeTab === 'painel' && rapido && <PainelGemi gemi={gemi} emp={emp} onAbrir={() => go(`/e/${id}/gemi`)} />}
+        {activeTab === 'painel' && !rapido && (
           <Painel
             blocos={blocos}
             emp={emp}
@@ -174,6 +186,7 @@ export default function Empresa({ id, tab, session }) {
             }}
           />
         )}
+        {activeTab === 'gemi' && <Gemi key={emp.id} empId={id} emp={emp} gemi={gemi} canEdit={canEdit} user={user} />}
         {RODADAS.some((r) => r.k === activeTab) && (
           <Rodada
             key={activeTab}
