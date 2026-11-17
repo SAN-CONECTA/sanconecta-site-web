@@ -82,10 +82,10 @@ export function DadosEmpresa({ emp, email }) {
           </div>
         </div>
         <label className="dg-fld">
-          <span>Tipo de diagnóstico</span>
+          <span>Fase de estudo</span>
           <select value={f.modo} onChange={set('modo')}>
-            <option value="completo">Completo: 3 rodadas, 29 blocos e 704 perguntas de campo</option>
-            <option value="rapido">Rápido (GEMI): 15 perguntas, nota 0 a 4, alertas e faixa de classificação</option>
+            <option value="completo">Fase Aprofundada de Estudo: 3 rodadas, 29 blocos e 704 perguntas de campo</option>
+            <option value="rapido">Fase Inicial de Estudo: 15 perguntas, nota 0 a 4, alertas e faixa de classificação</option>
           </select>
           <span className="dg-muted dg-small">Trocar o tipo só muda o que aparece na tela. Nada que já foi gravado é apagado.</span>
         </label>

@@ -31,7 +31,7 @@ export function exportCsv(emp, blocos, itens, gemi) {
         fmtTs(g.updatedAt),
       ]
     })
-    csvDownload(`diagnostico-rapido-${emp.nome}`, head, rows)
+    csvDownload(`fase-inicial-${emp.nome}`, head, rows)
     return
   }
   const head = ['Rodada', 'Código', 'Bloco', 'Status', 'Risco', 'Responsável', 'Prazo', 'Achados do bloco', 'Respostas por pergunta', 'Maturidade do bloco (0-5)', 'Situação da evidência', 'Fonte da evidência', 'Recomendação', 'Atualizado em']
