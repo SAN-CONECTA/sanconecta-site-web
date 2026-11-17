@@ -24,6 +24,11 @@ function campoLabel(blocoId, c) {
     const q = GEMI_QUESTOES.find((x) => x.id === id)
     return `Fase Inicial ${id} ${q ? q.t : ''}: ${campo === 'nota' ? 'nota (0 a 4)' : campo === 'obs' ? 'observação' : 'resposta'}`
   }
+  if (c.startsWith('simulacao.')) {
+    const k = c.slice(10)
+    const nomes = { fat: 'Faturamento mensal', dias: 'Dias úteis', horas: 'Horas por dia', colab: 'Colaboradores dependentes de TI', custo: 'Custo médio por colaborador', pct: '% da operação afetada (fração)', emerg: 'Custo emergencial', rto: 'Tempo de parada simulado (h)', invest: 'Investimento mensal em TI preventiva' }
+    return `Simulação: ${nomes[k] || k}`
+  }
   if (CAMPOS[c]) return CAMPOS[c]
   if (c.startsWith('respostas.')) {
     const [, itemId, qid] = c.split('.')

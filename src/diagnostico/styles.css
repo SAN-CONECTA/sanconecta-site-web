@@ -301,3 +301,14 @@ td select { min-height: 34px; width: auto; }
 .dg-btn.dg-next { background: #1d3f8f; border-color: #1d3f8f; color: #fff; }
 .dg-btn.dg-next:hover { background: #16316f; border-color: #16316f; }
 .dg-btn.dg-next:focus-visible { outline: 3px solid #9db8ee; outline-offset: 2px; }
+
+/* Simulação de prejuízo */
+.dg-sim-in { width: 150px; text-align: right; }
+.dg-sim-tot td { background: #eef3fb; font-weight: 700; }
+.dg-bars { display: grid; gap: 8px; margin-top: 14px; }
+.dg-bar { display: grid; grid-template-columns: minmax(120px, 230px) 1fr minmax(90px, auto); gap: 10px; align-items: center; font-size: 13px; }
+.dg-bar-t { display: block; height: 14px; background: #e3e8ee; border-radius: 7px; overflow: hidden; }
+.dg-bar-t i { display: block; height: 100%; background: #1d3f8f; }
+.dg-bar-t i.risco { background: #b3361f; }
+.dg-bar-t i.ok { background: #1f7a4d; }
+@media (max-width: 640px) { .dg-bar { grid-template-columns: 1fr; gap: 2px; } }

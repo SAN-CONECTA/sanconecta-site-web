@@ -8,6 +8,7 @@ rules_version = '2';
 //   empresas/{empresaId}/itens/{itemId}   respostas das perguntas, guardadas por item de origem ("1.1" a "10.2"), chaves q01..q40
 //   empresas/{empresaId}/blocos/{codigo}  status, risco, nota 0 a 5, achados etc. de cada bloco das 3 rodadas (TI-01, AL-01, GE-01...)
 //   empresas/{empresaId}/gemi/{codigo}    diagnóstico rápido GEMI (15 perguntas, 1.1 a 3.5); campo modo da empresa: completo ou rapido
+//   empresas/{empresaId}/simulacao/atual  simulação de prejuízo por downtime (dados financeiros; só equipe SAN)
 //   empresas/{empresaId}/log/{logId}      registro de cada gravação (quem, quando, o que mudou); só a equipe SAN lê
 //   membros/{empresaId}__{email}          quem acessa cada empresa (sempre com perfil de leitura)
 //
@@ -51,7 +52,7 @@ service cloud.firestore {
 
     // Códigos dos blocos: TI-01..TI-10 (com sufixo A a C), AL-01..AL-09 e GE-01..GE-09.
     function blocoIdOk(id) {
-      return id == 'GEMI' || id.matches('^(TI-(0[1-9]|10)[A-C]?|AL-0[1-9]|GE-0[1-9])$');
+      return id == 'GEMI' || id == 'SIMULACAO' || id.matches('^(TI-(0[1-9]|10)[A-C]?|AL-0[1-9]|GE-0[1-9])$');
     }
 
     // Exige, no mesmo lote da gravação, um registro novo no log feito por quem está gravando (uma única leitura).
@@ -245,6 +246,32 @@ service cloud.firestore {
               || (request.resource.data.nota is int && request.resource.data.nota >= 0 && request.resource.data.nota <= 4))
           && (!('obs' in request.resource.data) || shortStr(request.resource.data.obs, 2000))
           && (!('texto' in request.resource.data) || shortStr(request.resource.data.texto, 4000))
+          && request.resource.data.updatedAt == request.time
+          && request.resource.data.updatedBy == me()
+          && logOk(emp);
+
+        allow delete: if isStaff()
+          && get(/databases/$(database)/documents/empresas/$(emp)).data.arquivada == true;
+      }
+
+      // Simulação de prejuízo por indisponibilidade de TI (v1.10): um único documento "atual". Só a equipe SAN lê e grava,
+      // porque guarda dados financeiros do cliente. Percentual da operação afetada em fração (0 a 1).
+      match /simulacao/{sid} {
+        allow read: if isStaff();
+
+        allow create, update: if isStaff()
+          && sid == 'atual'
+          && request.resource.data.keys().hasOnly(['fat', 'dias', 'horas', 'colab', 'custo', 'pct', 'emerg', 'rto', 'invest', 'updatedAt', 'updatedBy', 'logId'])
+          && request.resource.data.keys().hasAll(['fat', 'dias', 'horas', 'colab', 'custo', 'pct', 'emerg', 'rto', 'invest', 'updatedAt', 'updatedBy', 'logId'])
+          && request.resource.data.fat is number && request.resource.data.fat >= 0 && request.resource.data.fat <= 10000000000
+          && request.resource.data.dias is number && request.resource.data.dias >= 1 && request.resource.data.dias <= 31
+          && request.resource.data.horas is number && request.resource.data.horas >= 1 && request.resource.data.horas <= 24
+          && request.resource.data.colab is number && request.resource.data.colab >= 0 && request.resource.data.colab <= 1000000
+          && request.resource.data.custo is number && request.resource.data.custo >= 0 && request.resource.data.custo <= 10000000
+          && request.resource.data.pct is number && request.resource.data.pct >= 0 && request.resource.data.pct <= 1
+          && request.resource.data.emerg is number && request.resource.data.emerg >= 0 && request.resource.data.emerg <= 1000000000
+          && request.resource.data.rto is number && request.resource.data.rto >= 0 && request.resource.data.rto <= 8760
+          && request.resource.data.invest is number && request.resource.data.invest >= 0 && request.resource.data.invest <= 1000000000
           && request.resource.data.updatedAt == request.time
           && request.resource.data.updatedBy == me()
           && logOk(emp);
