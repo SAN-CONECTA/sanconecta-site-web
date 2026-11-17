@@ -297,3 +297,7 @@ td select { min-height: 34px; width: auto; }
 .dg-gq-st { font-size: 12px; color: #6b7785; }
 .dg-gq-st.ok { color: #1f7a4d; font-weight: 600; }
 .dg-gq-corpo { padding: 6px 4px 6px 24px; }
+
+.dg-btn.dg-next { background: #1d3f8f; border-color: #1d3f8f; color: #fff; }
+.dg-btn.dg-next:hover { background: #16316f; border-color: #16316f; }
+.dg-btn.dg-next:focus-visible { outline: 3px solid #9db8ee; outline-offset: 2px; }
