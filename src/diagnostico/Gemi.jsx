@@ -1,0 +1,152 @@
+import { useState } from 'react'
+import { collection, doc, serverTimestamp, writeBatch } from 'firebase/firestore'
+import { db } from './firebase'
+import { GEMI_ESCALA, GEMI_FASES, GEMI_QUESTOES } from './gemiDados'
+import { fmtPct, gemiNota, gemiScore, gemiTexto } from './gemiCalc'
+import { errMsg, fmtTs, normEmail } from './util'
+
+const POR_LOTE = 4
+
+function Pergunta({ q, v, set, canEdit }) {
+  const obj = q.tipo === 'obj'
+  return (
+    <div className="dg-gq">
+      <h4>
+        <span className="dg-mono dg-muted">{q.id}</span> {q.t}
+        <span className="dg-tag">{obj ? `Objetiva · peso ${q.peso}` : 'Dissertativa · contexto'}</span>
+      </h4>
+      <p className="dg-gp">{q.p}</p>
+      {obj ? (
+        <>
+          <div className="dg-gops" role="radiogroup" aria-label={q.t}>
+            {q.op.map((txt, i) => (
+              <label className={`dg-gop${v.nota === i ? ' on' : ''}`} key={i}>
+                <input type="radio" name={`g${q.id}`} checked={v.nota === i} disabled={!canEdit} onChange={() => set({ nota: i })} />
+                <b className="dg-mono">{i} pt{i === 1 ? '' : 's'}</b>
+                <span>{txt}</span>
+              </label>
+            ))}
+          </div>
+          <p className="dg-muted dg-small">O que revela: {q.rev}</p>
+          <label className="dg-fld">
+            <span>Observação do consultor (opcional)</span>
+            <textarea value={v.obs} onChange={(e) => set({ obs: e.target.value })} disabled={!canEdit} maxLength={2000} />
+          </label>
+        </>
+      ) : (
+        <>
+          <p className="dg-muted dg-small">Objetivo e gancho comercial: {q.gancho}</p>
+          <label className="dg-fld">
+            <span>Resposta</span>
+            <textarea value={v.texto} onChange={(e) => set({ texto: e.target.value })} disabled={!canEdit} maxLength={4000} />
+          </label>
+        </>
+      )}
+    </div>
+  )
+}
+
+export default function Gemi({ empId, emp, gemi, canEdit, user }) {
+  const email = normEmail(user.email)
+  const inicial = () =>
+    Object.fromEntries(
+      GEMI_QUESTOES.map((q) => [q.id, { nota: gemiNota(gemi, q.id), obs: String((gemi && gemi[q.id] && gemi[q.id].obs) || ''), texto: gemiTexto(gemi, q.id) }]),
+    )
+  const [form, setForm] = useState(inicial)
+  const [busy, setBusy] = useState(false)
+  const [msg, setMsg] = useState({ kind: '', text: '' })
+  const setQ = (id) => (patch) => setForm((f) => ({ ...f, [id]: { ...f[id], ...patch } }))
+  const sc = gemiScore(Object.fromEntries(GEMI_QUESTOES.map((q) => [q.id, { nota: form[q.id].nota }])))
+
+  async function save() {
+    setBusy(true)
+    setMsg({ kind: '', text: '' })
+    try {
+      const ts = serverTimestamp()
+      const ops = []
+      GEMI_QUESTOES.forEach((q) => {
+        const a = { nota: gemiNota(gemi, q.id), obs: String((gemi && gemi[q.id] && gemi[q.id].obs) || '').trim(), texto: gemiTexto(gemi, q.id) }
+        const b = { nota: form[q.id].nota, obs: form[q.id].obs.trim(), texto: form[q.id].texto.trim() }
+        const mud = []
+        const t = (v) => (v === null || v === undefined ? '' : String(v))
+        if (q.tipo === 'obj') {
+          if (a.nota !== b.nota) mud.push({ c: `gemi.${q.id}.nota`, de: t(a.nota), para: t(b.nota) })
+          if (a.obs !== b.obs) mud.push({ c: `gemi.${q.id}.obs`, de: a.obs, para: b.obs })
+        } else if (a.texto !== b.texto) mud.push({ c: `gemi.${q.id}.texto`, de: a.texto, para: b.texto })
+        if (!mud.length) return
+        const campos = q.tipo === 'obj' ? { nota: b.nota, obs: b.obs } : { texto: b.texto }
+        ops.push({ ref: doc(db, 'empresas', empId, 'gemi', q.id), campos, mud })
+      })
+      if (!ops.length) {
+        setMsg({ kind: 'ok', text: 'Nada mudou desde a última gravação.' })
+        setBusy(false)
+        return
+      }
+      for (let i = 0; i < ops.length; i += POR_LOTE) {
+        const parte = ops.slice(i, i + POR_LOTE)
+        const logRef = doc(collection(db, 'empresas', empId, 'log'))
+        const batch = writeBatch(db)
+        parte.forEach((op) => batch.set(op.ref, { ...op.campos, logId: logRef.id, updatedAt: ts, updatedBy: email }))
+        batch.set(logRef, { item: 'GEMI', email, papel: 'equipe', quando: ts, mudancas: parte.flatMap((op) => op.mud) })
+        await batch.commit()
+      }
+      setMsg({ kind: 'ok', text: 'Diagnóstico salvo e registrado no log.' })
+    } catch (er) {
+      setMsg({ kind: 'err', text: errMsg(er) })
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  const ultima = Object.values(gemi || {})
+    .map((x) => x.updatedAt)
+    .filter((x) => x && x.toMillis)
+    .sort((a, b) => b.toMillis() - a.toMillis())[0]
+
+  return (
+    <div>
+      <p className="dg-muted">
+        Diagnóstico rápido de {emp.nome}: 11 perguntas objetivas (nota de 0 a 4 vezes o peso) e 4 dissertativas.
+        {canEdit ? ' A equipe SAN marca a opção que corresponde à realidade, junto com o cliente.' : ' Preenchido pela equipe SAN; você acompanha o resultado.'}
+      </p>
+      <details className="dg-scale">
+        <summary>Escala de pontuação (0 a 4)</summary>
+        <dl>
+          {GEMI_ESCALA.map((m) => (
+            <div key={m.k}>
+              <dt className="dg-mono">{m.k} pt{m.k === 1 ? '' : 's'} · {m.l}</dt>
+              <dd>{m.d}</dd>
+            </div>
+          ))}
+        </dl>
+      </details>
+      {GEMI_FASES.map((f) => {
+        const s = sc.fases.find((x) => x.id === f.id)
+        return (
+          <section className="dg-card" key={f.id}>
+            <h2>
+              Fase {f.id} · {f.n}
+              <span className="dg-tag">
+                {s.pct === null ? 'sem nota' : `${fmtPct(s.pct)} · ${s.pts}/${s.max} pts`}
+                {s.nResp < s.nObj && s.nResp > 0 ? ` (parcial ${s.nResp}/${s.nObj})` : ''}
+              </span>
+            </h2>
+            <p className="dg-muted">{f.o}</p>
+            {GEMI_QUESTOES.filter((q) => q.f === f.id).map((q) => (
+              <Pergunta key={q.id} q={q} v={form[q.id]} set={setQ(q.id)} canEdit={canEdit} />
+            ))}
+          </section>
+        )
+      })}
+      {canEdit && (
+        <div className="dg-actions">
+          <button className="dg-btn dg-primary" type="button" onClick={save} disabled={busy}>
+            {busy ? 'Salvando…' : 'Salvar diagnóstico'}
+          </button>
+        </div>
+      )}
+      {msg.text && <p className={msg.kind === 'ok' ? 'dg-ok' : 'dg-err'} role="alert">{msg.text}</p>}
+      {ultima && <p className="dg-muted dg-small">Última gravação: {fmtTs(ultima)}</p>}
+    </div>
+  )
+}

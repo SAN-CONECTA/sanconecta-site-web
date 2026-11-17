@@ -3,6 +3,7 @@ import { collection, limit, onSnapshot, orderBy, query } from 'firebase/firestor
 import { db } from './firebase'
 import { BLOCO_BY_ID, EVID, RISK, STATUS, evKey, labelOf, rkKey } from './catalog'
 import { csvDownload } from './exportCsv'
+import { GEMI_QUESTOES } from './gemiDados'
 import { errMsg, fmtTs } from './util'
 
 const CAMPOS = {
@@ -18,6 +19,11 @@ const CAMPOS = {
 }
 
 function campoLabel(blocoId, c) {
+  if (c.startsWith('gemi.')) {
+    const [, id, campo] = c.split('.')
+    const q = GEMI_QUESTOES.find((x) => x.id === id)
+    return `Rápido ${id} ${q ? q.t : ''}: ${campo === 'nota' ? 'nota (0 a 4)' : campo === 'obs' ? 'observação' : 'resposta'}`
+  }
   if (CAMPOS[c]) return CAMPOS[c]
   if (c.startsWith('respostas.')) {
     const [, itemId, qid] = c.split('.')
@@ -31,6 +37,7 @@ function campoLabel(blocoId, c) {
 
 function valorLabel(c, v) {
   if (v === '' || v === undefined) return '(vazio)'
+  if (c.startsWith('gemi.') && c.endsWith('.nota')) return `${v} pt${v === '1' ? '' : 's'}`
   if (c === 'status') return labelOf(STATUS, v)
   if (c === 'risk') return labelOf(RISK, rkKey(v))
   if (c === 'evidStatus') return labelOf(EVID, evKey(v))

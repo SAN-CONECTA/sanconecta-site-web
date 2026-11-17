@@ -1,5 +1,7 @@
 import { BLOCOS, EVID, RISK, RODADAS, STATUS, evKey, labelOf, mtKey, rkKey } from './catalog'
 import { dataOf, respOf } from './calc'
+import { GEMI_QUESTOES } from './gemiDados'
+import { gemiNota } from './gemiCalc'
 import { fmtD, fmtTs } from './util'
 
 const labelOfR = (k) => (RODADAS.find((r) => r.k === k) || {}).n || ''
@@ -10,7 +12,28 @@ function csvCell(v) {
   return /[";\r\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s
 }
 
-export function exportCsv(emp, blocos, itens) {
+export function exportCsv(emp, blocos, itens, gemi) {
+  if (emp.modo === 'rapido') {
+    const head = ['Fase', 'Código', 'Pergunta', 'Tipo', 'Peso', 'Nota (0-4)', 'Pontos', 'Opção escolhida', 'Resposta / observação', 'Atualizado em']
+    const rows = GEMI_QUESTOES.map((q) => {
+      const nota = gemiNota(gemi, q.id)
+      const g = (gemi && gemi[q.id]) || {}
+      return [
+        q.f,
+        q.id,
+        `${q.t}: ${q.p}`,
+        q.tipo === 'obj' ? 'Objetiva' : 'Dissertativa',
+        q.peso || '',
+        nota === null ? '' : String(nota),
+        nota === null ? '' : String(nota * q.peso),
+        nota === null ? '' : q.op[nota],
+        q.tipo === 'obj' ? g.obs || '' : g.texto || '',
+        fmtTs(g.updatedAt),
+      ]
+    })
+    csvDownload(`diagnostico-rapido-${emp.nome}`, head, rows)
+    return
+  }
   const head = ['Rodada', 'Código', 'Bloco', 'Status', 'Risco', 'Responsável', 'Prazo', 'Achados do bloco', 'Respostas por pergunta', 'Maturidade do bloco (0-5)', 'Situação da evidência', 'Fonte da evidência', 'Recomendação', 'Atualizado em']
   const rows = BLOCOS.map((b) => {
     const d = dataOf(blocos, b.id)

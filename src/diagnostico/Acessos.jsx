@@ -20,6 +20,7 @@ export function DadosEmpresa({ emp, email }) {
     inicio: emp.inicio || '',
     prazo: emp.prazo || '',
     arquivada: !!emp.arquivada,
+    modo: emp.modo === 'rapido' ? 'rapido' : 'completo',
   })
   const [busy, setBusy] = useState(false)
   const [msg, setMsg] = useState({ kind: '', text: '' })
@@ -38,6 +39,7 @@ export function DadosEmpresa({ emp, email }) {
         inicio: f.inicio,
         prazo: f.prazo,
         arquivada: f.arquivada,
+        modo: f.modo,
         atualizadoEm: serverTimestamp(),
         atualizadoPor: email,
       })
@@ -79,6 +81,14 @@ export function DadosEmpresa({ emp, email }) {
             </label>
           </div>
         </div>
+        <label className="dg-fld">
+          <span>Tipo de diagnóstico</span>
+          <select value={f.modo} onChange={set('modo')}>
+            <option value="completo">Completo: 3 rodadas, 29 blocos e 704 perguntas de campo</option>
+            <option value="rapido">Rápido (GEMI): 15 perguntas, nota 0 a 4, alertas e faixa de classificação</option>
+          </select>
+          <span className="dg-muted dg-small">Trocar o tipo só muda o que aparece na tela. Nada que já foi gravado é apagado.</span>
+        </label>
         <label className="dg-check">
           <input type="checkbox" checked={f.arquivada} onChange={(e) => setF((x) => ({ ...x, arquivada: e.target.checked }))} />
           Arquivar esta empresa (some da lista, os dados ficam guardados)
