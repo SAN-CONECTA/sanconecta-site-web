@@ -42,7 +42,7 @@ export default function PainelGemi({ gemi, emp, onAbrir }) {
         </section>
         <section className="dg-card">
           <h2>Por fase</h2>
-          <dl className="dg-dl">
+          <dl className="dg-dl dg-dl-blk">
             {sc.fases.map((f) => (
               <div key={f.id} className="dg-fase">
                 <dt>
@@ -110,7 +110,7 @@ export default function PainelGemi({ gemi, emp, onAbrir }) {
 
       <section className="dg-card">
         <h2>Faixas de classificação</h2>
-        <dl className="dg-dl">
+        <dl className="dg-dl dg-dl-blk">
           {FAIXAS.map((f) => (
             <div key={f.l}>
               <dt>{f.de}% a {f.ate}% · {f.l}</dt>
