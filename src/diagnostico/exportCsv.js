@@ -1,41 +1,34 @@
-import { AREAS, EVID, ITEMS, PILLARS, RISK, STATUS, evKey, labelOf, rkKey } from './catalog'
-import { dataOf, fmtMat, matOf } from './calc'
+import { BLOCOS, EVID, RISK, RODADAS, STATUS, evKey, labelOf, mtKey, rkKey } from './catalog'
+import { dataOf, respOf } from './calc'
 import { fmtD, fmtTs } from './util'
 
-export function csvCell(v) {
+const labelOfR = (k) => (RODADAS.find((r) => r.k === k) || {}).n || ''
+
+function csvCell(v) {
   let s = String(v == null ? '' : v)
   if (/^[=+\-@\t\r]/.test(s)) s = `'${s}`
   return /[";\r\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s
 }
 
-export function exportCsv(emp, itens) {
-  const head = ['Área', 'Pilar', 'Código', 'Item', 'Status', 'Risco', 'Responsável', 'Prazo', 'Achados gerais', 'Respostas por pergunta', 'Maturidade do item (média 0-5)', 'Maturidade por bloco', 'Situação da evidência', 'Fonte da evidência', 'Recomendação', 'Atualizado em']
-  const rows = ITEMS.map((it) => {
-    const d = dataOf(itens, it.id)
+export function exportCsv(emp, blocos, itens) {
+  const head = ['Rodada', 'Código', 'Bloco', 'Status', 'Risco', 'Responsável', 'Prazo', 'Achados do bloco', 'Respostas por pergunta', 'Maturidade do bloco (0-5)', 'Situação da evidência', 'Fonte da evidência', 'Recomendação', 'Atualizado em']
+  const rows = BLOCOS.map((b) => {
+    const d = dataOf(blocos, b.id)
+    const nota = mtKey(d.nota)
     return [
-      labelOf(AREAS, PILLARS[it.p - 1].a),
-      PILLARS[it.p - 1].n,
-      it.id,
-      it.t,
+      labelOfR(b.r),
+      b.id,
+      b.n,
       labelOf(STATUS, d.status),
       labelOf(RISK, rkKey(d.risk)),
       d.owner,
       fmtD(d.due),
       d.findings,
-      it.b
-        .map((b) =>
-          b.q
-            .map((q, i) => ((d.respostas || {})[q.id] ? `${b.id}.${i + 1}) ${q.t.split('\n')[0]} ${(d.respostas || {})[q.id]}` : ''))
-            .filter(Boolean)
-            .join('\n'),
-        )
+      b.q
+        .map((q, i) => (respOf(itens, q.i, q.id) ? `${i + 1}) [${q.i}] ${q.t.split('\n')[0]} ${respOf(itens, q.i, q.id)}` : ''))
         .filter(Boolean)
         .join('\n'),
-      fmtMat(matOf(it, d)),
-      it.b
-        .filter((b) => b.n && Number.isInteger((d.notas || {})[b.id]))
-        .map((b) => `${b.t}: ${d.notas[b.id]}`)
-        .join('\n'),
+      nota === null ? '' : String(nota),
       labelOf(EVID, evKey(d.evidStatus)),
       d.evidence,
       d.reco,

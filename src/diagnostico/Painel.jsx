@@ -1,6 +1,6 @@
 import { Fragment } from 'react'
-import { AREAS, ITEMS, PILLARS, pad2, RISK, STATUS, labelOf, rkKey, rkRank } from './catalog'
-import { dataOf, stats } from './calc'
+import { BLOCOS, RISK, RODADAS, STATUS, blocosDe, labelOf, rkKey, rkRank } from './catalog'
+import { dataOf, fmtMat, stats } from './calc'
 import { daysBetween, fmtD, todayStr } from './util'
 
 function Seg({ counts, total, label, classes }) {
@@ -28,7 +28,7 @@ function AttList({ title, items, extra, empty, onOpen }) {
               <button type="button" onClick={() => onOpen(it.id)}>
                 <span className="dg-mono dg-muted">{it.id}</span>
                 <span className="dg-att-t">
-                  {it.t}
+                  {it.n}
                   <span className="dg-att-x">{extra(it)}</span>
                 </span>
               </button>
@@ -36,23 +36,23 @@ function AttList({ title, items, extra, empty, onOpen }) {
           ))}
         </ul>
       )}
-      {items.length > 6 && <p className="dg-muted dg-small">e mais {items.length - 6} na aba Itens</p>}
+      {items.length > 6 && <p className="dg-muted dg-small">e mais {items.length - 6} nas abas das rodadas</p>}
     </div>
   )
 }
 
-export default function Painel({ itens, emp, onPillar, onOpen }) {
-  const all = stats(itens, ITEMS)
+export default function Painel({ blocos, emp, onRodada, onOpen }) {
+  const all = stats(blocos, BLOCOS)
   const today = todayStr()
-  const d = (id) => dataOf(itens, id)
+  const d = (id) => dataOf(blocos, id)
 
-  const crit = ITEMS.filter((it) => ['critico', 'alto'].includes(rkKey(d(it.id).risk))).sort(
+  const crit = BLOCOS.filter((it) => ['critico', 'alto'].includes(rkKey(d(it.id).risk))).sort(
     (a, b) => rkRank(d(b.id).risk) - rkRank(d(a.id).risk),
   )
-  const late = ITEMS.filter((it) => d(it.id).due && d(it.id).due < today && d(it.id).status !== 'concluido').sort((a, b) =>
+  const late = BLOCOS.filter((it) => d(it.id).due && d(it.id).due < today && d(it.id).status !== 'concluido').sort((a, b) =>
     d(a.id).due < d(b.id).due ? -1 : 1,
   )
-  const orphan = ITEMS.filter(
+  const orphan = BLOCOS.filter(
     (it) => !['nao_iniciado', 'concluido'].includes(d(it.id).status) && !String(d(it.id).owner).trim(),
   )
 
@@ -65,7 +65,7 @@ export default function Painel({ itens, emp, onPillar, onOpen }) {
           <h2>Progresso</h2>
           <p className="dg-big">
             <span className="dg-num">{all.st[3]}</span>
-            <span className="dg-of">de {all.total} itens concluídos</span>
+            <span className="dg-of">de {all.total} blocos concluídos</span>
           </p>
           <Seg counts={all.st} total={all.total} label="Distribuição por status" classes={ST_CLASSES} />
           <ul className="dg-legend">
@@ -83,7 +83,7 @@ export default function Painel({ itens, emp, onPillar, onOpen }) {
           <h2>Risco</h2>
           <p className="dg-big">
             <span className="dg-num">{all.rk.critico + all.rk.alto}</span>
-            <span className="dg-of">itens com risco alto ou crítico</span>
+            <span className="dg-of">blocos com risco alto ou crítico</span>
           </p>
           <Seg
             counts={RK_ORDER.map((k) => all.rk[k])}
@@ -105,26 +105,26 @@ export default function Painel({ itens, emp, onPillar, onOpen }) {
         <section className="dg-card">
           <h2>Maturidade</h2>
           {all.mAvg === null ? (
-            <p className="dg-muted">Nenhum item avaliado ainda. A nota vai de 0 (inexistente) a 5 (otimizado).</p>
+            <p className="dg-muted">Nenhum bloco avaliado ainda. A nota vai de 0 (inexistente) a 5 (otimizado).</p>
           ) : (
             <p className="dg-big">
               <span className="dg-num">{all.mAvg.toFixed(1).replace('.', ',')}</span>
-              <span className="dg-of">média de 0 a 5, em {all.mN} de {all.total} itens avaliados</span>
+              <span className="dg-of">média de 0 a 5, em {all.mN} de {all.total} blocos avaliados</span>
             </p>
           )}
           <dl className="dg-dl">
-            {AREAS.map((a) => {
-              const sa = stats(itens, ITEMS.filter((it) => PILLARS[it.p - 1].a === a.k))
+            {RODADAS.map((r) => {
+              const sa = stats(blocos, blocosDe(r.k))
               return (
-                <Fragment key={a.k}>
-                  <dt>{a.l}</dt>
-                  <dd>{sa.mAvg === null ? 'sem nota' : `${sa.mAvg.toFixed(1).replace('.', ',')} (${sa.mN} de ${sa.total})`}</dd>
+                <Fragment key={r.k}>
+                  <dt>{r.n}</dt>
+                  <dd>{sa.mAvg === null ? 'sem nota' : `${fmtMat(sa.mAvg)} (${sa.mN} de ${sa.total})`}</dd>
                 </Fragment>
               )
             })}
           </dl>
           <p className="dg-muted dg-small">
-            {all.evPend ? `${all.evPend} ${all.evPend === 1 ? 'item com evidência pendente' : 'itens com evidência pendente'}.` : 'Nenhuma evidência pendente.'}
+            {all.evPend ? `${all.evPend} ${all.evPend === 1 ? 'bloco com evidência pendente' : 'blocos com evidência pendente'}.` : 'Nenhuma evidência pendente.'}
           </p>
         </section>
 
@@ -158,26 +158,20 @@ export default function Painel({ itens, emp, onPillar, onOpen }) {
       </div>
 
       <section className="dg-card">
-        <h2>Andamento por pilar</h2>
-        {AREAS.map((ar) => (
-          <div key={ar.k}>
-            <h3 className="dg-area">{ar.l}</h3>
-            {PILLARS.filter((p) => p.a === ar.k).map((p) => {
-          const s = stats(itens, ITEMS.filter((it) => it.p === p.id))
+        <h2>Andamento por rodada</h2>
+        {RODADAS.map((r) => {
+          const s = stats(blocos, blocosDe(r.k))
           return (
-            <button type="button" className="dg-prow" key={p.id} onClick={() => onPillar(String(p.id))}>
+            <button type="button" className="dg-prow" key={r.k} onClick={() => onRodada(r.k)}>
               <span className="dg-pname">
-                <strong>
-                  <span className="dg-mono dg-muted">{pad2(p.id)}</span> {p.n}
-                </strong>
-                <span className="dg-tag">{p.t}</span>
+                <strong>{r.n}</strong>
               </span>
               <span className="dg-pbar">
-                <Seg counts={s.st} total={s.total} label={`Status do pilar ${p.id}`} classes={ST_CLASSES} />
+                <Seg counts={s.st} total={s.total} label={`Status da rodada ${r.n}`} classes={ST_CLASSES} />
               </span>
               <span className="dg-pnum">
                 {s.st[3]} de {s.total}
-                {s.mAvg !== null && <span className="dg-muted dg-small"> · mat. {s.mAvg.toFixed(1).replace('.', ',')}</span>}
+                {s.mAvg !== null && <span className="dg-muted dg-small"> · mat. {fmtMat(s.mAvg)}</span>}
               </span>
               <span className="dg-prisk">
                 {['critico', 'alto', 'medio']
@@ -191,9 +185,7 @@ export default function Painel({ itens, emp, onPillar, onOpen }) {
               </span>
             </button>
           )
-            })}
-          </div>
-        ))}
+        })}
       </section>
 
       <section className="dg-card">
@@ -204,21 +196,21 @@ export default function Painel({ itens, emp, onPillar, onOpen }) {
             items={crit}
             onOpen={onOpen}
             extra={(it) => `${labelOf(RISK, rkKey(d(it.id).risk))} · ${labelOf(STATUS, d(it.id).status)}`}
-            empty="Nenhum item com risco alto ou crítico até agora."
+            empty="Nenhum bloco com risco alto ou crítico até agora."
           />
           <AttList
             title="Prazo vencido"
             items={late}
             onOpen={onOpen}
             extra={(it) => `venceu em ${fmtD(d(it.id).due)}${d(it.id).owner ? ` · ${d(it.id).owner}` : ''}`}
-            empty="Nenhum item atrasado."
+            empty="Nenhum bloco atrasado."
           />
           <AttList
             title="Em andamento sem responsável"
             items={orphan}
             onOpen={onOpen}
             extra={(it) => labelOf(STATUS, d(it.id).status)}
-            empty="Todo item em andamento tem responsável."
+            empty="Todo bloco em andamento tem responsável."
           />
         </div>
       </section>

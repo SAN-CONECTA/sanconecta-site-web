@@ -5,8 +5,9 @@ rules_version = '2';
 // Modelo:
 //   staff/{email}                         administradores da SAN (todas as empresas)
 //   empresas/{empresaId}                  dados da empresa cliente
-//   empresas/{empresaId}/itens/{itemId}   os 31 itens (TI e Gestão do Negócio) do diagnóstico ("1.1" a "10.2")
-//   empresas/{empresaId}/log/{logId}      registro de cada gravação nos itens (quem, quando, o que mudou); só a equipe SAN lê
+//   empresas/{empresaId}/itens/{itemId}   respostas das perguntas, guardadas por item de origem ("1.1" a "10.2"), chaves q01..q40
+//   empresas/{empresaId}/blocos/{codigo}  status, risco, nota 0 a 5, achados etc. de cada bloco das 3 rodadas (TI-01, AL-01, GE-01...)
+//   empresas/{empresaId}/log/{logId}      registro de cada gravação (quem, quando, o que mudou); só a equipe SAN lê
 //   membros/{empresaId}__{email}          quem acessa cada empresa (sempre com perfil de leitura)
 //
 // Princípios:
@@ -14,8 +15,8 @@ rules_version = '2';
 //   - Cliente só enxerga a empresa em que o e-mail dele consta em "membros".
 //   - Só administradores SAN criam empresas, liberam usuários, preenchem os itens e alteram a equipe SAN.
 //   - Cliente (membro da empresa) lê a própria empresa e pode gravar SÓ as respostas das perguntas e a situação da evidência
-//     (v1.7). Nota de maturidade, risco, status, achados e recomendação continuam só da equipe SAN.
-//   - Toda gravação em item exige, no mesmo lote, um registro em log/ criado agora, com o e-mail de quem gravou (v1.7).
+//     (v1.7) e, por bloco, a situação da evidência (v1.8). Nota de maturidade, risco, status, achados e recomendação continuam só da equipe SAN.
+//   - Toda gravação em item ou bloco exige, no mesmo lote, um registro em log/ criado agora, com o e-mail de quem gravou (v1.7).
 //     Registros não podem ser alterados; só somem junto com a exclusão da empresa arquivada.
 //   - Empresas só são apagadas depois de arquivadas (e os itens delas junto); nunca por cliente.
 //   - O primeiro administrador SAN é criado à mão no console (staff/<email>), conforme docs/DIAGNOSTICO.md.
@@ -47,12 +48,21 @@ service cloud.firestore {
       return item.matches('^([1-5]\\.[1-5]|([6-9]|10)\\.[1-3])$');
     }
 
-    // Exige, no mesmo lote da gravação do item, um registro novo no log feito por quem está gravando.
-    function logOk(emp, item) {
+    // Códigos dos blocos: TI-01..TI-10 (com sufixo A a C), AL-01..AL-09 e GE-01..GE-09.
+    function blocoIdOk(id) {
+      return id.matches('^(TI-(0[1-9]|10)[A-C]?|AL-0[1-9]|GE-0[1-9])$');
+    }
+
+    // Exige, no mesmo lote da gravação, um registro novo no log feito por quem está gravando (uma única leitura).
+    function logOk(emp) {
+      let lg = getAfter(/databases/$(database)/documents/empresas/$(emp)/log/$(request.resource.data.logId)).data;
       return request.resource.data.logId is string
-        && getAfter(/databases/$(database)/documents/empresas/$(emp)/log/$(request.resource.data.logId)).data.item == item
-        && getAfter(/databases/$(database)/documents/empresas/$(emp)/log/$(request.resource.data.logId)).data.email == me()
-        && getAfter(/databases/$(database)/documents/empresas/$(emp)/log/$(request.resource.data.logId)).data.quando == request.time;
+        && lg.email == me()
+        && lg.quando == request.time;
+    }
+
+    function empAtiva(emp) {
+      return get(/databases/$(database)/documents/empresas/$(emp)).data.arquivada != true;
     }
 
     function shortStr(v, max) {
@@ -104,23 +114,6 @@ service cloud.firestore {
         && (!('q39' in r) || shortStr(r['q39'], 2000))
         && (!('q40' in r) || shortStr(r['q40'], 2000));
     }
-    function notaOk(n, k) {
-      return !(k in n) || (n[k] is int && n[k] >= 0 && n[k] <= 5);
-    }
-    function notasOk(n) {
-      return n is map
-        && n.keys().hasOnly(['b1','b2','b3','b4','b5','b6','b7','b8','b9','b10'])
-        && notaOk(n, 'b1')
-        && notaOk(n, 'b2')
-        && notaOk(n, 'b3')
-        && notaOk(n, 'b4')
-        && notaOk(n, 'b5')
-        && notaOk(n, 'b6')
-        && notaOk(n, 'b7')
-        && notaOk(n, 'b8')
-        && notaOk(n, 'b9')
-        && notaOk(n, 'b10');
-    }
 
     // Equipe SAN
     match /staff/{email} {
@@ -167,15 +160,40 @@ service cloud.firestore {
       // Só se apaga empresa que já foi arquivada (o primeiro passo é sempre arquivar).
       allow delete: if isStaff() && resource.data.arquivada == true;
 
-      // Itens do diagnóstico
+      // Respostas das perguntas, por item de origem. Equipe SAN, ou cliente da empresa se ela não estiver arquivada.
       match /itens/{item} {
         allow read: if isStaff() || isMember(emp);
 
-        allow create, update: if isStaff()
+        allow create: if (isStaff() || (isMember(emp) && empAtiva(emp)))
           && itemIdOk(item)
-          && request.resource.data.keys().hasOnly(['status', 'risk', 'owner', 'due', 'findings', 'evidence', 'reco', 'updatedAt', 'updatedBy', 'maturity', 'evidStatus', 'respostas', 'notas', 'logId'])
-          && request.resource.data.keys().hasAll(['status', 'risk', 'owner', 'due', 'findings', 'evidence', 'reco', 'updatedAt', 'updatedBy', 'logId'])
-          && logOk(emp, item)
+          && request.resource.data.keys().hasOnly(['respostas', 'updatedAt', 'updatedBy', 'logId'])
+          && request.resource.data.keys().hasAll(['respostas', 'updatedAt', 'updatedBy', 'logId'])
+          && respOk(request.resource.data.respostas)
+          && request.resource.data.updatedAt == request.time
+          && request.resource.data.updatedBy == me()
+          && logOk(emp);
+
+        allow update: if (isStaff() || (isMember(emp) && empAtiva(emp)))
+          && itemIdOk(item)
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['respostas', 'updatedAt', 'updatedBy', 'logId'])
+          && respOk(request.resource.data.respostas)
+          && request.resource.data.updatedAt == request.time
+          && request.resource.data.updatedBy == me()
+          && logOk(emp);
+
+        // Itens só podem ser apagados junto com a exclusão de uma empresa arquivada.
+        allow delete: if isStaff()
+          && get(/databases/$(database)/documents/empresas/$(emp)).data.arquivada == true;
+      }
+
+      // Blocos das três rodadas. Equipe SAN grava tudo; cliente grava só a situação da evidência.
+      match /blocos/{bid} {
+        allow read: if isStaff() || isMember(emp);
+
+        allow create, update: if isStaff()
+          && blocoIdOk(bid)
+          && request.resource.data.keys().hasOnly(['status', 'risk', 'owner', 'due', 'findings', 'evidence', 'reco', 'nota', 'evidStatus', 'updatedAt', 'updatedBy', 'logId'])
+          && request.resource.data.keys().hasAll(['status', 'risk', 'owner', 'due', 'findings', 'evidence', 'reco', 'nota', 'evidStatus', 'updatedAt', 'updatedBy', 'logId'])
           && request.resource.data.status in ['nao_iniciado', 'coleta', 'analise', 'concluido']
           && request.resource.data.risk in ['sem', 'baixo', 'medio', 'alto', 'critico']
           && shortStr(request.resource.data.owner, 80)
@@ -183,41 +201,30 @@ service cloud.firestore {
           && shortStr(request.resource.data.findings, 4000)
           && shortStr(request.resource.data.evidence, 300)
           && shortStr(request.resource.data.reco, 4000)
-          // Campos novos (v1.1), opcionais: maturidade 0 a 5 (ou null) e situação da evidência.
-          && (!('maturity' in request.resource.data) || request.resource.data.maturity == null
-              || (request.resource.data.maturity is int && request.resource.data.maturity >= 0 && request.resource.data.maturity <= 5))
-          && (!('evidStatus' in request.resource.data)
-              || request.resource.data.evidStatus in ['nao_solicitada', 'solicitada', 'parcial', 'recebida', 'nao_recebida', 'nao_aplica'])
-          && (!('respostas' in request.resource.data) || respOk(request.resource.data.respostas))
-          && (!('notas' in request.resource.data) || notasOk(request.resource.data.notas))
-          && request.resource.data.updatedAt == request.time
-          && request.resource.data.updatedBy == me();
-
-        // Cliente: só respostas e situação da evidência, em empresa não arquivada.
-        allow create: if isMember(emp)
-          && itemIdOk(item)
-          && get(/databases/$(database)/documents/empresas/$(emp)).data.arquivada != true
-          && request.resource.data.keys().hasOnly(['respostas', 'evidStatus', 'updatedAt', 'updatedBy', 'logId'])
-          && request.resource.data.keys().hasAll(['updatedAt', 'updatedBy', 'logId'])
-          && (!('evidStatus' in request.resource.data)
-              || request.resource.data.evidStatus in ['nao_solicitada', 'solicitada', 'parcial', 'recebida', 'nao_recebida', 'nao_aplica'])
-          && (!('respostas' in request.resource.data) || respOk(request.resource.data.respostas))
+          && (request.resource.data.nota == null
+              || (request.resource.data.nota is int && request.resource.data.nota >= 0 && request.resource.data.nota <= 5))
+          && request.resource.data.evidStatus in ['nao_solicitada', 'solicitada', 'parcial', 'recebida', 'nao_recebida', 'nao_aplica']
           && request.resource.data.updatedAt == request.time
           && request.resource.data.updatedBy == me()
-          && logOk(emp, item);
+          && logOk(emp);
 
-        allow update: if isMember(emp)
-          && itemIdOk(item)
-          && get(/databases/$(database)/documents/empresas/$(emp)).data.arquivada != true
-          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['respostas', 'evidStatus', 'updatedAt', 'updatedBy', 'logId'])
-          && (!('evidStatus' in request.resource.data)
-              || request.resource.data.evidStatus in ['nao_solicitada', 'solicitada', 'parcial', 'recebida', 'nao_recebida', 'nao_aplica'])
-          && (!('respostas' in request.resource.data) || respOk(request.resource.data.respostas))
+        allow create: if isMember(emp) && empAtiva(emp)
+          && blocoIdOk(bid)
+          && request.resource.data.keys().hasOnly(['evidStatus', 'updatedAt', 'updatedBy', 'logId'])
+          && request.resource.data.keys().hasAll(['evidStatus', 'updatedAt', 'updatedBy', 'logId'])
+          && request.resource.data.evidStatus in ['nao_solicitada', 'solicitada', 'parcial', 'recebida', 'nao_recebida', 'nao_aplica']
           && request.resource.data.updatedAt == request.time
           && request.resource.data.updatedBy == me()
-          && logOk(emp, item);
+          && logOk(emp);
 
-        // Itens só podem ser apagados junto com a exclusão de uma empresa arquivada.
+        allow update: if isMember(emp) && empAtiva(emp)
+          && blocoIdOk(bid)
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['evidStatus', 'updatedAt', 'updatedBy', 'logId'])
+          && request.resource.data.evidStatus in ['nao_solicitada', 'solicitada', 'parcial', 'recebida', 'nao_recebida', 'nao_aplica']
+          && request.resource.data.updatedAt == request.time
+          && request.resource.data.updatedBy == me()
+          && logOk(emp);
+
         allow delete: if isStaff()
           && get(/databases/$(database)/documents/empresas/$(emp)).data.arquivada == true;
       }
@@ -230,7 +237,7 @@ service cloud.firestore {
           && request.resource.data.keys().hasOnly(['item', 'email', 'papel', 'quando', 'mudancas'])
           && request.resource.data.keys().hasAll(['item', 'email', 'papel', 'quando', 'mudancas'])
           && request.resource.data.item is string
-          && itemIdOk(request.resource.data.item)
+          && blocoIdOk(request.resource.data.item)
           && request.resource.data.email == me()
           && request.resource.data.papel in ['equipe', 'cliente']
           && (request.resource.data.papel == 'equipe') == isStaff()

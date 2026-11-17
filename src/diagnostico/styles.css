@@ -265,6 +265,9 @@ td select { min-height: 34px; width: auto; }
 .dg-blk-h { display: flex; justify-content: space-between; align-items: flex-end; gap: 12px; flex-wrap: wrap; margin-bottom: 8px; }
 .dg-blk-h h4 { margin: 0; font-size: 15px; flex: 1 1 240px; }
 .dg-nota { min-width: 200px; margin: 0; }
+.dg-blk > h4 { margin: 0 0 8px; font-size: 14px; }
+.dg-rodada-h { margin-bottom: 12px; }
+.dg-rodada-h p { margin: 0 0 4px; }
 .dg-scale { margin: 0 0 8px; font-size: 13px; }
 .dg-scale summary { cursor: pointer; font-weight: 600; }
 .dg-scale dl { margin: 8px 0 0; }
