@@ -7,40 +7,53 @@ import { errMsg, fmtTs, normEmail } from './util'
 
 const POR_LOTE = 4
 
-function Pergunta({ q, v, set, canEdit }) {
+function Pergunta({ q, v, set, canEdit, aberta, toggle, proxima }) {
   const obj = q.tipo === 'obj'
+  const feita = obj ? v.nota !== null : !!v.texto.trim()
   return (
-    <div className="dg-gq">
-      <h4>
-        <span className="dg-mono dg-muted">{q.id}</span> {q.t}
-        <span className="dg-tag">{obj ? `Objetiva · peso ${q.peso}` : 'Dissertativa · contexto'}</span>
-      </h4>
-      <p className="dg-gp">{q.p}</p>
-      {obj ? (
-        <>
-          <div className="dg-gops" role="radiogroup" aria-label={q.t}>
-            {q.op.map((txt, i) => (
-              <label className={`dg-gop${v.nota === i ? ' on' : ''}`} key={i}>
-                <input type="radio" name={`g${q.id}`} checked={v.nota === i} disabled={!canEdit} onChange={() => set({ nota: i })} />
-                <b className="dg-mono">{i} pt{i === 1 ? '' : 's'}</b>
-                <span>{txt}</span>
+    <div className={`dg-gq${aberta ? ' aberta' : ''}`}>
+      <button type="button" className="dg-gq-h" aria-expanded={aberta} aria-controls={`gq-${q.id}`} onClick={toggle}>
+        <span className="dg-gq-seta" aria-hidden="true">{aberta ? '▾' : '▸'}</span>
+        <span className="dg-mono dg-muted">{q.id}</span>
+        <span className="dg-gq-t">{q.t}</span>
+        <span className="dg-tag">{obj ? `Objetiva · peso ${q.peso}` : 'Dissertativa'}</span>
+        <span className={`dg-gq-st${feita ? ' ok' : ''}`}>{obj ? (feita ? `${v.nota} pt${v.nota === 1 ? '' : 's'}` : 'sem resposta') : feita ? 'respondida' : 'sem resposta'}</span>
+      </button>
+      {aberta && (
+        <div id={`gq-${q.id}`} className="dg-gq-corpo">
+          <p className="dg-gp">{q.p}</p>
+          {obj ? (
+            <>
+              <div className="dg-gops" role="radiogroup" aria-label={q.t}>
+                {q.op.map((txt, i) => (
+                  <label className={`dg-gop${v.nota === i ? ' on' : ''}`} key={i}>
+                    <input type="radio" name={`g${q.id}`} checked={v.nota === i} disabled={!canEdit} onChange={() => set({ nota: i })} />
+                    <b className="dg-mono">{i} pt{i === 1 ? '' : 's'}</b>
+                    <span>{txt}</span>
+                  </label>
+                ))}
+              </div>
+              <p className="dg-muted dg-small">O que revela: {q.rev}</p>
+              <label className="dg-fld">
+                <span>Observação do consultor (opcional)</span>
+                <textarea value={v.obs} onChange={(e) => set({ obs: e.target.value })} disabled={!canEdit} maxLength={2000} />
               </label>
-            ))}
-          </div>
-          <p className="dg-muted dg-small">O que revela: {q.rev}</p>
-          <label className="dg-fld">
-            <span>Observação do consultor (opcional)</span>
-            <textarea value={v.obs} onChange={(e) => set({ obs: e.target.value })} disabled={!canEdit} maxLength={2000} />
-          </label>
-        </>
-      ) : (
-        <>
-          <p className="dg-muted dg-small">Objetivo e gancho comercial: {q.gancho}</p>
-          <label className="dg-fld">
-            <span>Resposta</span>
-            <textarea value={v.texto} onChange={(e) => set({ texto: e.target.value })} disabled={!canEdit} maxLength={4000} />
-          </label>
-        </>
+            </>
+          ) : (
+            <>
+              <p className="dg-muted dg-small">Objetivo e gancho comercial: {q.gancho}</p>
+              <label className="dg-fld">
+                <span>Resposta</span>
+                <textarea value={v.texto} onChange={(e) => set({ texto: e.target.value })} disabled={!canEdit} maxLength={4000} />
+              </label>
+            </>
+          )}
+          {proxima && (
+            <p>
+              <button type="button" className="dg-btn" onClick={proxima}>Próxima pergunta →</button>
+            </p>
+          )}
+        </div>
       )}
     </div>
   )
@@ -53,9 +66,18 @@ export default function Gemi({ empId, emp, gemi, canEdit, user }) {
       GEMI_QUESTOES.map((q) => [q.id, { nota: gemiNota(gemi, q.id), obs: String((gemi && gemi[q.id] && gemi[q.id].obs) || ''), texto: gemiTexto(gemi, q.id) }]),
     )
   const [form, setForm] = useState(inicial)
+  const [abertas, setAbertas] = useState([])
   const [busy, setBusy] = useState(false)
   const [msg, setMsg] = useState({ kind: '', text: '' })
   const setQ = (id) => (patch) => setForm((f) => ({ ...f, [id]: { ...f[id], ...patch } }))
+  const alterna = (id) => setAbertas((a) => (a.includes(id) ? a.filter((x) => x !== id) : [...a, id]))
+  // Recolhe a pergunta atual e abre a seguinte (de qualquer fase).
+  const avanca = (id) => {
+    const i = GEMI_QUESTOES.findIndex((q) => q.id === id)
+    const prox = GEMI_QUESTOES[i + 1]
+    setAbertas((a) => [...a.filter((x) => x !== id), ...(prox ? [prox.id] : [])])
+    if (prox) setTimeout(() => document.getElementById(`gq-${prox.id}`)?.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 50)
+  }
   const sc = gemiScore(Object.fromEntries(GEMI_QUESTOES.map((q) => [q.id, { nota: form[q.id].nota }])))
 
   async function save() {
@@ -109,6 +131,10 @@ export default function Gemi({ empId, emp, gemi, canEdit, user }) {
         Fase Inicial de Estudo de {emp.nome}: 11 perguntas objetivas (nota de 0 a 4 vezes o peso) e 4 dissertativas.
         {canEdit ? ' A equipe SAN marca a opção que corresponde à realidade, junto com o cliente.' : ' Preenchido pela equipe SAN; você acompanha o resultado.'}
       </p>
+      <p className="dg-actions">
+        <button type="button" className="dg-btn" onClick={() => setAbertas(GEMI_QUESTOES.map((q) => q.id))}>Abrir todas</button>
+        <button type="button" className="dg-btn" onClick={() => setAbertas([])}>Fechar todas</button>
+      </p>
       <details className="dg-scale">
         <summary>Escala de pontuação (0 a 4)</summary>
         <dl>
@@ -133,7 +159,16 @@ export default function Gemi({ empId, emp, gemi, canEdit, user }) {
             </h2>
             <p className="dg-muted">{f.o}</p>
             {GEMI_QUESTOES.filter((q) => q.f === f.id).map((q) => (
-              <Pergunta key={q.id} q={q} v={form[q.id]} set={setQ(q.id)} canEdit={canEdit} />
+              <Pergunta
+                key={q.id}
+                q={q}
+                v={form[q.id]}
+                set={setQ(q.id)}
+                canEdit={canEdit}
+                aberta={abertas.includes(q.id)}
+                toggle={() => alterna(q.id)}
+                proxima={q.id === GEMI_QUESTOES[GEMI_QUESTOES.length - 1].id ? null : () => avanca(q.id)}
+              />
             ))}
           </section>
         )
