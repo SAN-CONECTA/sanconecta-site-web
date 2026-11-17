@@ -102,7 +102,7 @@ export default function Simulacao({ empId, emp, sim, user }) {
       <section className="dg-card">
         <h2>1. Parâmetros operacionais e financeiros do cliente</h2>
         <div className="dg-tblwrap">
-          <table>
+          <table className="dg-t-param">
             <thead>
               <tr><th>Parâmetro</th><th>Unidade</th><th>Valor informado</th><th>Observação</th></tr>
             </thead>
