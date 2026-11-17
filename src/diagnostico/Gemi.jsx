@@ -50,7 +50,7 @@ function Pergunta({ q, v, set, canEdit, aberta, toggle, proxima }) {
           )}
           {proxima && (
             <p>
-              <button type="button" className="dg-btn" onClick={proxima}>Próxima pergunta →</button>
+              <button type="button" className="dg-btn dg-next" onClick={proxima}>Próxima pergunta →</button>
             </p>
           )}
         </div>
