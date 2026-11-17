@@ -22,7 +22,7 @@ function campoLabel(blocoId, c) {
   if (c.startsWith('gemi.')) {
     const [, id, campo] = c.split('.')
     const q = GEMI_QUESTOES.find((x) => x.id === id)
-    return `Rápido ${id} ${q ? q.t : ''}: ${campo === 'nota' ? 'nota (0 a 4)' : campo === 'obs' ? 'observação' : 'resposta'}`
+    return `Fase Inicial ${id} ${q ? q.t : ''}: ${campo === 'nota' ? 'nota (0 a 4)' : campo === 'obs' ? 'observação' : 'resposta'}`
   }
   if (CAMPOS[c]) return CAMPOS[c]
   if (c.startsWith('respostas.')) {

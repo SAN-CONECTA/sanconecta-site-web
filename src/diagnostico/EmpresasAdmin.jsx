@@ -66,10 +66,10 @@ function NovaEmpresa({ email, onCreated, onCancel }) {
           </div>
         </div>
         <label className="dg-fld">
-          <span>Tipo de diagnóstico</span>
+          <span>Fase de estudo</span>
           <select value={f.modo} onChange={set('modo')}>
-            <option value="completo">Completo: 3 rodadas, 29 blocos e 704 perguntas de campo</option>
-            <option value="rapido">Rápido (GEMI): 15 perguntas, nota 0 a 4, alertas e faixa de classificação</option>
+            <option value="completo">Fase Aprofundada de Estudo: 3 rodadas, 29 blocos e 704 perguntas de campo</option>
+            <option value="rapido">Fase Inicial de Estudo: 15 perguntas, nota 0 a 4, alertas e faixa de classificação</option>
           </select>
         </label>
         {err && <p className="dg-err" role="alert">{err}</p>}
@@ -210,7 +210,7 @@ export default function EmpresasAdmin({ email }) {
               <strong>{e.nome}</strong>
               <p className="dg-muted dg-small">
                 {e.cnpj ? `CNPJ ${e.cnpj}` : 'CNPJ não informado'}
-                {` · diagnóstico ${e.modo === 'rapido' ? 'rápido (GEMI)' : 'completo'}`}
+                {` · ${e.modo === 'rapido' ? 'Fase Inicial de Estudo' : 'Fase Aprofundada de Estudo'}`}
                 {e.prazo ? ` · prazo ${fmtD(e.prazo)}` : ''}
                 {e.responsavel ? ` · ${e.responsavel}` : ''}
                 {e.arquivada ? ' · arquivada' : ''}
@@ -229,7 +229,7 @@ export default function EmpresasAdmin({ email }) {
           {edit === e.id && <DadosEmpresa key={`${e.id}-${e.atualizadoEm ? e.atualizadoEm.seconds : 0}`} emp={e} email={email} />}
           {del === e.id && e.arquivada && <ExcluirEmpresa emp={e} onClose={() => setDel('')} />}
           {!e.arquivada && (
-            <p className="dg-muted dg-small">Em “Editar” você muda o tipo de diagnóstico, os dados da empresa e arquiva. Para excluir, primeiro arquive.</p>
+            <p className="dg-muted dg-small">Em “Editar” você muda a fase de estudo (inicial ou aprofundada), os dados da empresa e arquiva. Para excluir, primeiro arquive.</p>
           )}
         </section>
       ))}

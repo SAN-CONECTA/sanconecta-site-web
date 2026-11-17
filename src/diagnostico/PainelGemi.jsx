@@ -25,7 +25,7 @@ export default function PainelGemi({ gemi, emp, onAbrir }) {
         <section className="dg-card">
           <h2>Índice geral</h2>
           {sc.indice === null ? (
-            <p className="dg-muted">Nenhuma pergunta objetiva avaliada ainda. Abra o Diagnóstico rápido para começar.</p>
+            <p className="dg-muted">Nenhuma pergunta objetiva avaliada ainda. Abra a Fase Inicial de Estudo para começar.</p>
           ) : (
             <>
               <p className="dg-big">

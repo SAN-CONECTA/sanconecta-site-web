@@ -14,7 +14,7 @@ import Log from './Log'
 
 const TABS = [
   ['painel', 'Painel'],
-  ['gemi', 'Diagnóstico rápido'],
+  ['gemi', 'Fase Inicial de Estudo'],
   ['ti', 'Maturidade de TI'],
   ['al', 'Alinhamento entre TI e negócio'],
   ['ge', 'Maturidade de gestão empresarial'],

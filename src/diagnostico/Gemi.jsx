@@ -106,7 +106,7 @@ export default function Gemi({ empId, emp, gemi, canEdit, user }) {
   return (
     <div>
       <p className="dg-muted">
-        Diagnóstico rápido de {emp.nome}: 11 perguntas objetivas (nota de 0 a 4 vezes o peso) e 4 dissertativas.
+        Fase Inicial de Estudo de {emp.nome}: 11 perguntas objetivas (nota de 0 a 4 vezes o peso) e 4 dissertativas.
         {canEdit ? ' A equipe SAN marca a opção que corresponde à realidade, junto com o cliente.' : ' Preenchido pela equipe SAN; você acompanha o resultado.'}
       </p>
       <details className="dg-scale">
