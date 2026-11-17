@@ -151,6 +151,11 @@ fieldset:disabled input, fieldset:disabled select, fieldset:disabled textarea { 
 .dg-dl { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 6px 16px; margin: 0; }
 .dg-dl dt { color: var(--muted); }
 .dg-dl dd { margin: 0; }
+/* Lista em que cada item é um bloco dt+dd dentro de um div (Por fase, Faixas de classificação). */
+.dg-dl-blk { display: block; }
+.dg-dl-blk > div { margin-bottom: 14px; }
+.dg-dl-blk > div:last-child { margin-bottom: 0; }
+.dg-dl-blk dt { color: inherit; overflow-wrap: anywhere; }
 
 .dg-prow { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; width: 100%; text-align: left; background: none; border: 0; border-top: 1px solid var(--line); padding: 12px 0; cursor: pointer; }
 .dg-prow:first-of-type { border-top: 0; }
