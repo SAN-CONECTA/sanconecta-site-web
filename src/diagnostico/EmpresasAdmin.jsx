@@ -210,6 +210,7 @@ export default function EmpresasAdmin({ email }) {
               <strong>{e.nome}</strong>
               <p className="dg-muted dg-small">
                 {e.cnpj ? `CNPJ ${e.cnpj}` : 'CNPJ não informado'}
+                {` · diagnóstico ${e.modo === 'rapido' ? 'rápido (GEMI)' : 'completo'}`}
                 {e.prazo ? ` · prazo ${fmtD(e.prazo)}` : ''}
                 {e.responsavel ? ` · ${e.responsavel}` : ''}
                 {e.arquivada ? ' · arquivada' : ''}
@@ -228,7 +229,7 @@ export default function EmpresasAdmin({ email }) {
           {edit === e.id && <DadosEmpresa key={`${e.id}-${e.atualizadoEm ? e.atualizadoEm.seconds : 0}`} emp={e} email={email} />}
           {del === e.id && e.arquivada && <ExcluirEmpresa emp={e} onClose={() => setDel('')} />}
           {!e.arquivada && (
-            <p className="dg-muted dg-small">Para excluir, primeiro arquive a empresa em “Editar”.</p>
+            <p className="dg-muted dg-small">Em “Editar” você muda o tipo de diagnóstico, os dados da empresa e arquiva. Para excluir, primeiro arquive.</p>
           )}
         </section>
       ))}
