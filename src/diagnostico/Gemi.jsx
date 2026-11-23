@@ -7,6 +7,19 @@ import { errMsg, fmtTs, normEmail } from './util'
 
 const POR_LOTE = 4
 
+// Botão "?" com a explicação: aparece ao passar o mouse, ao focar com o teclado ou ao tocar (celular).
+function Dica({ texto }) {
+  const [aberta, setAberta] = useState(false)
+  return (
+    <span className={`dg-dica${aberta ? ' aberta' : ''}`}>
+      <button type="button" className="dg-dica-b" aria-label="Objetivo e gancho comercial" aria-expanded={aberta} onClick={() => setAberta((x) => !x)} onBlur={() => setAberta(false)}>
+        ?
+      </button>
+      <span className="dg-dica-t" role="tooltip">{texto}</span>
+    </span>
+  )
+}
+
 function Pergunta({ q, v, set, canEdit, canAnswer, aberta, toggle, proxima }) {
   const obj = q.tipo === 'obj'
   const feita = obj ? v.nota !== null : !!v.texto.trim() || v.opcoes.length > 0
@@ -21,7 +34,10 @@ function Pergunta({ q, v, set, canEdit, canAnswer, aberta, toggle, proxima }) {
       </button>
       {aberta && (
         <div id={`gq-${q.id}`} className="dg-gq-corpo">
-          <p className="dg-gp">{q.p}</p>
+          <p className="dg-gp">
+            {q.p}
+            {q.gancho && <Dica texto={`Objetivo e gancho comercial: ${q.gancho}`} />}
+          </p>
           {obj ? (
             <>
               <div className="dg-gops" role="radiogroup" aria-label={q.t}>
@@ -41,7 +57,7 @@ function Pergunta({ q, v, set, canEdit, canAnswer, aberta, toggle, proxima }) {
             </>
           ) : (
             <>
-              {q.gancho && <p className="dg-muted dg-small">Objetivo e gancho comercial: {q.gancho}</p>}
+              
               {q.opcoes && (
                 <fieldset className="dg-gchk">
                   <legend>Marque o que se aplica</legend>
