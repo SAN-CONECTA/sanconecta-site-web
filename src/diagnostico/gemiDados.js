@@ -159,7 +159,6 @@ export const GEMI_QUESTOES = [
     "t": "Visão de Futuro e Gargalos de Crescimento",
     "tipo": "dis",
     "p": "Se a empresa dobrasse o volume de vendas ou atendimento nos próximos 6 meses, o que na tecnologia atual seria o primeiro a travar?",
-    "gancho": "Fazer o próprio cliente verbalizar onde a limitação tecnológica está travando a escala do faturamento.",
     "opcoes": [
       ["erp", "O sistema de gestão (ERP) ficaria lento ou travaria"],
       ["integracao", "Os sistemas não se integram e a equipe digitaria dados em duplicidade"],
