@@ -41,7 +41,7 @@ function Pergunta({ q, v, set, canEdit, canAnswer, aberta, toggle, proxima }) {
             </>
           ) : (
             <>
-              <p className="dg-muted dg-small">Objetivo e gancho comercial: {q.gancho}</p>
+              {q.gancho && <p className="dg-muted dg-small">Objetivo e gancho comercial: {q.gancho}</p>}
               {q.opcoes && (
                 <fieldset className="dg-gchk">
                   <legend>Marque o que se aplica</legend>
