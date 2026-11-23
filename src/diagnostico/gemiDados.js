@@ -132,7 +132,7 @@ export const GEMI_QUESTOES = [
       "Existem sistemas diferentes que não se falam; a equipe precisa redigitar dados manualmente.",
       "Há exportação e importação manual de arquivos (CSV/Excel) entre sistemas.",
       "Os sistemas principais (ERP/CRM/Financeiro) são integrados via API ou banco único na maior parte dos processos.",
-      "Ecossistema totalmente integrado em tempo real, com dado único (Single Source of Truth) e zero retrabalho de digitação."
+      "Ecossistema totalmente integrado em tempo real, com dado único e zero retrabalho de digitação."
     ],
     "p": "Como as informações trafegam entre os diferentes sistemas e setores da empresa (Comercial, Operacional, Financeiro)?",
     "rev": "Identifica 'ilhas de informação', planilhas paralelas e lentidão na consolidação de dados."
