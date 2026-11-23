@@ -10,7 +10,9 @@ export const ONLINE_MS = 3 * 60 * 1000
 
 export function usePresenca(user, route) {
   const ref = useRef(route)
-  ref.current = route
+  useEffect(() => {
+    ref.current = route
+  }, [route])
   const email = user && user.emailVerified ? normEmail(user.email) : ''
   const nome = user ? String(user.displayName || '').slice(0, 120) : ''
 
