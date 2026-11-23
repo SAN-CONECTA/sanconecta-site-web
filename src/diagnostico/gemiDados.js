@@ -158,8 +158,17 @@ export const GEMI_QUESTOES = [
     "f": 2,
     "t": "Visão de Futuro e Gargalos de Crescimento",
     "tipo": "dis",
-    "p": "Se a empresa dobrasse o volume de vendas ou atendimento nos próximos 6 meses, qual processo ou sistema atual seria o primeiro a travar?",
-    "gancho": "Fazer o próprio cliente verbalizar onde a limitação tecnológica está travando a escala do faturamento."
+    "p": "Se a empresa dobrasse o volume de vendas ou atendimento nos próximos 6 meses, o que na tecnologia atual seria o primeiro a travar?",
+    "gancho": "Fazer o próprio cliente verbalizar onde a limitação tecnológica está travando a escala do faturamento.",
+    "opcoes": [
+      ["erp", "O sistema de gestão (ERP) ficaria lento ou travaria"],
+      ["integracao", "Os sistemas não se integram e a equipe digitaria dados em duplicidade"],
+      ["infra", "Servidor ou computadores sem capacidade para mais usuários"],
+      ["link", "Internet ou link sem folga para mais demanda"],
+      ["seguranca", "Segurança e backup não acompanhariam o volume maior de dados"],
+      ["dependencia", "Dependência de poucas pessoas (ou de um técnico) para manter tudo funcionando"],
+      ["outros", "Outros (descreva abaixo)"]
+    ]
   },
   {
     "id": "2.5",

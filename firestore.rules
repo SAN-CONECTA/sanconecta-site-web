@@ -253,8 +253,8 @@ service cloud.firestore {
           && (!('obs' in request.resource.data) || shortStr(request.resource.data.obs, 2000))
           && (!('texto' in request.resource.data) || shortStr(request.resource.data.texto, 4000))
           && (!('opcoes' in request.resource.data)
-              || (request.resource.data.opcoes is list && request.resource.data.opcoes.size() <= 4
-                  && request.resource.data.opcoes.hasOnly(['servidor', 'nobreak', 'link', 'outros'])))
+              || (request.resource.data.opcoes is list && request.resource.data.opcoes.size() <= 9
+                  && request.resource.data.opcoes.hasOnly(['servidor', 'nobreak', 'link', 'outros', 'erp', 'integracao', 'infra', 'seguranca', 'dependencia'])))
           && request.resource.data.updatedAt == request.time
           && request.resource.data.updatedBy == me()
           && logOk(emp);
@@ -269,8 +269,8 @@ service cloud.firestore {
               || (request.resource.data.nota is int && request.resource.data.nota >= 0 && request.resource.data.nota <= 4))
           && (!('texto' in request.resource.data) || shortStr(request.resource.data.texto, 4000))
           && (!('opcoes' in request.resource.data)
-              || (request.resource.data.opcoes is list && request.resource.data.opcoes.size() <= 4
-                  && request.resource.data.opcoes.hasOnly(['servidor', 'nobreak', 'link', 'outros'])))
+              || (request.resource.data.opcoes is list && request.resource.data.opcoes.size() <= 9
+                  && request.resource.data.opcoes.hasOnly(['servidor', 'nobreak', 'link', 'outros', 'erp', 'integracao', 'infra', 'seguranca', 'dependencia'])))
           && request.resource.data.updatedAt == request.time
           && request.resource.data.updatedBy == me()
           && logOk(emp);
@@ -284,8 +284,8 @@ service cloud.firestore {
               || (request.resource.data.nota is int && request.resource.data.nota >= 0 && request.resource.data.nota <= 4))
           && (!('texto' in request.resource.data) || shortStr(request.resource.data.texto, 4000))
           && (!('opcoes' in request.resource.data)
-              || (request.resource.data.opcoes is list && request.resource.data.opcoes.size() <= 4
-                  && request.resource.data.opcoes.hasOnly(['servidor', 'nobreak', 'link', 'outros'])))
+              || (request.resource.data.opcoes is list && request.resource.data.opcoes.size() <= 9
+                  && request.resource.data.opcoes.hasOnly(['servidor', 'nobreak', 'link', 'outros', 'erp', 'integracao', 'infra', 'seguranca', 'dependencia'])))
           && request.resource.data.updatedAt == request.time
           && request.resource.data.updatedBy == me()
           && logOk(emp);
