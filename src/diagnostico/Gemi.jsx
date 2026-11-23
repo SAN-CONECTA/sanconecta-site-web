@@ -2,14 +2,14 @@ import { useState } from 'react'
 import { collection, doc, serverTimestamp, writeBatch } from 'firebase/firestore'
 import { db } from './firebase'
 import { GEMI_ESCALA, GEMI_FASES, GEMI_QUESTOES } from './gemiDados'
-import { fmtPct, gemiNota, gemiScore, gemiTexto } from './gemiCalc'
+import { fmtPct, gemiNota, gemiOpcoes, gemiScore, gemiTexto } from './gemiCalc'
 import { errMsg, fmtTs, normEmail } from './util'
 
 const POR_LOTE = 4
 
 function Pergunta({ q, v, set, canEdit, canAnswer, aberta, toggle, proxima }) {
   const obj = q.tipo === 'obj'
-  const feita = obj ? v.nota !== null : !!v.texto.trim()
+  const feita = obj ? v.nota !== null : !!v.texto.trim() || v.opcoes.length > 0
   return (
     <div className={`dg-gq${aberta ? ' aberta' : ''}`}>
       <button type="button" className="dg-gq-h" aria-expanded={aberta} aria-controls={`gq-${q.id}`} onClick={toggle}>
@@ -42,6 +42,22 @@ function Pergunta({ q, v, set, canEdit, canAnswer, aberta, toggle, proxima }) {
           ) : (
             <>
               <p className="dg-muted dg-small">Objetivo e gancho comercial: {q.gancho}</p>
+              {q.opcoes && (
+                <fieldset className="dg-gchk">
+                  <legend>Marque o que se aplica</legend>
+                  {q.opcoes.map(([k, l]) => (
+                    <label className="dg-chk" key={k}>
+                      <input
+                        type="checkbox"
+                        checked={v.opcoes.includes(k)}
+                        disabled={!canAnswer}
+                        onChange={(e) => set({ opcoes: q.opcoes.map((o) => o[0]).filter((x) => (x === k ? e.target.checked : v.opcoes.includes(x))) })}
+                      />
+                      <span>{l}</span>
+                    </label>
+                  ))}
+                </fieldset>
+              )}
               <label className="dg-fld">
                 <span>Resposta</span>
                 <textarea value={v.texto} onChange={(e) => set({ texto: e.target.value })} disabled={!canAnswer} maxLength={4000} />
@@ -63,7 +79,7 @@ export default function Gemi({ empId, emp, gemi, canEdit, canAnswer, user }) {
   const email = normEmail(user.email)
   const inicial = () =>
     Object.fromEntries(
-      GEMI_QUESTOES.map((q) => [q.id, { nota: gemiNota(gemi, q.id), obs: String((gemi && gemi[q.id] && gemi[q.id].obs) || ''), texto: gemiTexto(gemi, q.id) }]),
+      GEMI_QUESTOES.map((q) => [q.id, { nota: gemiNota(gemi, q.id), obs: String((gemi && gemi[q.id] && gemi[q.id].obs) || ''), texto: gemiTexto(gemi, q.id), opcoes: gemiOpcoes(gemi, q) }]),
     )
   const [form, setForm] = useState(inicial)
   const [abertas, setAbertas] = useState([])
@@ -87,16 +103,19 @@ export default function Gemi({ empId, emp, gemi, canEdit, canAnswer, user }) {
       const ts = serverTimestamp()
       const ops = []
       GEMI_QUESTOES.forEach((q) => {
-        const a = { nota: gemiNota(gemi, q.id), obs: String((gemi && gemi[q.id] && gemi[q.id].obs) || '').trim(), texto: gemiTexto(gemi, q.id) }
-        const b = { nota: form[q.id].nota, obs: form[q.id].obs.trim(), texto: form[q.id].texto.trim() }
+        const a = { nota: gemiNota(gemi, q.id), obs: String((gemi && gemi[q.id] && gemi[q.id].obs) || '').trim(), texto: gemiTexto(gemi, q.id), opcoes: gemiOpcoes(gemi, q) }
+        const b = { nota: form[q.id].nota, obs: form[q.id].obs.trim(), texto: form[q.id].texto.trim(), opcoes: form[q.id].opcoes }
         const mud = []
         const t = (v) => (v === null || v === undefined ? '' : String(v))
         if (q.tipo === 'obj') {
           if (a.nota !== b.nota) mud.push({ c: `gemi.${q.id}.nota`, de: t(a.nota), para: t(b.nota) })
           if (canEdit && a.obs !== b.obs) mud.push({ c: `gemi.${q.id}.obs`, de: a.obs, para: b.obs })
-        } else if (a.texto !== b.texto) mud.push({ c: `gemi.${q.id}.texto`, de: a.texto, para: b.texto })
+        } else {
+          if (a.texto !== b.texto) mud.push({ c: `gemi.${q.id}.texto`, de: a.texto, para: b.texto })
+          if (q.opcoes && a.opcoes.join() !== b.opcoes.join()) mud.push({ c: `gemi.${q.id}.opcoes`, de: a.opcoes.join(', '), para: b.opcoes.join(', ') })
+        }
         if (!mud.length) return
-        const campos = q.tipo === 'obj' ? (canEdit ? { nota: b.nota, obs: b.obs } : { nota: b.nota }) : { texto: b.texto }
+        const campos = q.tipo === 'obj' ? (canEdit ? { nota: b.nota, obs: b.obs } : { nota: b.nota }) : q.opcoes ? { texto: b.texto, opcoes: b.opcoes } : { texto: b.texto }
         ops.push({ ref: doc(db, 'empresas', empId, 'gemi', q.id), campos, mud })
       })
       if (!ops.length) {

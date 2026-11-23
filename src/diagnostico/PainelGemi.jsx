@@ -1,5 +1,5 @@
 import { GEMI_ESCALA, GEMI_QUESTOES } from './gemiDados'
-import { fmtPct, gemiNota, gemiScore, gemiTexto, FAIXAS } from './gemiCalc'
+import { fmtPct, gemiNota, gemiOpcoesTxt, gemiScore, gemiTexto, FAIXAS } from './gemiCalc'
 import { daysBetween, fmtD, todayStr } from './util'
 
 export default function PainelGemi({ gemi, emp, onAbrir }) {
@@ -103,7 +103,8 @@ export default function PainelGemi({ gemi, emp, onAbrir }) {
               <span className="dg-mono dg-muted">{q.id}</span> {q.t}
             </h4>
             <p className="dg-muted dg-small">{q.p}</p>
-            <p className="dg-qt">{gemiTexto(gemi, q.id) || 'Ainda sem resposta.'}</p>
+            {q.opcoes && gemiOpcoesTxt(gemi, q) && <p className="dg-small"><b>Marcado:</b> {gemiOpcoesTxt(gemi, q)}</p>}
+            <p className="dg-qt">{gemiTexto(gemi, q.id) || (q.opcoes && gemiOpcoesTxt(gemi, q) ? '' : 'Ainda sem resposta.')}</p>
           </div>
         ))}
       </section>

@@ -102,7 +102,8 @@ export const GEMI_QUESTOES = [
     "t": "Gargalos Técnicos e Incidentes Críticos",
     "tipo": "dis",
     "p": "Qual foi o pior problema tecnológico ou parada operacional que a empresa enfrentou nos últimos 12 meses, e o que hoje mais gera lentidão ou reclamação na equipe?",
-    "gancho": "Capturar a 'dor latente' e o prejuízo financeiro real já sofrido pelo cliente para ancorar a proposta comercial."
+    "gancho": "Capturar a 'dor latente' e o prejuízo financeiro real já sofrido pelo cliente para ancorar a proposta comercial.",
+    "opcoes": [["servidor", "Foi servidor"], ["nobreak", "Foi nobreak"], ["link", "Foi link"], ["outros", "Outros"]]
   },
   {
     "id": "2.1",

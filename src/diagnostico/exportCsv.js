@@ -1,7 +1,7 @@
 import { BLOCOS, EVID, RISK, RODADAS, STATUS, evKey, labelOf, mtKey, rkKey } from './catalog'
 import { dataOf, respOf } from './calc'
 import { GEMI_QUESTOES } from './gemiDados'
-import { gemiNota } from './gemiCalc'
+import { gemiNota, gemiOpcoesTxt } from './gemiCalc'
 import { fmtD, fmtTs } from './util'
 
 const labelOfR = (k) => (RODADAS.find((r) => r.k === k) || {}).n || ''
@@ -27,7 +27,7 @@ export function exportCsv(emp, blocos, itens, gemi) {
         nota === null ? '' : String(nota),
         nota === null ? '' : String(nota * q.peso),
         nota === null ? '' : q.op[nota],
-        q.tipo === 'obj' ? g.obs || '' : g.texto || '',
+        q.tipo === 'obj' ? g.obs || '' : [q.opcoes ? gemiOpcoesTxt(gemi, q) : '', g.texto || ''].filter(Boolean).join(' | '),
         fmtTs(g.updatedAt),
       ]
     })

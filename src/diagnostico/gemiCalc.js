@@ -12,6 +12,13 @@ export const gemiNota = (g, id) => {
   return Number.isInteger(v) && v >= 0 && v <= 4 ? v : null
 }
 
+// Opções marcadas (pergunta dissertativa com opcoes): só as chaves válidas, na ordem do catálogo.
+export const gemiOpcoes = (g, q) => {
+  const v = g && g[q.id] && Array.isArray(g[q.id].opcoes) ? g[q.id].opcoes : []
+  return (q.opcoes || []).map((o) => o[0]).filter((k) => v.includes(k))
+}
+export const gemiOpcoesTxt = (g, q) => (q.opcoes || []).filter((o) => gemiOpcoes(g, q).includes(o[0])).map((o) => o[1]).join(', ')
+
 export const gemiTexto = (g, id) => String((g && g[id] && g[id].texto) || '').trim()
 
 export const faixaDe = (pct) => FAIXAS.find((f) => Math.round(pct) <= f.ate) || FAIXAS[FAIXAS.length - 1]
