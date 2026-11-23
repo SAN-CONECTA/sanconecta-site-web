@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { collection, deleteDoc, doc, onSnapshot, query, serverTimestamp, setDoc, updateDoc, where } from 'firebase/firestore'
 import { db } from './firebase'
 import { errMsg, fmtTs, isEmail, normEmail, PERFIS, perfilLabel } from './util'
+import { enviarEmailAcesso } from './convite'
 
 const SITE_URL = 'https://sanconecta.com/diagnostico360/'
 
@@ -111,6 +112,20 @@ function Usuarios({ emp, email }) {
   const [msg, setMsg] = useState({ kind: '', text: '' })
   const [convite, setConvite] = useState('')
   const [confirmDel, setConfirmDel] = useState('')
+  const [env, setEnv] = useState('')
+
+  async function enviaAcesso(mail) {
+    setEnv(mail)
+    setMsg({ kind: '', text: '' })
+    try {
+      const criada = await enviarEmailAcesso(mail)
+      setMsg({ kind: 'ok', text: `${criada ? 'Conta criada e e-mail' : 'E-mail'} de acesso enviado para ${mail}. Peça para a pessoa abrir o link, definir a senha e olhar também o spam.` })
+    } catch (er) {
+      setMsg({ kind: 'err', text: errMsg(er) })
+    } finally {
+      setEnv('')
+    }
+  }
 
   useEffect(() => {
     const q = query(collection(db, 'membros'), where('empresaId', '==', emp.id))
@@ -232,7 +247,12 @@ function Usuarios({ emp, email }) {
                         <button type="button" className="dg-btn" onClick={() => setConfirmDel('')}>Cancelar</button>
                       </>
                     ) : (
-                      <button type="button" className="dg-btn" onClick={() => setConfirmDel(m.id)}>Remover</button>
+                      <>
+                        <button type="button" className="dg-btn" disabled={env === m.email} onClick={() => enviaAcesso(m.email)}>
+                          {env === m.email ? 'Enviando…' : 'Enviar e-mail de acesso'}
+                        </button>{' '}
+                        <button type="button" className="dg-btn" onClick={() => setConfirmDel(m.id)}>Remover</button>
+                      </>
                     )}
                   </td>
                 </tr>
