@@ -116,7 +116,7 @@ fieldset:disabled input, fieldset:disabled select, fieldset:disabled textarea { 
 .dg-role { font-size: 12px; font-weight: 600; border-radius: 999px; padding: 3px 10px; border: 1px solid rgba(255, 255, 255, 0.3); }
 .dg-role.is-staff { background: var(--gold); color: var(--ink); border-color: var(--gold); }
 .dg-top .dg-btn { background: transparent; color: #fff; border-color: rgba(255, 255, 255, 0.35); min-height: 32px; }
-.dg-main { max-width: 1320px; margin: 0 auto; padding: 24px 16px 56px; }
+.dg-main { max-width: none; margin: 0; padding: 24px clamp(12px, 1.6vw, 28px) 56px; }
 .dg-crumb { margin-bottom: 8px; }
 .dg-ehead { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 8px 16px; margin-bottom: 16px; }
 .dg-ehead p { margin: 2px 0 0; }
