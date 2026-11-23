@@ -8,7 +8,7 @@ rules_version = '2';
 //   empresas/{empresaId}/itens/{itemId}   respostas das perguntas, guardadas por item de origem ("1.1" a "10.2"), chaves q01..q40
 //   empresas/{empresaId}/blocos/{codigo}  status, risco, nota 0 a 5, achados etc. de cada bloco das 3 rodadas (TI-01, AL-01, GE-01...)
 //   empresas/{empresaId}/gemi/{codigo}    diagnóstico rápido GEMI (15 perguntas, 1.1 a 3.5); campo modo da empresa: completo ou rapido
-//   empresas/{empresaId}/simulacao/atual  simulação de prejuízo por downtime (dados financeiros; só equipe SAN)
+//   empresas/{empresaId}/simulacao/atual  simulação de prejuízo por downtime (dados financeiros; equipe SAN grava; cliente só lê se liberado em membros.simulacao)
 //   empresas/{empresaId}/log/{logId}      registro de cada gravação (quem, quando, o que mudou); só a equipe SAN lê
 //   membros/{empresaId}__{email}          quem acessa cada empresa (role 'leitura' = cliente que preenche; 'visualizar' = somente consulta)
 //
@@ -288,7 +288,10 @@ service cloud.firestore {
       // Simulação de prejuízo por indisponibilidade de TI (v1.10): um único documento "atual". Só a equipe SAN lê e grava,
       // porque guarda dados financeiros do cliente. Percentual da operação afetada em fração (0 a 1).
       match /simulacao/{sid} {
-        allow read: if isStaff();
+        // v1.13: cliente só lê se a equipe SAN marcou 'simulacao' no vínculo dele (membros); gravar continua só da equipe.
+        allow read: if isStaff()
+          || (isMember(emp)
+              && get(/databases/$(database)/documents/membros/$(emp + '__' + me())).data.get('simulacao', false) == true);
 
         allow create, update: if isStaff()
           && sid == 'atual'
@@ -341,8 +344,9 @@ service cloud.firestore {
       allow read: if signedIn() && (isStaff() || resource.data.email == me());
 
       allow create, update: if isStaff()
-        && request.resource.data.keys().hasOnly(['empresaId', 'email', 'role', 'atualizadoEm', 'atualizadoPor'])
+        && request.resource.data.keys().hasOnly(['empresaId', 'email', 'role', 'simulacao', 'atualizadoEm', 'atualizadoPor'])
         && request.resource.data.keys().hasAll(['empresaId', 'email', 'role', 'atualizadoEm', 'atualizadoPor'])
+        && (!('simulacao' in request.resource.data) || request.resource.data.simulacao is bool)
         && request.resource.data.role in ['leitura', 'visualizar']
         && request.resource.data.email is string
         && request.resource.data.email == request.resource.data.email.lower()

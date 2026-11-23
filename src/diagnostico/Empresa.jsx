@@ -26,7 +26,7 @@ const TABS = [
 const NAV = TABS
 // Endereços antigos (v1.7) continuam levando ao lugar certo.
 const ANTIGAS = { gestao: 'ge', itens: 'painel' }
-const SO_STAFF = ['log', 'sim']
+const SO_STAFF = ['log']
 const DO_RAPIDO = ['painel', 'gemi', 'sim', 'acessos', 'log']
 const DO_COMPLETO = ['painel', 'ti', 'al', 'ge', 'sim', 'acessos', 'log']
 
@@ -57,7 +57,8 @@ export default function Empresa({ id, tab, session }) {
   const [itens, setItens] = useState(null)
   const [blocos, setBlocos] = useState(null)
   const [gemi, setGemi] = useState(null)
-  const [sim, setSim] = useState(staff ? null : {})
+  const [sim, setSim] = useState(null)
+  const [verSim, setVerSim] = useState(!!staff)
   const [papel, setPapel] = useState(staff ? 'staff' : undefined)
   const [flt, setFlt] = useState({ s: '', r: '', q: '' })
   const [openId, setOpenId] = useState(null)
@@ -90,14 +91,30 @@ export default function Empresa({ id, tab, session }) {
     const offItens = onSnapshot(collection(db, 'empresas', id, 'itens'), mapa(setItens), onErr)
     const offBlocos = onSnapshot(collection(db, 'empresas', id, 'blocos'), mapa(setBlocos), onErr)
     const offGemi = onSnapshot(collection(db, 'empresas', id, 'gemi'), mapa(setGemi), onErr)
-    // A simulação (dados financeiros do cliente) só é lida pela equipe SAN.
-    const offSim = staff ? onSnapshot(collection(db, 'empresas', id, 'simulacao'), mapa(setSim), onErr) : () => {}
-    if (!staff) {
+    // A simulação (dados financeiros) é lida pela equipe SAN e, só leitura, por cliente com 'simulacao' marcado no vínculo.
+    let offSim = () => {}
+    let fora = false
+    if (staff) {
+      offSim = onSnapshot(collection(db, 'empresas', id, 'simulacao'), mapa(setSim), onErr)
+    } else {
       getDoc(doc(db, 'membros', `${id}__${email}`))
-        .then((s) => setPapel(s.exists() ? s.data().role : null))
-        .catch(() => setPapel(null))
+        .then((s) => {
+          if (fora) return
+          const d = s.exists() ? s.data() : null
+          setPapel(d ? d.role : null)
+          const pode = !!d && d.simulacao === true
+          setVerSim(pode)
+          if (pode) offSim = onSnapshot(collection(db, 'empresas', id, 'simulacao'), mapa(setSim), onErr)
+          else setSim({})
+        })
+        .catch(() => {
+          if (fora) return
+          setPapel(null)
+          setSim({})
+        })
     }
     return () => {
+      fora = true
       offEmp()
       offItens()
       offBlocos()
@@ -109,7 +126,8 @@ export default function Empresa({ id, tab, session }) {
   const tabReal = ANTIGAS[tab] || tab
   const rapido = !!emp && emp.modo === 'rapido'
   const abas = rapido ? DO_RAPIDO : DO_COMPLETO
-  const activeTab = abas.includes(tabReal) && (staff || !SO_STAFF.includes(tabReal)) ? tabReal : 'painel'
+  const visivel = (k) => staff || (!SO_STAFF.includes(k) && (k !== 'sim' || verSim))
+  const activeTab = abas.includes(tabReal) && visivel(tabReal) ? tabReal : 'painel'
   const canEdit = staff
   // Cliente vinculado à empresa preenche respostas e situação da evidência (v1.7), exceto em empresa arquivada.
   const canAnswer = !!emp && (staff || (papel === 'leitura' && !emp.arquivada))
@@ -156,7 +174,7 @@ export default function Empresa({ id, tab, session }) {
           <a className="dg-side-all" href="#/">← Todas as empresas</a>
         </div>
         <nav className="dg-nav" aria-label="Seções">
-          {NAV.filter(([k]) => abas.includes(k) && (staff || !SO_STAFF.includes(k))).map(([k, l]) => (
+          {NAV.filter(([k]) => abas.includes(k) && visivel(k)).map(([k, l]) => (
             <button key={k} type="button" aria-current={activeTab === k ? 'page' : undefined} onClick={() => go(`/e/${id}/${k}`)}>
               <Icon k={k} />
               <span>{l}</span>
@@ -193,7 +211,7 @@ export default function Empresa({ id, tab, session }) {
             }}
           />
         )}
-        {activeTab === 'sim' && staff && <Simulacao key={emp.id} empId={id} emp={emp} sim={sim} user={user} />}
+        {activeTab === 'sim' && visivel('sim') && <Simulacao key={emp.id} empId={id} emp={emp} sim={sim} user={user} canEdit={canEdit} />}
         {activeTab === 'gemi' && <Gemi key={emp.id} empId={id} emp={emp} gemi={gemi} canEdit={canEdit} canAnswer={canAnswer} user={user} />}
         {RODADAS.some((r) => r.k === activeTab) && (
           <Rodada

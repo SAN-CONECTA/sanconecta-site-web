@@ -15,12 +15,12 @@ function conviteTexto(nomeEmpresa, mail) {
 function AcessosClientes({ email }) {
   const [membros, setMembros] = useState(null)
   const [empresas, setEmpresas] = useState([])
-  const [novo, setNovo] = useState({ email: '', empresa: '', role: 'leitura' })
+  const [novo, setNovo] = useState({ email: '', empresa: '', role: 'leitura', simulacao: false })
   const [busy, setBusy] = useState(false)
   const [msg, setMsg] = useState({ kind: '', text: '' })
   const [convite, setConvite] = useState('')
-  const [edit, setEdit] = useState({ id: '', empresa: '', email: '', role: 'leitura' })
-  const fechaEdit = () => setEdit({ id: '', empresa: '', email: '', role: 'leitura' })
+  const [edit, setEdit] = useState({ id: '', empresa: '', email: '', role: 'leitura', simulacao: false })
+  const fechaEdit = () => setEdit({ id: '', empresa: '', email: '', role: 'leitura', simulacao: false })
   const [confirmDel, setConfirmDel] = useState('')
 
   useEffect(() => {
@@ -51,10 +51,11 @@ function AcessosClientes({ email }) {
   const nomeDe = (id) => (empresas.find((e) => e.id === id) || {}).nome || 'empresa removida'
   const ativas = empresas.filter((e) => !e.arquivada)
 
-  const dadosMembro = (empresaId, mail, role) => ({
+  const dadosMembro = (empresaId, mail, role, simulacao) => ({
     empresaId,
     email: mail,
     role,
+    simulacao: !!simulacao,
     atualizadoEm: serverTimestamp(),
     atualizadoPor: email,
   })
@@ -67,7 +68,7 @@ function AcessosClientes({ email }) {
     setBusy(true)
     setMsg({ kind: '', text: '' })
     try {
-      await setDoc(doc(db, 'membros', `${novo.empresa}__${mail}`), dadosMembro(novo.empresa, mail, novo.role))
+      await setDoc(doc(db, 'membros', `${novo.empresa}__${mail}`), dadosMembro(novo.empresa, mail, novo.role, novo.simulacao))
       setConvite(conviteTexto(nomeDe(novo.empresa), mail))
       setNovo((n) => ({ ...n, email: '' }))
     } catch (er) {
@@ -86,7 +87,7 @@ function AcessosClientes({ email }) {
     try {
       const novoId = `${edit.empresa}__${mail}`
       const batch = writeBatch(db)
-      batch.set(doc(db, 'membros', novoId), dadosMembro(edit.empresa, mail, edit.role))
+      batch.set(doc(db, 'membros', novoId), dadosMembro(edit.empresa, mail, edit.role, edit.simulacao))
       if (novoId !== m.id) batch.delete(doc(db, 'membros', m.id))
       await batch.commit()
       if (mail !== m.email) setConvite(conviteTexto(nomeDe(edit.empresa), mail))
@@ -118,7 +119,7 @@ function AcessosClientes({ email }) {
         A pessoa cria a própria conta e senha na tela de login, usando o e-mail liberado aqui. Remover tira o acesso aos dados;
         a conta de login continua existindo e só o console do Firebase (Authentication) a apaga. Para trocar o e-mail de
         alguém, use Editar (o e-mail novo precisa criar a própria conta). "Pode responder" permite preencher respostas e a
-        situação da evidência; "Somente visualizar" só consulta.
+        situação da evidência; "Somente visualizar" só consulta. A Simulação Prejuízo tem dados financeiros e fica oculta ao cliente, a menos que você marque "Ver Simulação Prejuízo" (só leitura).
       </p>
       <form onSubmit={add} className="dg-addrow">
         <label className="dg-fld">
@@ -142,6 +143,10 @@ function AcessosClientes({ email }) {
             ))}
           </select>
         </label>
+        <label className="dg-fld dg-chk">
+          <input type="checkbox" checked={novo.simulacao} onChange={(e) => setNovo((n) => ({ ...n, simulacao: e.target.checked }))} />
+          <span>Ver Simulação Prejuízo</span>
+        </label>
         <button className="dg-btn dg-primary" type="submit" disabled={busy}>Liberar acesso</button>
       </form>
       {msg.text && <p className={msg.kind === 'ok' ? 'dg-ok' : 'dg-err'} role="alert">{msg.text}</p>}
@@ -164,6 +169,7 @@ function AcessosClientes({ email }) {
                 <th>E-mail</th>
                 <th>Empresa</th>
                 <th>Perfil</th>
+                <th>Simulação</th>
                 <th>Atualizado</th>
                 <th />
               </tr>
@@ -200,6 +206,18 @@ function AcessosClientes({ email }) {
                       perfilLabel(m.role)
                     )}
                   </td>
+                  <td>
+                    {edit.id === m.id ? (
+                      <label className="dg-chk">
+                        <input type="checkbox" checked={edit.simulacao} onChange={(e) => setEdit((x) => ({ ...x, simulacao: e.target.checked }))} />
+                        <span>Pode ver</span>
+                      </label>
+                    ) : m.simulacao === true ? (
+                      'Pode ver'
+                    ) : (
+                      'Oculta'
+                    )}
+                  </td>
                   <td className="dg-small dg-muted">{fmtTs(m.atualizadoEm)}</td>
                   <td>
                     {edit.id === m.id ? (
@@ -214,7 +232,7 @@ function AcessosClientes({ email }) {
                       </>
                     ) : (
                       <>
-                        <button type="button" className="dg-btn" onClick={() => setEdit({ id: m.id, empresa: m.empresaId, email: m.email, role: m.role === 'visualizar' ? 'visualizar' : 'leitura' })}>Editar</button>{' '}
+                        <button type="button" className="dg-btn" onClick={() => setEdit({ id: m.id, empresa: m.empresaId, email: m.email, role: m.role === 'visualizar' ? 'visualizar' : 'leitura', simulacao: m.simulacao === true })}>Editar</button>{' '}
                         <button type="button" className="dg-btn" onClick={() => setConfirmDel(m.id)}>Remover acesso</button>
                       </>
                     )}

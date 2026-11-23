@@ -344,3 +344,6 @@ td select { min-height: 34px; width: auto; }
   .dg-t-param th:nth-child(2), .dg-t-param td:nth-child(2) { display: none; }
   .dg-sim-in { width: 110px; }
 }
+
+.dg-chk { display: inline-flex; align-items: center; gap: 8px; cursor: pointer; }
+.dg-chk input { width: auto; }
