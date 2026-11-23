@@ -347,3 +347,5 @@ td select { min-height: 34px; width: auto; }
 
 .dg-chk { display: inline-flex; align-items: center; gap: 8px; cursor: pointer; }
 .dg-chk input { width: auto; }
+.dg-gchk { border: 0; margin: 0 0 10px; padding: 0; display: flex; flex-wrap: wrap; gap: 8px 18px; }
+.dg-gchk legend { font-size: 13px; color: var(--muted); margin-bottom: 6px; padding: 0; }

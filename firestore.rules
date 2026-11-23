@@ -245,13 +245,16 @@ service cloud.firestore {
 
         allow create, update: if isStaff()
           && qid.matches('^[1-3]\\.[1-5]$')
-          && request.resource.data.keys().hasOnly(['nota', 'obs', 'texto', 'updatedAt', 'updatedBy', 'logId'])
+          && request.resource.data.keys().hasOnly(['nota', 'obs', 'texto', 'opcoes', 'updatedAt', 'updatedBy', 'logId'])
           && request.resource.data.keys().hasAll(['updatedAt', 'updatedBy', 'logId'])
           && (!('nota' in request.resource.data)
               || request.resource.data.nota == null
               || (request.resource.data.nota is int && request.resource.data.nota >= 0 && request.resource.data.nota <= 4))
           && (!('obs' in request.resource.data) || shortStr(request.resource.data.obs, 2000))
           && (!('texto' in request.resource.data) || shortStr(request.resource.data.texto, 4000))
+          && (!('opcoes' in request.resource.data)
+              || (request.resource.data.opcoes is list && request.resource.data.opcoes.size() <= 4
+                  && request.resource.data.opcoes.hasOnly(['servidor', 'nobreak', 'link', 'outros'])))
           && request.resource.data.updatedAt == request.time
           && request.resource.data.updatedBy == me()
           && logOk(emp);
@@ -259,24 +262,30 @@ service cloud.firestore {
         // v1.12: cliente com perfil 'leitura' marca a nota e escreve as dissertativas; não mexe na observação do consultor.
         allow create: if isEditor(emp) && empAtiva(emp)
           && qid.matches('^[1-3]\\.[1-5]$')
-          && request.resource.data.keys().hasOnly(['nota', 'texto', 'updatedAt', 'updatedBy', 'logId'])
+          && request.resource.data.keys().hasOnly(['nota', 'texto', 'opcoes', 'updatedAt', 'updatedBy', 'logId'])
           && request.resource.data.keys().hasAll(['updatedAt', 'updatedBy', 'logId'])
           && (!('nota' in request.resource.data)
               || request.resource.data.nota == null
               || (request.resource.data.nota is int && request.resource.data.nota >= 0 && request.resource.data.nota <= 4))
           && (!('texto' in request.resource.data) || shortStr(request.resource.data.texto, 4000))
+          && (!('opcoes' in request.resource.data)
+              || (request.resource.data.opcoes is list && request.resource.data.opcoes.size() <= 4
+                  && request.resource.data.opcoes.hasOnly(['servidor', 'nobreak', 'link', 'outros'])))
           && request.resource.data.updatedAt == request.time
           && request.resource.data.updatedBy == me()
           && logOk(emp);
 
         allow update: if isEditor(emp) && empAtiva(emp)
           && qid.matches('^[1-3]\\.[1-5]$')
-          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['nota', 'texto', 'updatedAt', 'updatedBy', 'logId'])
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['nota', 'texto', 'opcoes', 'updatedAt', 'updatedBy', 'logId'])
           && request.resource.data.keys().hasAll(['updatedAt', 'updatedBy', 'logId'])
           && (!('nota' in request.resource.data)
               || request.resource.data.nota == null
               || (request.resource.data.nota is int && request.resource.data.nota >= 0 && request.resource.data.nota <= 4))
           && (!('texto' in request.resource.data) || shortStr(request.resource.data.texto, 4000))
+          && (!('opcoes' in request.resource.data)
+              || (request.resource.data.opcoes is list && request.resource.data.opcoes.size() <= 4
+                  && request.resource.data.opcoes.hasOnly(['servidor', 'nobreak', 'link', 'outros'])))
           && request.resource.data.updatedAt == request.time
           && request.resource.data.updatedBy == me()
           && logOk(emp);
