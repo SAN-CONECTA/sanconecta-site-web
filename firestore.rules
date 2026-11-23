@@ -256,6 +256,31 @@ service cloud.firestore {
           && request.resource.data.updatedBy == me()
           && logOk(emp);
 
+        // v1.12: cliente com perfil 'leitura' marca a nota e escreve as dissertativas; não mexe na observação do consultor.
+        allow create: if isEditor(emp) && empAtiva(emp)
+          && qid.matches('^[1-3]\\.[1-5]$')
+          && request.resource.data.keys().hasOnly(['nota', 'texto', 'updatedAt', 'updatedBy', 'logId'])
+          && request.resource.data.keys().hasAll(['updatedAt', 'updatedBy', 'logId'])
+          && (!('nota' in request.resource.data)
+              || request.resource.data.nota == null
+              || (request.resource.data.nota is int && request.resource.data.nota >= 0 && request.resource.data.nota <= 4))
+          && (!('texto' in request.resource.data) || shortStr(request.resource.data.texto, 4000))
+          && request.resource.data.updatedAt == request.time
+          && request.resource.data.updatedBy == me()
+          && logOk(emp);
+
+        allow update: if isEditor(emp) && empAtiva(emp)
+          && qid.matches('^[1-3]\\.[1-5]$')
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['nota', 'texto', 'updatedAt', 'updatedBy', 'logId'])
+          && request.resource.data.keys().hasAll(['updatedAt', 'updatedBy', 'logId'])
+          && (!('nota' in request.resource.data)
+              || request.resource.data.nota == null
+              || (request.resource.data.nota is int && request.resource.data.nota >= 0 && request.resource.data.nota <= 4))
+          && (!('texto' in request.resource.data) || shortStr(request.resource.data.texto, 4000))
+          && request.resource.data.updatedAt == request.time
+          && request.resource.data.updatedBy == me()
+          && logOk(emp);
+
         allow delete: if isStaff()
           && get(/databases/$(database)/documents/empresas/$(emp)).data.arquivada == true;
       }

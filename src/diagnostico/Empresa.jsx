@@ -194,7 +194,7 @@ export default function Empresa({ id, tab, session }) {
           />
         )}
         {activeTab === 'sim' && staff && <Simulacao key={emp.id} empId={id} emp={emp} sim={sim} user={user} />}
-        {activeTab === 'gemi' && <Gemi key={emp.id} empId={id} emp={emp} gemi={gemi} canEdit={canEdit} user={user} />}
+        {activeTab === 'gemi' && <Gemi key={emp.id} empId={id} emp={emp} gemi={gemi} canEdit={canEdit} canAnswer={canAnswer} user={user} />}
         {RODADAS.some((r) => r.k === activeTab) && (
           <Rodada
             key={activeTab}
