@@ -7,7 +7,7 @@ import { errMsg, fmtTs, normEmail } from './util'
 
 const POR_LOTE = 4
 
-function Pergunta({ q, v, set, canEdit, aberta, toggle, proxima }) {
+function Pergunta({ q, v, set, canEdit, canAnswer, aberta, toggle, proxima }) {
   const obj = q.tipo === 'obj'
   const feita = obj ? v.nota !== null : !!v.texto.trim()
   return (
@@ -27,7 +27,7 @@ function Pergunta({ q, v, set, canEdit, aberta, toggle, proxima }) {
               <div className="dg-gops" role="radiogroup" aria-label={q.t}>
                 {q.op.map((txt, i) => (
                   <label className={`dg-gop${v.nota === i ? ' on' : ''}`} key={i}>
-                    <input type="radio" name={`g${q.id}`} checked={v.nota === i} disabled={!canEdit} onChange={() => set({ nota: i })} />
+                    <input type="radio" name={`g${q.id}`} checked={v.nota === i} disabled={!canAnswer} onChange={() => set({ nota: i })} />
                     <b className="dg-mono">{i} pt{i === 1 ? '' : 's'}</b>
                     <span>{txt}</span>
                   </label>
@@ -44,7 +44,7 @@ function Pergunta({ q, v, set, canEdit, aberta, toggle, proxima }) {
               <p className="dg-muted dg-small">Objetivo e gancho comercial: {q.gancho}</p>
               <label className="dg-fld">
                 <span>Resposta</span>
-                <textarea value={v.texto} onChange={(e) => set({ texto: e.target.value })} disabled={!canEdit} maxLength={4000} />
+                <textarea value={v.texto} onChange={(e) => set({ texto: e.target.value })} disabled={!canAnswer} maxLength={4000} />
               </label>
             </>
           )}
@@ -59,7 +59,7 @@ function Pergunta({ q, v, set, canEdit, aberta, toggle, proxima }) {
   )
 }
 
-export default function Gemi({ empId, emp, gemi, canEdit, user }) {
+export default function Gemi({ empId, emp, gemi, canEdit, canAnswer, user }) {
   const email = normEmail(user.email)
   const inicial = () =>
     Object.fromEntries(
@@ -93,10 +93,10 @@ export default function Gemi({ empId, emp, gemi, canEdit, user }) {
         const t = (v) => (v === null || v === undefined ? '' : String(v))
         if (q.tipo === 'obj') {
           if (a.nota !== b.nota) mud.push({ c: `gemi.${q.id}.nota`, de: t(a.nota), para: t(b.nota) })
-          if (a.obs !== b.obs) mud.push({ c: `gemi.${q.id}.obs`, de: a.obs, para: b.obs })
+          if (canEdit && a.obs !== b.obs) mud.push({ c: `gemi.${q.id}.obs`, de: a.obs, para: b.obs })
         } else if (a.texto !== b.texto) mud.push({ c: `gemi.${q.id}.texto`, de: a.texto, para: b.texto })
         if (!mud.length) return
-        const campos = q.tipo === 'obj' ? { nota: b.nota, obs: b.obs } : { texto: b.texto }
+        const campos = q.tipo === 'obj' ? (canEdit ? { nota: b.nota, obs: b.obs } : { nota: b.nota }) : { texto: b.texto }
         ops.push({ ref: doc(db, 'empresas', empId, 'gemi', q.id), campos, mud })
       })
       if (!ops.length) {
@@ -108,8 +108,8 @@ export default function Gemi({ empId, emp, gemi, canEdit, user }) {
         const parte = ops.slice(i, i + POR_LOTE)
         const logRef = doc(collection(db, 'empresas', empId, 'log'))
         const batch = writeBatch(db)
-        parte.forEach((op) => batch.set(op.ref, { ...op.campos, logId: logRef.id, updatedAt: ts, updatedBy: email }))
-        batch.set(logRef, { item: 'GEMI', email, papel: 'equipe', quando: ts, mudancas: parte.flatMap((op) => op.mud) })
+        parte.forEach((op) => batch.set(op.ref, { ...op.campos, logId: logRef.id, updatedAt: ts, updatedBy: email }, { merge: true }))
+        batch.set(logRef, { item: 'GEMI', email, papel: canEdit ? 'equipe' : 'cliente', quando: ts, mudancas: parte.flatMap((op) => op.mud) })
         await batch.commit()
       }
       setMsg({ kind: 'ok', text: 'Diagnóstico salvo e registrado no log.' })
@@ -129,7 +129,11 @@ export default function Gemi({ empId, emp, gemi, canEdit, user }) {
     <div>
       <p className="dg-muted">
         Fase Inicial de Estudo de {emp.nome}: 11 perguntas objetivas (nota de 0 a 4 vezes o peso) e 4 dissertativas.
-        {canEdit ? ' A equipe SAN marca a opção que corresponde à realidade, junto com o cliente.' : ' Preenchido pela equipe SAN; você acompanha o resultado.'}
+        {canEdit
+          ? ' A equipe SAN marca a opção que corresponde à realidade, junto com o cliente, e valida as respostas.'
+          : canAnswer
+            ? ' Marque a opção que melhor descreve a sua empresa e responda as perguntas abertas. A equipe SAN valida o resultado.'
+            : ' Preenchido pela equipe SAN; você acompanha o resultado.'}
       </p>
       <p className="dg-actions">
         <button type="button" className="dg-btn" onClick={() => setAbertas(GEMI_QUESTOES.map((q) => q.id))}>Abrir todas</button>
@@ -165,6 +169,7 @@ export default function Gemi({ empId, emp, gemi, canEdit, user }) {
                 v={form[q.id]}
                 set={setQ(q.id)}
                 canEdit={canEdit}
+                canAnswer={canAnswer}
                 aberta={abertas.includes(q.id)}
                 toggle={() => alterna(q.id)}
                 proxima={q.id === GEMI_QUESTOES[GEMI_QUESTOES.length - 1].id ? null : () => avanca(q.id)}
@@ -173,7 +178,7 @@ export default function Gemi({ empId, emp, gemi, canEdit, user }) {
           </section>
         )
       })}
-      {canEdit && (
+      {canAnswer && (
         <div className="dg-actions">
           <button className="dg-btn dg-primary" type="button" onClick={save} disabled={busy}>
             {busy ? 'Salvando…' : 'Salvar diagnóstico'}
