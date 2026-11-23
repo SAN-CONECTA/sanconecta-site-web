@@ -106,6 +106,7 @@ function Usuarios({ emp, email }) {
   const [membros, setMembros] = useState(null)
   const [novo, setNovo] = useState('')
   const [perfil, setPerfil] = useState('leitura')
+  const [verSim, setVerSim] = useState(false)
   const [busy, setBusy] = useState(false)
   const [msg, setMsg] = useState({ kind: '', text: '' })
   const [convite, setConvite] = useState('')
@@ -129,6 +130,7 @@ function Usuarios({ emp, email }) {
       empresaId: emp.id,
       email: mail,
       role: perfil,
+      simulacao: verSim,
       atualizadoEm: serverTimestamp(),
       atualizadoPor: email,
     })
@@ -188,6 +190,10 @@ function Usuarios({ emp, email }) {
             ))}
           </select>
         </label>
+        <label className="dg-fld dg-chk">
+          <input type="checkbox" checked={verSim} onChange={(e) => setVerSim(e.target.checked)} />
+          <span>Ver Simulação Prejuízo</span>
+        </label>
         <button className="dg-btn dg-primary" type="submit" disabled={busy}>Liberar acesso</button>
       </form>
       {msg.text && <p className={msg.kind === 'ok' ? 'dg-ok' : 'dg-err'} role="alert">{msg.text}</p>}
@@ -217,7 +223,7 @@ function Usuarios({ emp, email }) {
               {membros.map((m) => (
                 <tr key={m.id}>
                   <td>{m.email}</td>
-                  <td>{perfilLabel(m.role)}</td>
+                  <td>{perfilLabel(m.role)}{m.simulacao === true ? ' · vê Simulação' : ''}</td>
                   <td className="dg-small dg-muted">{fmtTs(m.atualizadoEm)}</td>
                   <td>
                     {confirmDel === m.id ? (

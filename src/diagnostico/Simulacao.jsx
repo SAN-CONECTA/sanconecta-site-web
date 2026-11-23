@@ -43,7 +43,7 @@ function Barras({ itens }) {
   )
 }
 
-export default function Simulacao({ empId, emp, sim, user }) {
+export default function Simulacao({ empId, emp, sim, user, canEdit }) {
   const email = normEmail(user.email)
   const salvo = sim && sim.atual ? sim.atual : null
   const base = { ...SIM_PADRAO, ...(salvo ? Object.fromEntries(Object.keys(SIM_PADRAO).filter((k) => typeof salvo[k] === 'number').map((k) => [k, salvo[k]])) : {}) }
@@ -95,8 +95,8 @@ export default function Simulacao({ empId, emp, sim, user }) {
   return (
     <div>
       <p className="dg-muted">
-        Simulador de impacto financeiro de indisponibilidade de TI de {emp.nome}. Preencha os dados do cliente; os cálculos e os
-        gráficos atualizam sozinhos. {salvo ? '' : 'Os valores abaixo são o exemplo da planilha original: troque pelos dados do cliente e salve.'}
+        Simulador de impacto financeiro de indisponibilidade de TI de {emp.nome}. Os cálculos e os
+        gráficos atualizam sozinhos. {salvo ? '' : canEdit ? 'Os valores abaixo são o exemplo da planilha original: troque pelos dados do cliente e salve.' : 'A equipe SAN ainda não salvou a simulação desta empresa; os valores abaixo são um exemplo.'}
       </p>
 
       <section className="dg-card">
@@ -112,7 +112,7 @@ export default function Simulacao({ empId, emp, sim, user }) {
                   <td>{l}</td>
                   <td className="dg-muted">{u}</td>
                   <td>
-                    <input className="dg-sim-in" inputMode="decimal" value={txt[k]} onChange={(e) => setTxt((t) => ({ ...t, [k]: e.target.value }))} aria-label={l} />
+                    <input className="dg-sim-in" inputMode="decimal" value={txt[k]} onChange={(e) => setTxt((t) => ({ ...t, [k]: e.target.value }))} aria-label={l} disabled={!canEdit} />
                   </td>
                   <td className="dg-muted dg-small">{o}</td>
                 </tr>
@@ -127,11 +127,15 @@ export default function Simulacao({ empId, emp, sim, user }) {
           </table>
         </div>
         {erro && <p className="dg-err" role="alert">{erro}</p>}
-        <div className="dg-actions">
-          <button className="dg-btn dg-primary" type="button" onClick={save} disabled={busy || !ok}>
-            {busy ? 'Salvando…' : 'Salvar simulação'}
-          </button>
-        </div>
+        {canEdit ? (
+          <div className="dg-actions">
+            <button className="dg-btn dg-primary" type="button" onClick={save} disabled={busy || !ok}>
+              {busy ? 'Salvando…' : 'Salvar simulação'}
+            </button>
+          </div>
+        ) : (
+          <p className="dg-warn">Somente leitura. Os valores são definidos pela equipe SAN.</p>
+        )}
         {msg.text && <p className={msg.kind === 'ok' ? 'dg-ok' : 'dg-err'} role="alert">{msg.text}</p>}
         {salvo && salvo.updatedAt && (
           <p className="dg-muted dg-small">
