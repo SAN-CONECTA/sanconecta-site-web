@@ -10,6 +10,7 @@ rules_version = '2';
 //   empresas/{empresaId}/gemi/{codigo}    diagnóstico rápido GEMI (15 perguntas, 1.1 a 3.5); campo modo da empresa: completo ou rapido
 //   empresas/{empresaId}/simulacao/atual  simulação de prejuízo por downtime (dados financeiros; equipe SAN grava; cliente só lê se liberado em membros.simulacao)
 //   empresas/{empresaId}/log/{logId}      registro de cada gravação (quem, quando, o que mudou); só a equipe SAN lê
+//   presenca/{email}                      último sinal de vida de cada pessoa (online agora, empresa e tela); só a equipe SAN lê
 //   membros/{empresaId}__{email}          quem acessa cada empresa (role 'leitura' = cliente que preenche; 'visualizar' = somente consulta)
 //
 // Princípios:
@@ -364,6 +365,23 @@ service cloud.firestore {
         && exists(/databases/$(database)/documents/empresas/$(request.resource.data.empresaId))
         && request.resource.data.atualizadoEm == request.time
         && request.resource.data.atualizadoPor == me();
+
+      allow delete: if isStaff();
+    }
+
+    // Presença (v1.18): cada pessoa grava só o próprio documento (sinal de vida a cada minuto); só a equipe SAN lê.
+    match /presenca/{id} {
+      allow read: if isStaff();
+
+      allow create, update: if signedIn()
+        && id == me()
+        && request.resource.data.keys().hasOnly(['email', 'nome', 'empresaId', 'tela', 'visto'])
+        && request.resource.data.keys().hasAll(['email', 'visto'])
+        && request.resource.data.email == me()
+        && request.resource.data.visto == request.time
+        && (!('nome' in request.resource.data) || shortStr(request.resource.data.nome, 120))
+        && (!('empresaId' in request.resource.data) || shortStr(request.resource.data.empresaId, 80))
+        && (!('tela' in request.resource.data) || shortStr(request.resource.data.tela, 30));
 
       allow delete: if isStaff();
     }

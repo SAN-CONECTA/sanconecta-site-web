@@ -7,6 +7,7 @@ import Admin from './Admin'
 import Empresas from './Empresas'
 import Empresa from './Empresa'
 import Versao from './Versao'
+import { usePresenca } from './presenca'
 import logo from '../assets/logo.png'
 
 function Setup() {
@@ -28,6 +29,7 @@ function Setup() {
 export default function App() {
   const session = useSession()
   const route = useRoute()
+  usePresenca(session.user, route)
 
   if (!firebaseConfigured) return <Setup />
   if (session.loading) return <main className="dg-auth"><p className="dg-muted">Carregando…</p></main>
