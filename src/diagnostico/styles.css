@@ -356,3 +356,8 @@ td select { min-height: 34px; width: auto; }
 .dg-dica-b:hover, .dg-dica-b:focus-visible { border-color: var(--blue); color: var(--blue); }
 .dg-dica-t { display: none; position: absolute; left: 0; top: calc(100% + 6px); z-index: 5; width: min(360px, 80vw); padding: 10px 12px; border-radius: 8px; background: var(--navy); color: #fff; font-size: 13px; font-weight: 400; line-height: 1.4; box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25); }
 .dg-dica:hover .dg-dica-t, .dg-dica:focus-within .dg-dica-t, .dg-dica.aberta .dg-dica-t { display: block; }
+
+/* Presença (quem está online) */
+.dg-dot { display: inline-block; width: 9px; height: 9px; margin-right: 6px; border-radius: 50%; background: #b8c0cc; }
+.dg-dot.on { background: #1f9d55; box-shadow: 0 0 0 3px rgba(31, 157, 85, 0.2); }
+.dg-on { color: #1f7a4d; font-weight: 600; }

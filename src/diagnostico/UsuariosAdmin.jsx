@@ -3,8 +3,98 @@ import { collection, deleteDoc, doc, getDocs, onSnapshot, serverTimestamp, setDo
 import { db } from './firebase'
 import { errMsg, fmtTs, isEmail, normEmail, PERFIS, perfilLabel } from './util'
 import { enviarEmailAcesso } from './convite'
+import { ONLINE_MS } from './presenca'
 
 const SITE_URL = 'https://sanconecta.com/diagnostico360/'
+
+const TELAS = {
+  painel: 'Painel',
+  ti: 'Maturidade de TI',
+  al: 'Alinhamento TI e negócio',
+  ge: 'Gestão empresarial',
+  gemi: 'Fase Inicial',
+  sim: 'Simulação Prejuízo',
+  acessos: 'Empresa e acessos',
+  log: 'Log',
+  empresas: 'Lista de empresas',
+  usuarios: 'Usuários',
+}
+
+function haQuanto(ms) {
+  const m = Math.floor(ms / 60000)
+  if (m < 1) return 'agora há pouco'
+  if (m < 60) return `há ${m} min`
+  const h = Math.floor(m / 60)
+  if (h < 24) return `há ${h} h`
+  return `há ${Math.floor(h / 24)} d`
+}
+
+// Lê presenca/ (só a equipe SAN lê) e devolve { email: { online, quando, onde } }; atualiza a cada 30 s para o "online" expirar.
+function usePresencas() {
+  const [docs, setDocs] = useState(null)
+  const [empresas, setEmpresas] = useState({})
+  const [agora, setAgora] = useState(() => Date.now())
+  useEffect(() => {
+    const offP = onSnapshot(collection(db, 'presenca'), (s) => setDocs(s.docs.map((d) => ({ id: d.id, ...d.data() }))), () => setDocs([]))
+    const offE = onSnapshot(collection(db, 'empresas'), (s) => setEmpresas(Object.fromEntries(s.docs.map((d) => [d.id, d.data().nome || d.id]))), () => {})
+    const t = setInterval(() => setAgora(Date.now()), 30000)
+    return () => {
+      offP()
+      offE()
+      clearInterval(t)
+    }
+  }, [])
+  const mapa = {}
+  ;(docs || []).forEach((p) => {
+    const ms = p.visto && p.visto.toMillis ? p.visto.toMillis() : 0
+    if (!ms) return
+    const onde = [p.empresaId ? empresas[p.empresaId] || 'empresa' : '', TELAS[p.tela] || p.tela].filter(Boolean).join(' · ')
+    mapa[p.id] = { online: agora - ms < ONLINE_MS, quando: haQuanto(agora - ms), ms, onde, nome: p.nome || '' }
+  })
+  return { mapa, carregando: docs === null }
+}
+
+function Status({ p }) {
+  if (!p) return <span className="dg-small dg-muted">nunca entrou</span>
+  return (
+    <span className={`dg-small ${p.online ? 'dg-on' : 'dg-muted'}`}>
+      <span className={`dg-dot${p.online ? ' on' : ''}`} aria-hidden="true" />
+      {p.online ? 'Online agora' : `Visto ${p.quando}`}
+    </span>
+  )
+}
+
+function Online({ mapa, carregando }) {
+  const lista = Object.entries(mapa).sort((a, b) => b[1].ms - a[1].ms)
+  const on = lista.filter(([, p]) => p.online)
+  return (
+    <section className="dg-card">
+      <h2>Quem está usando o sistema</h2>
+      <p className="dg-muted">
+        Online = abriu a aba e mandou sinal nos últimos 3 minutos (o sinal é enviado a cada minuto, só com a aba visível). A
+        lista atualiza sozinha; quem fecha a aba some em até 3 minutos.
+      </p>
+      {carregando ? (
+        <p className="dg-muted">Carregando…</p>
+      ) : !lista.length ? (
+        <div className="dg-empty">Ninguém registrou acesso ainda. Os registros começam depois que cada pessoa abrir o sistema com a versão nova.</div>
+      ) : (
+        <>
+          <p><b>{on.length}</b> online agora</p>
+          <ul className="dg-staff">
+            {lista.map(([mail, p]) => (
+              <li key={mail}>
+                <span>{p.nome ? `${p.nome} · ` : ''}{mail}</span>
+                <span className="dg-small dg-muted">{p.online ? p.onde : ''}</span>
+                <Status p={p} />
+              </li>
+            ))}
+          </ul>
+        </>
+      )}
+    </section>
+  )
+}
 
 function conviteTexto(nomeEmpresa, mail) {
   return (
@@ -366,11 +456,13 @@ function EquipeSan({ email }) {
 }
 
 export default function UsuariosAdmin({ email }) {
+  const pres = usePresencas()
   return (
     <div>
       <div className="dg-ehead">
         <h1>Usuários</h1>
       </div>
+      <Online mapa={pres.mapa} carregando={pres.carregando} />
       <AcessosClientes email={email} />
       <EquipeSan email={email} />
     </div>
