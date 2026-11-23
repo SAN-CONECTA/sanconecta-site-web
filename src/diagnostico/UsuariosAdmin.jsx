@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { collection, deleteDoc, doc, getDocs, onSnapshot, serverTimestamp, setDoc, writeBatch } from 'firebase/firestore'
 import { db } from './firebase'
 import { errMsg, fmtTs, isEmail, normEmail, PERFIS, perfilLabel } from './util'
+import { enviarEmailAcesso } from './convite'
 
 const SITE_URL = 'https://sanconecta.com/diagnostico360/'
 
@@ -10,6 +11,22 @@ function conviteTexto(nomeEmpresa, mail) {
     `Olá! A SAN Conecta liberou o seu acesso de consulta ao Diagnóstico 360° da ${nomeEmpresa}.\n` +
     `1. Abra ${SITE_URL}\n2. Escolha Criar conta e use este e-mail: ${mail}\n3. Confirme o e-mail pelo link que você vai receber e entre.`
   )
+}
+
+async function enviaAcesso(mail, setMsg, setEnv) {
+  setEnv(mail)
+  setMsg({ kind: '', text: '' })
+  try {
+    const criada = await enviarEmailAcesso(mail)
+    setMsg({
+      kind: 'ok',
+      text: `${criada ? 'Conta criada e e-mail' : 'E-mail'} de acesso enviado para ${mail}. Peça para a pessoa abrir o link, definir a senha e olhar também o spam.`,
+    })
+  } catch (er) {
+    setMsg({ kind: 'err', text: errMsg(er) })
+  } finally {
+    setEnv('')
+  }
 }
 
 function AcessosClientes({ email }) {
@@ -22,6 +39,7 @@ function AcessosClientes({ email }) {
   const [edit, setEdit] = useState({ id: '', empresa: '', email: '', role: 'leitura', simulacao: false })
   const fechaEdit = () => setEdit({ id: '', empresa: '', email: '', role: 'leitura', simulacao: false })
   const [confirmDel, setConfirmDel] = useState('')
+  const [env, setEnv] = useState('')
 
   useEffect(() => {
     const offM = onSnapshot(
@@ -116,7 +134,7 @@ function AcessosClientes({ email }) {
     <section className="dg-card">
       <h2>Clientes com acesso à empresa</h2>
       <p className="dg-muted">
-        A pessoa cria a própria conta e senha na tela de login, usando o e-mail liberado aqui. Remover tira o acesso aos dados;
+        A pessoa recebe o e-mail de acesso (botão Enviar e-mail de acesso) ou cria a própria conta na tela de login, usando o e-mail liberado aqui. Remover tira o acesso aos dados;
         a conta de login continua existindo e só o console do Firebase (Authentication) a apaga. Para trocar o e-mail de
         alguém, use Editar (o e-mail novo precisa criar a própria conta). "Pode responder" permite preencher respostas e a
         situação da evidência; "Somente visualizar" só consulta. A Simulação Prejuízo tem dados financeiros e fica oculta ao cliente, a menos que você marque "Ver Simulação Prejuízo" (só leitura).
@@ -233,6 +251,9 @@ function AcessosClientes({ email }) {
                     ) : (
                       <>
                         <button type="button" className="dg-btn" onClick={() => setEdit({ id: m.id, empresa: m.empresaId, email: m.email, role: m.role === 'visualizar' ? 'visualizar' : 'leitura', simulacao: m.simulacao === true })}>Editar</button>{' '}
+                        <button type="button" className="dg-btn" disabled={env === m.email} onClick={() => enviaAcesso(m.email, setMsg, setEnv)}>
+                          {env === m.email ? 'Enviando…' : 'Enviar e-mail de acesso'}
+                        </button>{' '}
                         <button type="button" className="dg-btn" onClick={() => setConfirmDel(m.id)}>Remover acesso</button>
                       </>
                     )}
@@ -253,6 +274,8 @@ function EquipeSan({ email }) {
   const [msg, setMsg] = useState('')
   const [tick, setTick] = useState(0)
   const [confirmDel, setConfirmDel] = useState('')
+  const [env, setEnv] = useState('')
+  const [aviso, setAviso] = useState({ kind: '', text: '' })
 
   useEffect(() => {
     let off = false
@@ -310,6 +333,7 @@ function EquipeSan({ email }) {
         <button className="dg-btn dg-primary" type="submit">Adicionar</button>
       </form>
       {msg && <p className="dg-err" role="alert">{msg}</p>}
+      {aviso.text && <p className={aviso.kind === 'ok' ? 'dg-ok' : 'dg-err'} role="alert">{aviso.text}</p>}
       {lista === null ? (
         <p className="dg-muted">Carregando…</p>
       ) : (
@@ -326,7 +350,12 @@ function EquipeSan({ email }) {
                   <button type="button" className="dg-btn" onClick={() => setConfirmDel('')}>Cancelar</button>
                 </span>
               ) : (
-                <button type="button" className="dg-btn" onClick={() => setConfirmDel(s.id)}>Remover</button>
+                <span>
+                  <button type="button" className="dg-btn" disabled={env === s.id} onClick={() => enviaAcesso(s.id, setAviso, setEnv)}>
+                    {env === s.id ? 'Enviando…' : 'Enviar e-mail de acesso'}
+                  </button>{' '}
+                  <button type="button" className="dg-btn" onClick={() => setConfirmDel(s.id)}>Remover</button>
+                </span>
               )}
             </li>
           ))}
