@@ -72,3 +72,10 @@ export function useRoute() {
 export const go = (path) => {
   window.location.hash = path
 }
+
+// Perfis do cliente: 'leitura' preenche respostas; 'visualizar' só consulta.
+export const PERFIS = [
+  ['leitura', 'Pode responder'],
+  ['visualizar', 'Somente visualizar'],
+]
+export const perfilLabel = (r) => (PERFIS.find((p) => p[0] === r) || PERFIS[0])[1]
