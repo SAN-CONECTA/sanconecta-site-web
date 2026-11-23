@@ -43,7 +43,7 @@ export const GEMI_QUESTOES = [
       "Backup manual/esporádico em HD externo ou nuvem gratuita, sem monitoramento.",
       "Backup automático diário (local ou nuvem), mas nunca testamos a restauração na prática.",
       "Backup automático em nuvem/híbrido com monitoramento de falhas e testes ocasionais de restauração.",
-      "Política 3-2-1 automatizada, cópias imutáveis (anti-ransomware) e testes periódicos documentados de recuperação de desastres (DR)."
+      "Backup automático em nuvem/híbrido, cópias imutáveis (anti-ransomware) e testes periódicos documentados de recuperação de desastres (DR)."
     ],
     "p": "Como são realizados os backups dos dados críticos da empresa e como é validada a recuperação?",
     "rev": "Risco existencial. Backup sem teste de restauração equivale a não ter backup."
