@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { collection, deleteDoc, doc, onSnapshot, query, serverTimestamp, setDoc, updateDoc, where } from 'firebase/firestore'
 import { db } from './firebase'
-import { errMsg, fmtTs, isEmail, normEmail } from './util'
+import { errMsg, fmtTs, isEmail, normEmail, PERFIS, perfilLabel } from './util'
 
 const SITE_URL = 'https://sanconecta.com/diagnostico360/'
 
@@ -105,6 +105,7 @@ export function DadosEmpresa({ emp, email }) {
 function Usuarios({ emp, email }) {
   const [membros, setMembros] = useState(null)
   const [novo, setNovo] = useState('')
+  const [perfil, setPerfil] = useState('leitura')
   const [busy, setBusy] = useState(false)
   const [msg, setMsg] = useState({ kind: '', text: '' })
   const [convite, setConvite] = useState('')
@@ -122,12 +123,12 @@ function Usuarios({ emp, email }) {
     )
   }, [emp.id])
 
-  // Clientes têm o perfil único role=leitura: leem a empresa e gravam só respostas e situação da evidência.
+  // Perfis: 'leitura' lê e grava só respostas e situação da evidência; 'visualizar' só consulta.
   const grava = (mail) =>
     setDoc(doc(db, 'membros', `${emp.id}__${mail}`), {
       empresaId: emp.id,
       email: mail,
-      role: 'leitura',
+      role: perfil,
       atualizadoEm: serverTimestamp(),
       atualizadoPor: email,
     })
@@ -179,6 +180,14 @@ function Usuarios({ emp, email }) {
           <span>E-mail do usuário (cliente: lê e preenche respostas)</span>
           <input type="email" value={novo} onChange={(e) => setNovo(e.target.value)} />
         </label>
+        <label className="dg-fld">
+          <span>Perfil</span>
+          <select value={perfil} onChange={(e) => setPerfil(e.target.value)}>
+            {PERFIS.map(([v, l]) => (
+              <option key={v} value={v}>{l}</option>
+            ))}
+          </select>
+        </label>
         <button className="dg-btn dg-primary" type="submit" disabled={busy}>Liberar acesso</button>
       </form>
       {msg.text && <p className={msg.kind === 'ok' ? 'dg-ok' : 'dg-err'} role="alert">{msg.text}</p>}
@@ -208,7 +217,7 @@ function Usuarios({ emp, email }) {
               {membros.map((m) => (
                 <tr key={m.id}>
                   <td>{m.email}</td>
-                  <td>Cliente</td>
+                  <td>{perfilLabel(m.role)}</td>
                   <td className="dg-small dg-muted">{fmtTs(m.atualizadoEm)}</td>
                   <td>
                     {confirmDel === m.id ? (

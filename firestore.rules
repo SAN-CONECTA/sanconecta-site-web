@@ -10,7 +10,7 @@ rules_version = '2';
 //   empresas/{empresaId}/gemi/{codigo}    diagnóstico rápido GEMI (15 perguntas, 1.1 a 3.5); campo modo da empresa: completo ou rapido
 //   empresas/{empresaId}/simulacao/atual  simulação de prejuízo por downtime (dados financeiros; só equipe SAN)
 //   empresas/{empresaId}/log/{logId}      registro de cada gravação (quem, quando, o que mudou); só a equipe SAN lê
-//   membros/{empresaId}__{email}          quem acessa cada empresa (sempre com perfil de leitura)
+//   membros/{empresaId}__{email}          quem acessa cada empresa (role 'leitura' = cliente que preenche; 'visualizar' = somente consulta)
 //
 // Princípios:
 //   - Tudo exige login com e-mail VERIFICADO. Criar conta sozinho não libera nenhum dado.
@@ -44,6 +44,12 @@ service cloud.firestore {
     function isMember(emp) {
       return signedIn()
         && exists(/databases/$(database)/documents/membros/$(emp + '__' + me()));
+    }
+
+    // Cliente com perfil 'leitura' (preenche respostas) — 'visualizar' só consulta, não grava nada.
+    function isEditor(emp) {
+      return isMember(emp)
+        && get(/databases/$(database)/documents/membros/$(emp + '__' + me())).data.role == 'leitura';
     }
 
     function itemIdOk(item) {
@@ -168,7 +174,7 @@ service cloud.firestore {
       match /itens/{item} {
         allow read: if isStaff() || isMember(emp);
 
-        allow create: if (isStaff() || (isMember(emp) && empAtiva(emp)))
+        allow create: if (isStaff() || (isEditor(emp) && empAtiva(emp)))
           && itemIdOk(item)
           && request.resource.data.keys().hasOnly(['respostas', 'updatedAt', 'updatedBy', 'logId'])
           && request.resource.data.keys().hasAll(['respostas', 'updatedAt', 'updatedBy', 'logId'])
@@ -177,7 +183,7 @@ service cloud.firestore {
           && request.resource.data.updatedBy == me()
           && logOk(emp);
 
-        allow update: if (isStaff() || (isMember(emp) && empAtiva(emp)))
+        allow update: if (isStaff() || (isEditor(emp) && empAtiva(emp)))
           && itemIdOk(item)
           && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['respostas', 'updatedAt', 'updatedBy', 'logId'])
           && respOk(request.resource.data.respostas)
@@ -212,7 +218,7 @@ service cloud.firestore {
           && request.resource.data.updatedBy == me()
           && logOk(emp);
 
-        allow create: if isMember(emp) && empAtiva(emp)
+        allow create: if isEditor(emp) && empAtiva(emp)
           && blocoIdOk(bid)
           && request.resource.data.keys().hasOnly(['evidStatus', 'updatedAt', 'updatedBy', 'logId'])
           && request.resource.data.keys().hasAll(['evidStatus', 'updatedAt', 'updatedBy', 'logId'])
@@ -221,7 +227,7 @@ service cloud.firestore {
           && request.resource.data.updatedBy == me()
           && logOk(emp);
 
-        allow update: if isMember(emp) && empAtiva(emp)
+        allow update: if isEditor(emp) && empAtiva(emp)
           && blocoIdOk(bid)
           && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['evidStatus', 'updatedAt', 'updatedBy', 'logId'])
           && request.resource.data.evidStatus in ['nao_solicitada', 'solicitada', 'parcial', 'recebida', 'nao_recebida', 'nao_aplica']
@@ -284,7 +290,7 @@ service cloud.firestore {
       match /log/{lid} {
         allow read: if isStaff();
 
-        allow create: if (isStaff() || isMember(emp))
+        allow create: if (isStaff() || isEditor(emp))
           && request.resource.data.keys().hasOnly(['item', 'email', 'papel', 'quando', 'mudancas'])
           && request.resource.data.keys().hasAll(['item', 'email', 'papel', 'quando', 'mudancas'])
           && request.resource.data.item is string
@@ -312,7 +318,7 @@ service cloud.firestore {
       allow create, update: if isStaff()
         && request.resource.data.keys().hasOnly(['empresaId', 'email', 'role', 'atualizadoEm', 'atualizadoPor'])
         && request.resource.data.keys().hasAll(['empresaId', 'email', 'role', 'atualizadoEm', 'atualizadoPor'])
-        && request.resource.data.role == 'leitura'
+        && request.resource.data.role in ['leitura', 'visualizar']
         && request.resource.data.email is string
         && request.resource.data.email == request.resource.data.email.lower()
         && request.resource.data.empresaId is string

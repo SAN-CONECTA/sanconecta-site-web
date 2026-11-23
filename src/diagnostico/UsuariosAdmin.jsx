@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { collection, deleteDoc, doc, getDocs, onSnapshot, serverTimestamp, setDoc, writeBatch } from 'firebase/firestore'
 import { db } from './firebase'
-import { errMsg, fmtTs, isEmail, normEmail } from './util'
+import { errMsg, fmtTs, isEmail, normEmail, PERFIS, perfilLabel } from './util'
 
 const SITE_URL = 'https://sanconecta.com/diagnostico360/'
 
@@ -15,11 +15,12 @@ function conviteTexto(nomeEmpresa, mail) {
 function AcessosClientes({ email }) {
   const [membros, setMembros] = useState(null)
   const [empresas, setEmpresas] = useState([])
-  const [novo, setNovo] = useState({ email: '', empresa: '' })
+  const [novo, setNovo] = useState({ email: '', empresa: '', role: 'leitura' })
   const [busy, setBusy] = useState(false)
   const [msg, setMsg] = useState({ kind: '', text: '' })
   const [convite, setConvite] = useState('')
-  const [edit, setEdit] = useState({ id: '', empresa: '' })
+  const [edit, setEdit] = useState({ id: '', empresa: '', email: '', role: 'leitura' })
+  const fechaEdit = () => setEdit({ id: '', empresa: '', email: '', role: 'leitura' })
   const [confirmDel, setConfirmDel] = useState('')
 
   useEffect(() => {
@@ -50,10 +51,10 @@ function AcessosClientes({ email }) {
   const nomeDe = (id) => (empresas.find((e) => e.id === id) || {}).nome || 'empresa removida'
   const ativas = empresas.filter((e) => !e.arquivada)
 
-  const dadosMembro = (empresaId, mail) => ({
+  const dadosMembro = (empresaId, mail, role) => ({
     empresaId,
     email: mail,
-    role: 'leitura',
+    role,
     atualizadoEm: serverTimestamp(),
     atualizadoPor: email,
   })
@@ -66,7 +67,7 @@ function AcessosClientes({ email }) {
     setBusy(true)
     setMsg({ kind: '', text: '' })
     try {
-      await setDoc(doc(db, 'membros', `${novo.empresa}__${mail}`), dadosMembro(novo.empresa, mail))
+      await setDoc(doc(db, 'membros', `${novo.empresa}__${mail}`), dadosMembro(novo.empresa, mail, novo.role))
       setConvite(conviteTexto(nomeDe(novo.empresa), mail))
       setNovo((n) => ({ ...n, email: '' }))
     } catch (er) {
@@ -76,16 +77,20 @@ function AcessosClientes({ email }) {
     }
   }
 
-  // O id do vínculo contém a empresa: mudar de empresa = criar o novo vínculo e apagar o antigo.
-  async function mover(m) {
-    if (!edit.empresa || edit.empresa === m.empresaId) return setEdit({ id: '', empresa: '' })
+  // O id do vínculo contém empresa e e-mail: mudar um deles = criar o novo vínculo e apagar o antigo.
+  async function salvar(m) {
+    const mail = normEmail(edit.email)
+    if (!isEmail(mail)) return setMsg({ kind: 'err', text: 'Informe um e-mail válido.' })
+    if (!edit.empresa) return setMsg({ kind: 'err', text: 'Escolha a empresa.' })
     setMsg({ kind: '', text: '' })
     try {
+      const novoId = `${edit.empresa}__${mail}`
       const batch = writeBatch(db)
-      batch.set(doc(db, 'membros', `${edit.empresa}__${m.email}`), dadosMembro(edit.empresa, m.email))
-      batch.delete(doc(db, 'membros', m.id))
+      batch.set(doc(db, 'membros', novoId), dadosMembro(edit.empresa, mail, edit.role))
+      if (novoId !== m.id) batch.delete(doc(db, 'membros', m.id))
       await batch.commit()
-      setEdit({ id: '', empresa: '' })
+      if (mail !== m.email) setConvite(conviteTexto(nomeDe(edit.empresa), mail))
+      fechaEdit()
     } catch (er) {
       setMsg({ kind: 'err', text: errMsg(er) })
     }
@@ -112,7 +117,8 @@ function AcessosClientes({ email }) {
       <p className="dg-muted">
         A pessoa cria a própria conta e senha na tela de login, usando o e-mail liberado aqui. Remover tira o acesso aos dados;
         a conta de login continua existindo e só o console do Firebase (Authentication) a apaga. Para trocar o e-mail de
-        alguém, libere o novo e remova o antigo.
+        alguém, use Editar (o e-mail novo precisa criar a própria conta). "Pode responder" permite preencher respostas e a
+        situação da evidência; "Somente visualizar" só consulta.
       </p>
       <form onSubmit={add} className="dg-addrow">
         <label className="dg-fld">
@@ -125,6 +131,14 @@ function AcessosClientes({ email }) {
             <option value="">Escolha…</option>
             {ativas.map((e) => (
               <option key={e.id} value={e.id}>{e.nome}</option>
+            ))}
+          </select>
+        </label>
+        <label className="dg-fld">
+          <span>Perfil</span>
+          <select value={novo.role} onChange={(e) => setNovo((n) => ({ ...n, role: e.target.value }))}>
+            {PERFIS.map(([v, l]) => (
+              <option key={v} value={v}>{l}</option>
             ))}
           </select>
         </label>
@@ -149,6 +163,7 @@ function AcessosClientes({ email }) {
               <tr>
                 <th>E-mail</th>
                 <th>Empresa</th>
+                <th>Perfil</th>
                 <th>Atualizado</th>
                 <th />
               </tr>
@@ -156,10 +171,16 @@ function AcessosClientes({ email }) {
             <tbody>
               {membros.map((m) => (
                 <tr key={m.id}>
-                  <td>{m.email}</td>
                   <td>
                     {edit.id === m.id ? (
-                      <select aria-label="Nova empresa" value={edit.empresa} onChange={(e) => setEdit({ id: m.id, empresa: e.target.value })}>
+                      <input type="email" aria-label="E-mail" value={edit.email} onChange={(e) => setEdit((x) => ({ ...x, email: e.target.value }))} />
+                    ) : (
+                      m.email
+                    )}
+                  </td>
+                  <td>
+                    {edit.id === m.id ? (
+                      <select aria-label="Empresa" value={edit.empresa} onChange={(e) => setEdit((x) => ({ ...x, empresa: e.target.value }))}>
                         {ativas.map((e) => (
                           <option key={e.id} value={e.id}>{e.nome}</option>
                         ))}
@@ -168,12 +189,23 @@ function AcessosClientes({ email }) {
                       nomeDe(m.empresaId)
                     )}
                   </td>
+                  <td>
+                    {edit.id === m.id ? (
+                      <select aria-label="Perfil" value={edit.role} onChange={(e) => setEdit((x) => ({ ...x, role: e.target.value }))}>
+                        {PERFIS.map(([v, l]) => (
+                          <option key={v} value={v}>{l}</option>
+                        ))}
+                      </select>
+                    ) : (
+                      perfilLabel(m.role)
+                    )}
+                  </td>
                   <td className="dg-small dg-muted">{fmtTs(m.atualizadoEm)}</td>
                   <td>
                     {edit.id === m.id ? (
                       <>
-                        <button type="button" className="dg-btn dg-primary" onClick={() => mover(m)}>Salvar</button>{' '}
-                        <button type="button" className="dg-btn" onClick={() => setEdit({ id: '', empresa: '' })}>Cancelar</button>
+                        <button type="button" className="dg-btn dg-primary" onClick={() => salvar(m)}>Salvar</button>{' '}
+                        <button type="button" className="dg-btn" onClick={fechaEdit}>Cancelar</button>
                       </>
                     ) : confirmDel === m.id ? (
                       <>
@@ -182,7 +214,7 @@ function AcessosClientes({ email }) {
                       </>
                     ) : (
                       <>
-                        <button type="button" className="dg-btn" onClick={() => setEdit({ id: m.id, empresa: m.empresaId })}>Alterar empresa</button>{' '}
+                        <button type="button" className="dg-btn" onClick={() => setEdit({ id: m.id, empresa: m.empresaId, email: m.email, role: m.role === 'visualizar' ? 'visualizar' : 'leitura' })}>Editar</button>{' '}
                         <button type="button" className="dg-btn" onClick={() => setConfirmDel(m.id)}>Remover acesso</button>
                       </>
                     )}
