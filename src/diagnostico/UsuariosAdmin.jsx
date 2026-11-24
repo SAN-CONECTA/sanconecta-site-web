@@ -165,11 +165,15 @@ async function enviaAcesso(mail, setMsg, setEnv) {
   }
 }
 
+const semAcento = (s) => String(s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
+
 function AcessosClientes({ email, pres }) {
   const [membros, setMembros] = useState(null)
   const [empresas, setEmpresas] = useState([])
   const [novo, setNovo] = useState({ email: '', empresas: [], role: 'leitura', simulacao: false })
   const [busy, setBusy] = useState(false)
+  const [busca, setBusca] = useState('')
+  const [aberta, setAberta] = useState(false)
   const [msg, setMsg] = useState({ kind: '', text: '' })
   const [convite, setConvite] = useState('')
   const [edit, setEdit] = useState({ id: '', empresa: '', email: '', role: 'leitura', simulacao: false })
@@ -210,6 +214,13 @@ function AcessosClientes({ email, pres }) {
   const jaVinculadas = new Set((membros || []).filter((m) => m.email === mailDigitado).map((m) => m.empresaId))
   const escolhidas = novo.empresas.filter((id) => !jaVinculadas.has(id))
   const alterna = (id, on) => setNovo((n) => ({ ...n, empresas: on ? [...new Set([...n.empresas, id])] : n.empresas.filter((x) => x !== id) }))
+  const termo = semAcento(busca)
+  const sugestoes = ativas.filter((e) => !jaVinculadas.has(e.id) && !novo.empresas.includes(e.id) && semAcento(e.nome).includes(termo))
+  const adiciona = (id) => {
+    alterna(id, true)
+    setBusca('')
+    setAberta(false)
+  }
   const todasMarcadas = ativas.length > 0 && ativas.every((e) => jaVinculadas.has(e.id) || novo.empresas.includes(e.id))
   // Quem já entrou no sistema mas ainda não tem nenhum vínculo (e não é da equipe SAN): atalho para vincular.
   const comVinculo = new Set((membros || []).map((m) => m.email))
@@ -309,25 +320,63 @@ function AcessosClientes({ email, pres }) {
           <input type="checkbox" checked={novo.simulacao} onChange={(e) => setNovo((n) => ({ ...n, simulacao: e.target.checked }))} />
           <span>Ver Simulação Prejuízo</span>
         </label>
-        <fieldset className="dg-empsel">
-          <legend>
-            Empresas (marque uma ou mais){' '}
-            <button
-              type="button"
-              className="dg-linkmini"
-              onClick={() => setNovo((n) => ({ ...n, empresas: todasMarcadas ? [] : ativas.map((e) => e.id) }))}
-            >
-              {todasMarcadas ? 'Limpar' : 'Marcar todas'}
-            </button>
-          </legend>
-          {!ativas.length && <span className="dg-muted">Nenhuma empresa ativa.</span>}
-          {ativas.map((e) => (
-            <label className="dg-chk" key={e.id}>
-              <input type="checkbox" checked={jaVinculadas.has(e.id) || novo.empresas.includes(e.id)} disabled={jaVinculadas.has(e.id)} onChange={(ev) => alterna(e.id, ev.target.checked)} />
-              <span>{e.nome}{jaVinculadas.has(e.id) ? ' (já vinculada)' : ''}</span>
-            </label>
-          ))}
-        </fieldset>
+        <div className="dg-empsel">
+          <label className="dg-fld">
+            <span>
+              Empresas{' '}
+              <button
+                type="button"
+                className="dg-linkmini"
+                onClick={() => setNovo((n) => ({ ...n, empresas: todasMarcadas ? [] : ativas.map((e) => e.id) }))}
+              >
+                {todasMarcadas ? 'Limpar' : 'Marcar todas'}
+              </button>
+            </span>
+            <input
+              type="search"
+              placeholder="Digite para buscar e escolher a empresa…"
+              value={busca}
+              autoComplete="off"
+              onChange={(e) => {
+                setBusca(e.target.value)
+                setAberta(true)
+              }}
+              onFocus={() => setAberta(true)}
+              onBlur={() => setAberta(false)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault()
+                  if (sugestoes.length) adiciona(sugestoes[0].id)
+                } else if (e.key === 'Escape') setAberta(false)
+              }}
+            />
+          </label>
+          {aberta && (
+            <ul className="dg-sug" role="listbox" onMouseDown={(e) => e.preventDefault()}>
+              {sugestoes.length ? (
+                sugestoes.map((e) => (
+                  <li key={e.id}>
+                    <button type="button" role="option" onClick={() => adiciona(e.id)}>{e.nome}</button>
+                  </li>
+                ))
+              ) : (
+                <li className="dg-muted dg-small">{ativas.length ? 'Nenhuma empresa encontrada (ou todas já escolhidas).' : 'Nenhuma empresa ativa.'}</li>
+              )}
+            </ul>
+          )}
+          <div className="dg-chips" aria-live="polite">
+            {[...jaVinculadas].map((id) => (
+              <span className="dg-chip is-fixa" key={id}>{nomeDe(id)} · já vinculada</span>
+            ))}
+            {novo.empresas.map((id) => (
+              <span className="dg-chip" key={id}>
+                {nomeDe(id)}
+                <button type="button" aria-label={`Remover ${nomeDe(id)}`} onClick={() => alterna(id, false)}>×</button>
+              </span>
+            ))}
+            {!novo.empresas.length && !jaVinculadas.size && <span className="dg-small dg-muted">Nenhuma empresa escolhida ainda.</span>}
+          </div>
+        </div>
         <button className="dg-btn dg-primary" type="submit" disabled={busy}>Liberar acesso</button>
       </form>
       {semVinculo.length > 0 && (
