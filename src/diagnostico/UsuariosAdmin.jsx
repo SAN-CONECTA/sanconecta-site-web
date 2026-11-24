@@ -33,14 +33,17 @@ function haQuanto(ms) {
 function usePresencas() {
   const [docs, setDocs] = useState(null)
   const [empresas, setEmpresas] = useState({})
+  const [equipe, setEquipe] = useState([])
   const [agora, setAgora] = useState(() => Date.now())
   useEffect(() => {
     const offP = onSnapshot(collection(db, 'presenca'), (s) => setDocs(s.docs.map((d) => ({ id: d.id, ...d.data() }))), () => setDocs([]))
     const offE = onSnapshot(collection(db, 'empresas'), (s) => setEmpresas(Object.fromEntries(s.docs.map((d) => [d.id, d.data().nome || d.id]))), () => {})
+    const offS = onSnapshot(collection(db, 'staff'), (s) => setEquipe(s.docs.map((d) => d.id)), () => {})
     const t = setInterval(() => setAgora(Date.now()), 30000)
     return () => {
       offP()
       offE()
+      offS()
       clearInterval(t)
     }
   }, [])
@@ -51,7 +54,7 @@ function usePresencas() {
     const onde = [p.empresaId ? empresas[p.empresaId] || 'empresa' : '', TELAS[p.tela] || p.tela].filter(Boolean).join(' · ')
     mapa[p.id] = { online: agora - ms < ONLINE_MS, quando: haQuanto(agora - ms), ms, onde, nome: p.nome || '' }
   })
-  return { mapa, carregando: docs === null }
+  return { mapa, equipe, carregando: docs === null }
 }
 
 function Status({ p }) {
@@ -119,10 +122,10 @@ async function enviaAcesso(mail, setMsg, setEnv) {
   }
 }
 
-function AcessosClientes({ email }) {
+function AcessosClientes({ email, pres }) {
   const [membros, setMembros] = useState(null)
   const [empresas, setEmpresas] = useState([])
-  const [novo, setNovo] = useState({ email: '', empresa: '', role: 'leitura', simulacao: false })
+  const [novo, setNovo] = useState({ email: '', empresas: [], role: 'leitura', simulacao: false })
   const [busy, setBusy] = useState(false)
   const [msg, setMsg] = useState({ kind: '', text: '' })
   const [convite, setConvite] = useState('')
@@ -159,6 +162,18 @@ function AcessosClientes({ email }) {
   const nomeDe = (id) => (empresas.find((e) => e.id === id) || {}).nome || 'empresa removida'
   const ativas = empresas.filter((e) => !e.arquivada)
 
+  // Empresas em que o e-mail digitado já está vinculado (ficam marcadas e travadas na lista).
+  const mailDigitado = normEmail(novo.email)
+  const jaVinculadas = new Set((membros || []).filter((m) => m.email === mailDigitado).map((m) => m.empresaId))
+  const escolhidas = novo.empresas.filter((id) => !jaVinculadas.has(id))
+  const alterna = (id, on) => setNovo((n) => ({ ...n, empresas: on ? [...new Set([...n.empresas, id])] : n.empresas.filter((x) => x !== id) }))
+  const todasMarcadas = ativas.length > 0 && ativas.every((e) => jaVinculadas.has(e.id) || novo.empresas.includes(e.id))
+  // Quem já entrou no sistema mas ainda não tem nenhum vínculo (e não é da equipe SAN): atalho para vincular.
+  const comVinculo = new Set((membros || []).map((m) => m.email))
+  const semVinculo = Object.keys(pres.mapa)
+    .filter((mail) => !comVinculo.has(mail) && !pres.equipe.includes(mail))
+    .sort((a, b) => pres.mapa[b].ms - pres.mapa[a].ms)
+
   const dadosMembro = (empresaId, mail, role, simulacao) => ({
     empresaId,
     email: mail,
@@ -172,13 +187,18 @@ function AcessosClientes({ email }) {
     e.preventDefault()
     const mail = normEmail(novo.email)
     if (!isEmail(mail)) return setMsg({ kind: 'err', text: 'Informe um e-mail válido.' })
-    if (!novo.empresa) return setMsg({ kind: 'err', text: 'Escolha a empresa.' })
+    if (!escolhidas.length) return setMsg({ kind: 'err', text: 'Marque ao menos uma empresa ainda não vinculada a este e-mail.' })
     setBusy(true)
     setMsg({ kind: '', text: '' })
     try {
-      await setDoc(doc(db, 'membros', `${novo.empresa}__${mail}`), dadosMembro(novo.empresa, mail, novo.role, novo.simulacao))
-      setConvite(conviteTexto(nomeDe(novo.empresa), mail))
-      setNovo((n) => ({ ...n, email: '' }))
+      for (let i = 0; i < escolhidas.length; i += 8) {
+        const batch = writeBatch(db)
+        escolhidas.slice(i, i + 8).forEach((id) => batch.set(doc(db, 'membros', `${id}__${mail}`), dadosMembro(id, mail, novo.role, novo.simulacao)))
+        await batch.commit()
+      }
+      setConvite(conviteTexto(escolhidas.map(nomeDe).join(', '), mail))
+      setMsg({ kind: 'ok', text: `${mail} vinculado a ${escolhidas.length} empresa(s).` })
+      setNovo((n) => ({ ...n, email: '', empresas: [] }))
     } catch (er) {
       setMsg({ kind: 'err', text: errMsg(er) })
     } finally {
@@ -235,15 +255,6 @@ function AcessosClientes({ email }) {
           <input type="email" value={novo.email} onChange={(e) => setNovo((n) => ({ ...n, email: e.target.value }))} />
         </label>
         <label className="dg-fld">
-          <span>Empresa</span>
-          <select value={novo.empresa} onChange={(e) => setNovo((n) => ({ ...n, empresa: e.target.value }))}>
-            <option value="">Escolha…</option>
-            {ativas.map((e) => (
-              <option key={e.id} value={e.id}>{e.nome}</option>
-            ))}
-          </select>
-        </label>
-        <label className="dg-fld">
           <span>Perfil</span>
           <select value={novo.role} onChange={(e) => setNovo((n) => ({ ...n, role: e.target.value }))}>
             {PERFIS.map(([v, l]) => (
@@ -255,8 +266,41 @@ function AcessosClientes({ email }) {
           <input type="checkbox" checked={novo.simulacao} onChange={(e) => setNovo((n) => ({ ...n, simulacao: e.target.checked }))} />
           <span>Ver Simulação Prejuízo</span>
         </label>
+        <fieldset className="dg-empsel">
+          <legend>
+            Empresas (marque uma ou mais){' '}
+            <button
+              type="button"
+              className="dg-linkmini"
+              onClick={() => setNovo((n) => ({ ...n, empresas: todasMarcadas ? [] : ativas.map((e) => e.id) }))}
+            >
+              {todasMarcadas ? 'Limpar' : 'Marcar todas'}
+            </button>
+          </legend>
+          {!ativas.length && <span className="dg-muted">Nenhuma empresa ativa.</span>}
+          {ativas.map((e) => (
+            <label className="dg-chk" key={e.id}>
+              <input type="checkbox" checked={jaVinculadas.has(e.id) || novo.empresas.includes(e.id)} disabled={jaVinculadas.has(e.id)} onChange={(ev) => alterna(e.id, ev.target.checked)} />
+              <span>{e.nome}{jaVinculadas.has(e.id) ? ' (já vinculada)' : ''}</span>
+            </label>
+          ))}
+        </fieldset>
         <button className="dg-btn dg-primary" type="submit" disabled={busy}>Liberar acesso</button>
       </form>
+      {semVinculo.length > 0 && (
+        <div className="dg-note">
+          <p className="dg-small"><b>Entraram no sistema, mas ainda sem vínculo com nenhuma empresa:</b></p>
+          <ul className="dg-staff">
+            {semVinculo.map((mail) => (
+              <li key={mail}>
+                <span>{mail}</span>
+                <span className="dg-small dg-muted">visto {pres.mapa[mail].quando}</span>
+                <button type="button" className="dg-btn" onClick={() => setNovo((n) => ({ ...n, email: mail }))}>Vincular</button>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
       {msg.text && <p className={msg.kind === 'ok' ? 'dg-ok' : 'dg-err'} role="alert">{msg.text}</p>}
       {convite && (
         <div className="dg-note">
@@ -463,7 +507,7 @@ export default function UsuariosAdmin({ email }) {
         <h1>Usuários</h1>
       </div>
       <Online mapa={pres.mapa} carregando={pres.carregando} />
-      <AcessosClientes email={email} />
+      <AcessosClientes email={email} pres={pres} />
       <EquipeSan email={email} />
     </div>
   )

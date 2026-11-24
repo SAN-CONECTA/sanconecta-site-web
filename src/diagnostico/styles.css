@@ -361,3 +361,10 @@ td select { min-height: 34px; width: auto; }
 .dg-dot { display: inline-block; width: 9px; height: 9px; margin-right: 6px; border-radius: 50%; background: #b8c0cc; }
 .dg-dot.on { background: #1f9d55; box-shadow: 0 0 0 3px rgba(31, 157, 85, 0.2); }
 .dg-on { color: #1f7a4d; font-weight: 600; }
+
+/* Escolha de várias empresas ao liberar acesso */
+.dg-empsel { border: 1px solid var(--line); border-radius: 8px; margin: 0 0 12px; padding: 8px 12px 12px; display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 6px 16px; max-height: 240px; overflow: auto; }
+.dg-empsel legend { padding: 0 6px; font-weight: 500; }
+.dg-empsel .dg-chk { align-items: flex-start; }
+.dg-empsel .dg-chk input { margin-top: 3px; }
+.dg-linkmini { background: none; border: 0; padding: 0; color: var(--blue); cursor: pointer; text-decoration: underline; font: inherit; font-size: 13px; }
