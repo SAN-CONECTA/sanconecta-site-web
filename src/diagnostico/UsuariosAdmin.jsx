@@ -316,10 +316,6 @@ function AcessosClientes({ email, pres }) {
             ))}
           </select>
         </label>
-        <label className="dg-fld dg-chk">
-          <input type="checkbox" checked={novo.simulacao} onChange={(e) => setNovo((n) => ({ ...n, simulacao: e.target.checked }))} />
-          <span>Ver Simulação Prejuízo</span>
-        </label>
         <div className="dg-empsel">
           <label className="dg-fld">
             <span>
@@ -364,20 +360,25 @@ function AcessosClientes({ email, pres }) {
               )}
             </ul>
           )}
-          <div className="dg-chips" aria-live="polite">
-            {[...jaVinculadas].map((id) => (
-              <span className="dg-chip is-fixa" key={id}>{nomeDe(id)} · já vinculada</span>
-            ))}
-            {novo.empresas.map((id) => (
-              <span className="dg-chip" key={id}>
-                {nomeDe(id)}
-                <button type="button" aria-label={`Remover ${nomeDe(id)}`} onClick={() => alterna(id, false)}>×</button>
-              </span>
-            ))}
-            {!novo.empresas.length && !jaVinculadas.size && <span className="dg-small dg-muted">Nenhuma empresa escolhida ainda.</span>}
-          </div>
         </div>
+        <label className="dg-fld dg-chk">
+          <input type="checkbox" checked={novo.simulacao} onChange={(e) => setNovo((n) => ({ ...n, simulacao: e.target.checked }))} />
+          <span>Ver Simulação Prejuízo</span>
+        </label>
         <button className="dg-btn dg-primary" type="submit" disabled={busy}>Liberar acesso</button>
+        <div className="dg-chips dg-chips-row" aria-live="polite">
+          {[...jaVinculadas].map((id) => (
+            <span className="dg-chip is-fixa" key={id}>{nomeDe(id)} · já vinculada</span>
+          ))}
+          {novo.empresas.map((id) => (
+            <span className="dg-chip" key={id}>
+              {nomeDe(id)}
+              <button type="button" aria-label={`Remover ${nomeDe(id)}`} onClick={() => alterna(id, false)}>×</button>
+            </span>
+          ))}
+          {!novo.empresas.length && !jaVinculadas.size && <span className="dg-small dg-muted">Nenhuma empresa escolhida ainda.</span>}
+        </div>
+
       </form>
       {semVinculo.length > 0 && (
         <div className="dg-note">

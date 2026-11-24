@@ -365,7 +365,7 @@ td select { min-height: 34px; width: auto; }
 /* Escolha de várias empresas: busca com sugestões + etiquetas */
 .dg-empsel { position: relative; flex: 1 1 360px; min-width: 260px; margin-bottom: 12px; }
 .dg-empsel .dg-fld { margin-bottom: 6px; }
-.dg-sug { position: absolute; z-index: 6; left: 0; right: 0; top: 62px; margin: 0; padding: 4px; list-style: none; max-height: 220px; overflow: auto; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15); }
+.dg-sug { position: absolute; z-index: 6; left: 0; right: 0; top: 100%; margin: 0; padding: 4px; list-style: none; max-height: 220px; overflow: auto; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15); }
 .dg-sug li { padding: 4px 8px; }
 .dg-sug button { width: 100%; text-align: left; padding: 8px; border: 0; border-radius: 6px; background: none; cursor: pointer; font: inherit; }
 .dg-sug button:hover, .dg-sug button:focus-visible { background: var(--mint, #e6f4ec); }
@@ -375,3 +375,11 @@ td select { min-height: 34px; width: auto; }
 .dg-chip button { width: 20px; height: 20px; padding: 0; border: 0; border-radius: 50%; background: rgba(255, 255, 255, 0.2); color: #fff; cursor: pointer; line-height: 1; }
 .dg-linkmini { background: none; border: 0; padding: 0; color: var(--blue); cursor: pointer; text-decoration: underline; font: inherit; font-size: 13px; }
 .dg-badge-novo { display: inline-block; margin-left: 6px; padding: 1px 8px; border-radius: 999px; background: #fff3d6; color: #8a5a00; font-size: 12px; font-weight: 600; }
+
+/* Formulário de liberar acesso: campos na mesma linha base */
+.dg-addrow .dg-chk { flex: 0 0 auto; display: inline-flex; align-items: center; gap: 8px; height: 40px; min-height: 0; padding: 0; box-sizing: border-box; }
+.dg-addrow .dg-chk > span { display: inline; margin: 0; }
+.dg-addrow .dg-empsel { margin-bottom: 0; flex: 2 1 320px; }
+.dg-chips-row { flex: 1 1 100%; }
+.dg-addrow .dg-empsel .dg-fld { margin-bottom: 0; }
+.dg-addrow > .dg-btn { height: 40px; box-sizing: border-box; }
