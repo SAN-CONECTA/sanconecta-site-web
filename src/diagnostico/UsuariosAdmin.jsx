@@ -34,16 +34,19 @@ function usePresencas() {
   const [docs, setDocs] = useState(null)
   const [empresas, setEmpresas] = useState({})
   const [equipe, setEquipe] = useState([])
+  const [vinculados, setVinculados] = useState([])
   const [agora, setAgora] = useState(() => Date.now())
   useEffect(() => {
     const offP = onSnapshot(collection(db, 'presenca'), (s) => setDocs(s.docs.map((d) => ({ id: d.id, ...d.data() }))), () => setDocs([]))
     const offE = onSnapshot(collection(db, 'empresas'), (s) => setEmpresas(Object.fromEntries(s.docs.map((d) => [d.id, d.data().nome || d.id]))), () => {})
     const offS = onSnapshot(collection(db, 'staff'), (s) => setEquipe(s.docs.map((d) => d.id)), () => {})
+    const offM = onSnapshot(collection(db, 'membros'), (s) => setVinculados(s.docs.map((d) => d.data().email)), () => {})
     const t = setInterval(() => setAgora(Date.now()), 30000)
     return () => {
       offP()
       offE()
       offS()
+      offM()
       clearInterval(t)
     }
   }, [])
@@ -53,6 +56,9 @@ function usePresencas() {
     if (!ms) return
     const onde = [p.empresaId ? empresas[p.empresaId] || 'empresa' : '', TELAS[p.tela] || p.tela].filter(Boolean).join(' · ')
     mapa[p.id] = { online: agora - ms < ONLINE_MS, quando: haQuanto(agora - ms), ms, onde, nome: p.nome || '' }
+  })
+  Object.keys(mapa).forEach((mail) => {
+    mapa[mail].semVinculo = !vinculados.includes(mail) && !equipe.includes(mail)
   })
   return { mapa, equipe, carregando: docs === null }
 }
@@ -68,26 +74,33 @@ function Status({ p }) {
 }
 
 function Online({ mapa, carregando }) {
-  const lista = Object.entries(mapa).sort((a, b) => b[1].ms - a[1].ms)
+  // Só mostra quem está online agora e as contas novas ainda sem vínculo (precisam da ação da SAN).
+  const lista = Object.entries(mapa)
+    .filter(([, p]) => p.online || p.semVinculo)
+    .sort((a, b) => Number(b[1].online) - Number(a[1].online) || b[1].ms - a[1].ms)
   const on = lista.filter(([, p]) => p.online)
   return (
     <section className="dg-card">
       <h2>Quem está usando o sistema</h2>
       <p className="dg-muted">
-        Online = abriu a aba e mandou sinal nos últimos 3 minutos (o sinal é enviado a cada minuto, só com a aba visível). A
-        lista atualiza sozinha; quem fecha a aba some em até 3 minutos.
+        Mostra quem está online agora e quem criou conta mas ainda não foi vinculado a nenhuma empresa. Online = mandou sinal
+        nos últimos 3 minutos (o sinal é enviado a cada minuto, só com a aba visível). A lista atualiza sozinha; quem fecha a aba
+        some em até 3 minutos.
       </p>
       {carregando ? (
         <p className="dg-muted">Carregando…</p>
       ) : !lista.length ? (
-        <div className="dg-empty">Ninguém registrou acesso ainda. Os registros começam depois que cada pessoa abrir o sistema com a versão nova.</div>
+        <div className="dg-empty">Ninguém online agora e nenhuma conta nova esperando vínculo.</div>
       ) : (
         <>
           <p><b>{on.length}</b> online agora</p>
           <ul className="dg-staff">
             {lista.map(([mail, p]) => (
               <li key={mail}>
-                <span>{p.nome ? `${p.nome} · ` : ''}{mail}</span>
+                <span>
+                  {p.nome ? `${p.nome} · ` : ''}{mail}
+                  {p.semVinculo && <span className="dg-badge-novo"> Novo · sem vínculo</span>}
+                </span>
                 <span className="dg-small dg-muted">{p.online ? p.onde : ''}</span>
                 <Status p={p} />
               </li>

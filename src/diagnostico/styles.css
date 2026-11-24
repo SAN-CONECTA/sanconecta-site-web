@@ -368,3 +368,4 @@ td select { min-height: 34px; width: auto; }
 .dg-empsel .dg-chk { align-items: flex-start; }
 .dg-empsel .dg-chk input { margin-top: 3px; }
 .dg-linkmini { background: none; border: 0; padding: 0; color: var(--blue); cursor: pointer; text-decoration: underline; font: inherit; font-size: 13px; }
+.dg-badge-novo { display: inline-block; margin-left: 6px; padding: 1px 8px; border-radius: 999px; background: #fff3d6; color: #8a5a00; font-size: 12px; font-weight: 600; }
