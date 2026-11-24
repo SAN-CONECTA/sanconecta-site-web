@@ -362,10 +362,16 @@ td select { min-height: 34px; width: auto; }
 .dg-dot.on { background: #1f9d55; box-shadow: 0 0 0 3px rgba(31, 157, 85, 0.2); }
 .dg-on { color: #1f7a4d; font-weight: 600; }
 
-/* Escolha de várias empresas ao liberar acesso */
-.dg-empsel { border: 1px solid var(--line); border-radius: 8px; margin: 0 0 12px; padding: 8px 12px 12px; display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 6px 16px; max-height: 240px; overflow: auto; }
-.dg-empsel legend { padding: 0 6px; font-weight: 500; }
-.dg-empsel .dg-chk { align-items: flex-start; }
-.dg-empsel .dg-chk input { margin-top: 3px; }
+/* Escolha de várias empresas: busca com sugestões + etiquetas */
+.dg-empsel { position: relative; flex: 1 1 360px; min-width: 260px; margin-bottom: 12px; }
+.dg-empsel .dg-fld { margin-bottom: 6px; }
+.dg-sug { position: absolute; z-index: 6; left: 0; right: 0; top: 62px; margin: 0; padding: 4px; list-style: none; max-height: 220px; overflow: auto; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15); }
+.dg-sug li { padding: 4px 8px; }
+.dg-sug button { width: 100%; text-align: left; padding: 8px; border: 0; border-radius: 6px; background: none; cursor: pointer; font: inherit; }
+.dg-sug button:hover, .dg-sug button:focus-visible { background: var(--mint, #e6f4ec); }
+.dg-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.dg-chip { display: inline-flex; align-items: center; gap: 6px; padding: 4px 6px 4px 10px; border-radius: 999px; background: var(--navy); color: #fff; font-size: 13px; }
+.dg-chip.is-fixa { background: var(--line); color: var(--muted); padding-right: 10px; }
+.dg-chip button { width: 20px; height: 20px; padding: 0; border: 0; border-radius: 50%; background: rgba(255, 255, 255, 0.2); color: #fff; cursor: pointer; line-height: 1; }
 .dg-linkmini { background: none; border: 0; padding: 0; color: var(--blue); cursor: pointer; text-decoration: underline; font: inherit; font-size: 13px; }
 .dg-badge-novo { display: inline-block; margin-left: 6px; padding: 1px 8px; border-radius: 999px; background: #fff3d6; color: #8a5a00; font-size: 12px; font-weight: 600; }
