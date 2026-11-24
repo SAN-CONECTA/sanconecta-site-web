@@ -375,10 +375,13 @@ service cloud.firestore {
 
       allow create, update: if signedIn()
         && id == me()
-        && request.resource.data.keys().hasOnly(['email', 'nome', 'empresaId', 'tela', 'visto'])
+        && request.resource.data.keys().hasOnly(['email', 'nome', 'empresaId', 'tela', 'visto', 'criada'])
         && request.resource.data.keys().hasAll(['email', 'visto'])
         && request.resource.data.email == me()
         && request.resource.data.visto == request.time
+        && (!('criada' in request.resource.data)
+            || (request.resource.data.criada is number && request.resource.data.criada > 0
+                && request.resource.data.criada <= request.time.toMillis() + 60000))
         && (!('nome' in request.resource.data) || shortStr(request.resource.data.nome, 120))
         && (!('empresaId' in request.resource.data) || shortStr(request.resource.data.empresaId, 80))
         && (!('tela' in request.resource.data) || shortStr(request.resource.data.tela, 30));
