@@ -55,12 +55,12 @@ function usePresencas() {
     const ms = p.visto && p.visto.toMillis ? p.visto.toMillis() : 0
     if (!ms) return
     const onde = [p.empresaId ? empresas[p.empresaId] || 'empresa' : '', TELAS[p.tela] || p.tela].filter(Boolean).join(' · ')
-    mapa[p.id] = { online: agora - ms < ONLINE_MS, quando: haQuanto(agora - ms), ms, onde, nome: p.nome || '' }
+    mapa[p.id] = { online: agora - ms < ONLINE_MS, quando: haQuanto(agora - ms), ms, onde, nome: p.nome || '', criada: Number(p.criada) || 0 }
   })
   Object.keys(mapa).forEach((mail) => {
     mapa[mail].semVinculo = !vinculados.includes(mail) && !equipe.includes(mail)
   })
-  return { mapa, equipe, carregando: docs === null }
+  return { mapa, equipe, agora, carregando: docs === null }
 }
 
 function Status({ p }) {
@@ -73,7 +73,21 @@ function Status({ p }) {
   )
 }
 
-function Online({ mapa, carregando }) {
+const SEM_VINCULO_MS = 15 * 60 * 1000
+
+function Online({ mapa, carregando, agora }) {
+  const [confirma, setConfirma] = useState('')
+  const [aviso, setAviso] = useState('')
+  // Tira a pessoa do painel. A conta de login continua no Firebase (Authentication) e ela reaparece se entrar de novo.
+  async function exclui(mail) {
+    setAviso('')
+    try {
+      await deleteDoc(doc(db, 'presenca', mail))
+      setConfirma('')
+    } catch (er) {
+      setAviso(errMsg(er))
+    }
+  }
   // Só mostra quem está online agora e as contas novas ainda sem vínculo (precisam da ação da SAN).
   const lista = Object.entries(mapa)
     .filter(([, p]) => p.online || p.semVinculo)
@@ -100,12 +114,28 @@ function Online({ mapa, carregando }) {
                 <span>
                   {p.nome ? `${p.nome} · ` : ''}{mail}
                   {p.semVinculo && <span className="dg-badge-novo"> Novo · sem vínculo</span>}
+                  {p.semVinculo && p.criada > 0 && <span className="dg-small dg-muted"> · conta criada {haQuanto(agora - p.criada)}</span>}
                 </span>
                 <span className="dg-small dg-muted">{p.online ? p.onde : ''}</span>
                 <Status p={p} />
+                {p.semVinculo && p.criada > 0 && agora - p.criada > SEM_VINCULO_MS && (
+                  confirma === mail ? (
+                    <span>
+                      <button type="button" className="dg-btn dg-danger" onClick={() => exclui(mail)}>Confirmar exclusão</button>{' '}
+                      <button type="button" className="dg-btn" onClick={() => setConfirma('')}>Cancelar</button>
+                    </span>
+                  ) : (
+                    <button type="button" className="dg-btn" onClick={() => setConfirma(mail)}>Excluir</button>
+                  )
+                )}
               </li>
             ))}
           </ul>
+          {aviso && <p className="dg-err" role="alert">{aviso}</p>}
+          <p className="dg-small dg-muted">
+            Excluir tira a conta do painel depois de 15 minutos sem vínculo. A conta de login continua no Firebase (Authentication)
+            e a pessoa reaparece aqui se entrar de novo; para apagar de vez, use o console do Firebase.
+          </p>
         </>
       )}
     </section>
@@ -519,7 +549,7 @@ export default function UsuariosAdmin({ email }) {
       <div className="dg-ehead">
         <h1>Usuários</h1>
       </div>
-      <Online mapa={pres.mapa} carregando={pres.carregando} />
+      <Online mapa={pres.mapa} carregando={pres.carregando} agora={pres.agora} />
       <AcessosClientes email={email} pres={pres} />
       <EquipeSan email={email} />
     </div>

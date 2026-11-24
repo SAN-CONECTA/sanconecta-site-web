@@ -15,6 +15,8 @@ export function usePresenca(user, route) {
   }, [route])
   const email = user && user.emailVerified ? normEmail(user.email) : ''
   const nome = user ? String(user.displayName || '').slice(0, 120) : ''
+  // Quando a conta de login foi criada (o Firebase informa); serve para saber há quanto tempo alguém está sem vínculo.
+  const criada = user && user.metadata && user.metadata.creationTime ? Date.parse(user.metadata.creationTime) || 0 : 0
 
   useEffect(() => {
     if (!email || !db) return undefined
@@ -28,6 +30,7 @@ export function usePresenca(user, route) {
         tela: String(r.name === 'empresa' ? r.tab || 'painel' : r.name || 'empresas').slice(0, 30),
         visto: serverTimestamp(),
       }
+      if (criada > 0) dados.criada = criada
       setDoc(doc(db, 'presenca', email), dados).catch(() => {})
     }
     envia()
@@ -39,5 +42,5 @@ export function usePresenca(user, route) {
       document.removeEventListener('visibilitychange', envia)
       window.removeEventListener('hashchange', envia)
     }
-  }, [email, nome])
+  }, [email, nome, criada])
 }
