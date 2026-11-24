@@ -108,12 +108,6 @@ export function Login() {
           <button type="button" className="dg-link" onClick={() => switchMode('entrar')}>Voltar para Entrar</button>
         )}
       </form>
-      {mode === 'criar' && (
-        <p className="dg-note">
-          Use o mesmo e-mail que a SAN Conecta cadastrou para a sua empresa. Criar a conta não libera dados: o acesso
-          depende do cadastro feito pela SAN.
-        </p>
-      )}
     </Frame>
   )
 }
