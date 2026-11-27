@@ -308,7 +308,7 @@ td select { min-height: 34px; width: auto; }
 .dg-btn.dg-next:focus-visible { outline: 3px solid #9db8ee; outline-offset: 2px; }
 
 /* Simulação de prejuízo */
-.dg-sim-in { width: 150px; text-align: right; }
+.dg-sim-in { width: 170px; text-align: right; }
 .dg-sim-tot td { background: #eef3fb; font-weight: 700; }
 .dg-bars { display: grid; gap: 8px; margin-top: 14px; }
 .dg-bar { display: grid; grid-template-columns: minmax(120px, 230px) 1fr minmax(90px, auto); gap: 10px; align-items: center; font-size: 13px; }
@@ -337,12 +337,12 @@ td select { min-height: 34px; width: auto; }
   .dg-erow-act > * { flex: 1 1 auto; }
   .dg-gop { grid-template-columns: auto 1fr; }
   .dg-gop > :nth-child(3) { grid-column: 1 / -1; }
-  .dg-sim-in { width: 120px; }
+  .dg-sim-in { width: 150px; }
   .dg-two, .dg-grid3 { grid-template-columns: minmax(0, 1fr); }
   .dg-tblwrap { margin-inline: -4px; }
   .dg-t-param { min-width: 0; }
   .dg-t-param th:nth-child(2), .dg-t-param td:nth-child(2) { display: none; }
-  .dg-sim-in { width: 110px; }
+  .dg-sim-in { width: 140px; }
 }
 
 .dg-chk { display: inline-flex; align-items: center; gap: 8px; cursor: pointer; }
