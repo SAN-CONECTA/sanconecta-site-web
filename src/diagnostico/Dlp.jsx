@@ -1,15 +1,17 @@
 import { useMemo, useState } from 'react'
 import { collection, doc, serverTimestamp, writeBatch } from 'firebase/firestore'
 import { db } from './firebase'
-import { DLP_CANAIS, DLP_INTERNO_GERAL, DLP_MODOS, DLP_PENDENCIAS, DLP_PLATAFORMAS, DLP_PRIORIDADE, DLP_SECOES, chavesDoCampo } from './dlpDados'
+import { DLP_CANAIS, DLP_INTERNO_GERAL, DLP_MODOS, DLP_OPC, DLP_PENDENCIAS, DLP_PRIORIDADE, DLP_SECOES, SN, chavesDoCampo } from './dlpDados'
 import { errMsg, fmtTs, normEmail } from './util'
 
 const POR_LOTE = 4
-const CATEGORIAS = DLP_SECOES[1].grupos[0].campos[0].opc
 const ordemPri = { alta: 0, media: 1, baixa: 2, nao: 3 }
 const priLabel = (v) => (DLP_PRIORIDADE.find((p) => p[0] === v) || ['', 'Sem prioridade'])[1]
 const lista = (s) => String(s || '').split(',').filter(Boolean)
 const rotulo = (opc, v) => (opc.find((o) => o[0] === v) || [v, v])[1]
+// Rótulos legíveis de um valor (uma opção ou várias separadas por vírgula).
+const rotulos = (k, v) => (DLP_OPC[k] ? lista(v).map((x) => rotulo(DLP_OPC[k], x)).join(' · ') : v)
+const temNaoSei = (v) => lista(v).includes('naosei')
 
 const valorSalvo = (dlp, sid, k) => {
   const v = dlp && dlp[sid] && dlp[sid].r ? dlp[sid].r[k] : ''
@@ -30,61 +32,62 @@ function Dica({ texto }) {
   )
 }
 
-function Campo({ c, sid, form, set, dis }) {
+function Controle({ c, sid, form, set, dis }) {
   const nome = (k) => `${sid}.${k}`
   const v = (k) => form[nome(k)] || ''
   if (c.tipo === 'text') {
-    return (
-      <label className="dg-fld">
-        <span>{c.t}</span>
-        <input value={v(c.k)} onChange={(e) => set(nome(c.k), e.target.value)} disabled={dis} maxLength={200} />
-      </label>
-    )
+    return <input value={v(c.k)} onChange={(e) => set(nome(c.k), e.target.value)} disabled={dis} maxLength={200} aria-label={c.t} />
   }
   if (c.tipo === 'long') {
-    return (
-      <label className="dg-fld">
-        <span>{c.t}</span>
-        <textarea value={v(c.k)} onChange={(e) => set(nome(c.k), e.target.value)} disabled={dis} maxLength={2000} />
-      </label>
-    )
+    return <textarea value={v(c.k)} onChange={(e) => set(nome(c.k), e.target.value)} disabled={dis} maxLength={2000} aria-label={c.t} />
   }
   if (c.tipo === 'multi') {
     const marcados = lista(v(c.k))
     return (
-      <fieldset className="dg-gchk" disabled={dis}>
-        <legend>{c.t}</legend>
+      <div className="dg-dlp-opcs">
         {c.opc.map(([k, l]) => (
           <label className="dg-chk" key={k}>
             <input
               type="checkbox"
               checked={marcados.includes(k)}
+              disabled={dis}
               onChange={(e) => set(nome(c.k), c.opc.map((o) => o[0]).filter((x) => (x === k ? e.target.checked : marcados.includes(x))).join(','))}
             />
             <span>{l}</span>
           </label>
         ))}
-      </fieldset>
+      </div>
     )
   }
   if (c.tipo === 'radio') {
     return (
-      <fieldset className="dg-gchk" disabled={dis}>
-        <legend>{c.t}</legend>
+      <div className="dg-dlp-opcs" role="radiogroup" aria-label={c.t}>
         {c.opc.map(([k, l, d]) => (
-          <label className={`dg-gop${v(c.k) === k ? ' on' : ''}`} key={k}>
-            <input type="radio" name={nome(c.k)} checked={v(c.k) === k} onChange={() => set(nome(c.k), k)} />
-            <b>{l}</b>
-            <span>{d}</span>
+          <label className={`dg-chk${v(c.k) === k ? ' on' : ''}`} key={k}>
+            <input type="radio" name={nome(c.k)} checked={v(c.k) === k} disabled={dis} onChange={() => set(nome(c.k), k)} />
+            <span>
+              {l}
+              {d && <small className="dg-muted"> — {d}</small>}
+            </span>
           </label>
         ))}
-      </fieldset>
+      </div>
     )
   }
   if (c.tipo === 'canal') {
     return (
-      <div className="dg-dlp-canal">
-        <p className="dg-dlp-canal-t"><b>{c.t}</b><span className="dg-muted dg-small">{c.q}</span></p>
+      <div className="dg-dlp-canalgrid">
+        <div>
+          <span className="dg-small dg-muted">O canal é usado?</span>
+          <div className="dg-dlp-opcs" role="radiogroup" aria-label={`${c.t}: o canal é usado?`}>
+            {SN.map(([k, l]) => (
+              <label className="dg-chk" key={k}>
+                <input type="radio" name={nome(`${c.k}_u`)} checked={v(`${c.k}_u`) === k} disabled={dis} onChange={() => set(nome(`${c.k}_u`), k)} />
+                <span>{l}</span>
+              </label>
+            ))}
+          </div>
+        </div>
         <label className="dg-fld">
           <span>Prioridade</span>
           <select value={v(`${c.k}_p`)} onChange={(e) => set(nome(`${c.k}_p`), e.target.value)} disabled={dis}>
@@ -92,32 +95,61 @@ function Campo({ c, sid, form, set, dis }) {
             {DLP_PRIORIDADE.map(([k, l]) => <option key={k} value={k}>{l}</option>)}
           </select>
         </label>
+      </div>
+    )
+  }
+  return null
+}
+
+function Campo({ c, sid, form, set, dis }) {
+  const nome = (k) => `${sid}.${k}`
+  if (c.tipo === 'pend') {
+    return (
+      <div className="dg-dlp-pend">
+        <p className="dg-dlp-canal-t"><b>{c.t}</b></p>
         <label className="dg-fld">
-          <span>Resposta do cliente</span>
-          <textarea value={v(`${c.k}_r`)} onChange={(e) => set(nome(`${c.k}_r`), e.target.value)} disabled={dis} maxLength={2000} />
+          <span>Responsável</span>
+          <input value={form[nome(`${c.k}_resp`)] || ''} onChange={(e) => set(nome(`${c.k}_resp`), e.target.value)} disabled={dis} maxLength={200} />
+        </label>
+        <label className="dg-fld">
+          <span>Prazo</span>
+          <input value={form[nome(`${c.k}_prazo`)] || ''} onChange={(e) => set(nome(`${c.k}_prazo`), e.target.value)} disabled={dis} maxLength={200} />
         </label>
       </div>
     )
   }
-  // pend: responsável e prazo
+  const aberto = c.tipo === 'text' || c.tipo === 'long'
+  const obsKey = c.tipo === 'canal' ? `${c.k}_r` : `${c.k}_o`
+  const temObs = c.tipo === 'canal' || c.obs
+  const temVs = c.tipo !== 'long' && !c.semv
+  const vsKey = `${c.k}_v`
+  const Wrap = aberto ? 'label' : 'div'
   return (
-    <div className="dg-dlp-pend">
-      <p className="dg-dlp-canal-t"><b>{c.t}</b></p>
-      <label className="dg-fld">
-        <span>Responsável</span>
-        <input value={v(`${c.k}_resp`)} onChange={(e) => set(nome(`${c.k}_resp`), e.target.value)} disabled={dis} maxLength={200} />
-      </label>
-      <label className="dg-fld">
-        <span>Prazo</span>
-        <input value={v(`${c.k}_prazo`)} onChange={(e) => set(nome(`${c.k}_prazo`), e.target.value)} disabled={dis} maxLength={200} />
-      </label>
+    <div className={`dg-dlp-q${aberto ? ' aberto' : ''}`}>
+      <Wrap className={aberto ? 'dg-fld' : 'dg-dlp-qt'}>
+        <span className={aberto ? undefined : 'dg-dlp-qtit'}>{c.t}</span>
+        {c.q && <span className="dg-muted dg-small">{c.q}</span>}
+        <Controle c={c} sid={sid} form={form} set={set} dis={dis} />
+      </Wrap>
+      {temObs && (
+        <label className="dg-fld dg-dlp-obs">
+          <span>Observação (opcional)</span>
+          <textarea value={form[nome(obsKey)] || ''} onChange={(e) => set(nome(obsKey), e.target.value)} disabled={dis} maxLength={2000} />
+        </label>
+      )}
+      {temVs && (
+        <label className="dg-chk dg-dlp-vs">
+          <input type="checkbox" checked={form[nome(vsKey)] === '1'} disabled={dis} onChange={(e) => set(nome(vsKey), e.target.checked ? '1' : '')} />
+          <span>Validar com a SAN</span>
+        </label>
+      )}
     </div>
   )
 }
 
 function respondida(dlp, s) {
   const ks = s.grupos.flatMap((g) => g.campos)
-  const feitos = ks.filter((c) => chavesDoCampo(c).some((x) => valorSalvo(dlp, s.id, x.key).trim()))
+  const feitos = ks.filter((c) => chavesDoCampo(c).some((x) => !x.flag && valorSalvo(dlp, s.id, x.key).trim()))
   return { feitos: feitos.length, total: ks.length }
 }
 
@@ -131,10 +163,25 @@ function Avaliacao({ dlp, emp, staff, notas, irPara }) {
   const cats = lista(g('s2', 'da_cat'))
   const pri = lista(g('s2', 'da_pri'))
   const outros = g('s2', 'da_outros')
-  const canais = DLP_CANAIS.map(([k, t]) => ({ k, t, p: g('s3', `${k}_p`), r: g('s3', `${k}_r`) })).sort((a, b) => (ordemPri[a.p] ?? 4) - (ordemPri[b.p] ?? 4))
+  const canais = DLP_CANAIS.map(([k, t]) => ({ k, t, u: g('s3', `${k}_u`), p: g('s3', `${k}_p`), r: g('s3', `${k}_r`) })).sort((a, b) => (ordemPri[a.p] ?? 4) - (ordemPri[b.p] ?? 4))
   const plat = lista(g('s4', 'am_plat'))
   const modo = DLP_MODOS.find((m) => m[0] === g('s5', 'po_modo'))
   const pend = DLP_PENDENCIAS.map(([k, t]) => ({ k, t, resp: g('s7', `${k}_resp`), prazo: g('s7', `${k}_prazo`) }))
+  const linha = (rot, sid, k) => (
+    <p className="dg-small" key={k}>
+      <b>{rot}:</b> {rotulos(k, g(sid, k)) || 'não informado'}
+      {g(sid, `${k}_o`) ? <span className="dg-muted"> — {g(sid, `${k}_o`)}</span> : null}
+    </p>
+  )
+
+  // Perguntas marcadas "Validar com a SAN" e respostas "Não sei".
+  const validar = []
+  let naoSei = 0
+  DLP_SECOES.forEach((s) => s.grupos.forEach((gr) => gr.campos.forEach((c) => {
+    if (valorSalvo(dlp, s.id, `${c.k}_v`) === '1') validar.push({ sid: s.id, t: c.t, sec: s.t })
+    const base = c.tipo === 'canal' ? `${c.k}_u` : c.k
+    if ((c.tipo === 'radio' || c.tipo === 'multi' || c.tipo === 'canal') && temNaoSei(valorSalvo(dlp, s.id, base))) naoSei += 1
+  })))
 
   const atencao = []
   if (!cats.length) atencao.push('Nenhuma categoria de dados foi marcada.')
@@ -142,9 +189,11 @@ function Avaliacao({ dlp, emp, staff, notas, irPara }) {
   if (canais.some((c) => !c.p)) atencao.push(`${canais.filter((c) => !c.p).length} canal(is) de saída sem prioridade definida.`)
   if (!plat.length) atencao.push('Plataforma de e-mail, arquivos e colaboração não informada.')
   if (!modo) atencao.push('Modo de atuação (monitorar, alertar ou bloquear) ainda não definido.')
-  if (!g('s7', 'pi_piloto').trim()) atencao.push('Setor piloto e cenários de teste não definidos.')
+  if (!g('s7', 'pi_piloto').trim()) atencao.push('Setor do piloto não definido.')
   const semDono = pend.filter((p) => !p.resp.trim() || !p.prazo.trim()).length
   if (semDono) atencao.push(`${semDono} entrega(s) sem responsável ou prazo.`)
+  if (naoSei) atencao.push(`${naoSei} pergunta(s) respondidas com “Não sei”: confirmar com o cliente.`)
+  if (g('s1', 'mo_incid') === 'sim') atencao.push('O cliente relatou incidente ou suspeita de vazamento: tratar como prioridade.')
   if (plat.length) atencao.push('Cobertura da Safetica para a plataforma informada ainda precisa de validação técnica.')
 
   const notasComTexto = staff ? DLP_SECOES.filter((s) => String((notas && notas[s.id]) || '').trim()) : []
@@ -154,7 +203,7 @@ function Avaliacao({ dlp, emp, staff, notas, irPara }) {
       <p className="dg-muted">Resumo automático do levantamento de {emp.nome}. Atualiza sozinho conforme as respostas são salvas na aba Levantamento. Não há nota numérica: o objetivo é mostrar o que já está definido e o que falta.</p>
 
       <section className="dg-card">
-        <h2>Andamento <span className="dg-tag">{pct}% · {feitos}/{total} campos</span></h2>
+        <h2>Andamento <span className="dg-tag">{pct}% · {feitos}/{total} perguntas</span></h2>
         <div className="dg-bars">
           {secs.map(({ s, feitos: f, total: t }) => (
             <div className="dg-bar" key={s.id}>
@@ -167,6 +216,16 @@ function Avaliacao({ dlp, emp, staff, notas, irPara }) {
       </section>
 
       <section className="dg-card">
+        <h2>Motivação</h2>
+        {linha('Motivo da busca', 's1', 'mo_motivo')}
+        {linha('Incidente ou suspeita de vazamento', 's1', 'mo_incid')}
+        {linha('Risco a tratar primeiro', 's1', 'mo_risco')}
+        {linha('Sucesso em 90 dias', 's1', 'mo_sucesso')}
+        {linha('Prazo', 's1', 'mo_prazo')}
+        {linha('Orçamento', 's1', 'mo_invest')}
+      </section>
+
+      <section className="dg-card">
         <h2>Dados a proteger</h2>
         {cats.length === 0 && !outros ? (
           <p className="dg-muted">Ainda não informado.</p>
@@ -174,26 +233,31 @@ function Avaliacao({ dlp, emp, staff, notas, irPara }) {
           <ul className="dg-staff">
             {cats.map((c) => (
               <li key={c}>
-                {rotulo(CATEGORIAS, c)}
+                {rotulos('da_cat', c)}
                 {pri.includes(c) && <span className="dg-tag dg-tag-pri">prioritária</span>}
                 {c === 'outros' && outros ? `: ${outros}` : ''}
               </li>
             ))}
           </ul>
         )}
-        {g('s2', 'da_onde') && <p className="dg-small"><b>Onde ficam:</b> {g('s2', 'da_onde')}</p>}
-        {g('s2', 'da_setores') && <p className="dg-small"><b>Setores:</b> {g('s2', 'da_setores')}</p>}
+        {linha('Setores', 's2', 'da_setores')}
+        {linha('Onde ficam', 's2', 'da_onde')}
+        {linha('Quem compartilha externamente', 's2', 'da_acesso')}
+        {linha('Classificação / rótulos', 's2', 'da_class')}
+        {linha('Padrões identificáveis', 's2', 'da_padroes')}
+        {linha('Formatos', 's2', 'da_formatos')}
       </section>
 
       <section className="dg-card">
         <h2>Canais de saída por prioridade</h2>
         <div className="dg-tblwrap">
           <table>
-            <thead><tr><th>Canal</th><th>Prioridade</th><th>Resposta do cliente</th></tr></thead>
+            <thead><tr><th>Canal</th><th>Usado?</th><th>Prioridade</th><th>Observação</th></tr></thead>
             <tbody>
               {canais.map((c) => (
                 <tr key={c.k}>
                   <td>{c.t}</td>
+                  <td>{rotulos(`${c.k}_u`, c.u) || '—'}</td>
                   <td>{priLabel(c.p)}</td>
                   <td className="dg-logv">{c.r || '—'}</td>
                 </tr>
@@ -201,20 +265,46 @@ function Avaliacao({ dlp, emp, staff, notas, irPara }) {
             </tbody>
           </table>
         </div>
-        {g('s3', 'ca_fluxos') && <p className="dg-small"><b>Fluxos legítimos e exceções:</b> {g('s3', 'ca_fluxos')}</p>}
+        {linha('Compartilhamentos legítimos', 's3', 'ca_legit')}
+        {linha('Parceiros e destinos autorizados', 's3', 'ca_parc')}
+        {linha('Exceções por setor', 's3', 'ca_exc')}
       </section>
 
       <section className="dg-card">
-        <h2>Ambiente e modo de atuação</h2>
-        <p className="dg-small"><b>Plataforma:</b> {plat.length ? plat.map((p) => rotulo(DLP_PLATAFORMAS, p)).join(' · ') : 'não informada'}{g('s4', 'am_outra') ? ` · ${g('s4', 'am_outra')}` : ''}</p>
-        <p className="dg-small"><b>Usuários e endpoints:</b> {g('s4', 'am_usuarios') || 'não informado'}</p>
-        <p className="dg-small"><b>Modo de atuação inicial:</b> {modo ? `${modo[1]} — ${modo[2]}` : 'não definido'}</p>
-        <p className="dg-small"><b>Quem recebe alertas e aprova exceções:</b> {g('s5', 'po_quem') || 'não informado'}</p>
+        <h2>Ambiente técnico</h2>
+        {linha('Plataformas', 's4', 'am_plat')}
+        {g('s4', 'am_outra') && <p className="dg-small"><b>Outra:</b> {g('s4', 'am_outra')}</p>}
+        {linha('Sistemas de gestão', 's4', 'am_sist')}
+        {linha('Licenciamento', 's4', 'am_plano')}
+        {linha('Usuários', 's4', 'am_usuarios')}
+        {linha('Sistemas operacionais', 's4', 'am_so')}
+        {linha('Equipamentos', 's4', 'am_equip')}
+        {linha('Trabalho remoto', 's4', 'am_remoto')}
+        {linha('Dados fora da nuvem', 's4', 'am_serv')}
+        {linha('Diretório', 's4', 'am_dir')}
+        {linha('Instalação dos agentes', 's4', 'am_agentes')}
+        {linha('Segurança já implantada', 's4', 'am_seg')}
+      </section>
+
+      <section className="dg-card">
+        <h2>Modo de atuação e responsáveis</h2>
+        <p className="dg-small"><b>Modo inicial:</b> {modo ? `${modo[1]} — ${modo[2]}` : 'não definido'}{g('s5', 'po_modo_o') ? <span className="dg-muted"> — {g('s5', 'po_modo_o')}</span> : null}</p>
+        {linha('Ações a bloquear', 's5', 'po_bloq')}
+        {linha('Justificativa / liberação', 's5', 'po_justif')}
+        {linha('Quem recebe alertas e aprova exceções', 's5', 'po_quem')}
+        {linha('Prazo de atendimento', 's5', 'po_prazo')}
+        {linha('Falsos positivos', 's5', 'po_falsos')}
+        {linha('Relatórios', 's5', 'po_relat')}
+        {linha('Áreas validadoras', 's6', 're_gestores')}
+        {linha('Política interna', 's6', 're_politica')}
+        {linha('Quem administra', 's6', 're_admin')}
+        {linha('Retenção dos registros', 's6', 're_retencao')}
       </section>
 
       <section className="dg-card">
         <h2>Piloto e entregas</h2>
-        <p className="dg-small"><b>Piloto:</b> {g('s7', 'pi_piloto') || 'não definido'}</p>
+        {linha('Setor do piloto', 's7', 'pi_piloto')}
+        {linha('Critérios de avaliação', 's7', 'pi_criterios')}
         <div className="dg-tblwrap">
           <table>
             <thead><tr><th>Entrega</th><th>Responsável</th><th>Prazo</th></tr></thead>
@@ -226,6 +316,22 @@ function Avaliacao({ dlp, emp, staff, notas, irPara }) {
           </table>
         </div>
         {g('s7', 'pi_proxima') && <p className="dg-small"><b>Próxima reunião:</b> {g('s7', 'pi_proxima')}</p>}
+      </section>
+
+      <section className="dg-card">
+        <h2>Validar com a SAN <span className="dg-tag">{validar.length}</span></h2>
+        {validar.length ? (
+          <ul className="dg-staff">
+            {validar.map((x) => (
+              <li key={`${x.sid}${x.t}`}>
+                <span>{x.t}</span>
+                <button type="button" className="dg-linkmini" onClick={() => irPara(x.sid)}>{x.sec}</button>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="dg-muted">Nenhuma pergunta marcada para validação.</p>
+        )}
       </section>
 
       <section className="dg-card">
