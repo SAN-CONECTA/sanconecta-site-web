@@ -55,21 +55,47 @@ export const DLP_PLATAFORMAS = [
 ]
 
 export const DLP_MODOS = [
-  ['monitorar', 'Somente monitorar', 'Registrar eventos para compreender os fluxos reais.'],
-  ['alertar', 'Monitorar e alertar', 'Registrar eventos e notificar os responsáveis definidos.'],
-  ['bloquear', 'Também bloquear', 'Impedir ações expressamente definidas e tecnicamente suportadas.'],
+  ['monitorar', 'Somente registrar (auditoria)', 'Mapear como os arquivos circulam e testar as regras antes de restringir.'],
+  ['alertar', 'Registrar e notificar', 'Avisar o usuário e os responsáveis; em canais compatíveis, a exceção pode exigir justificativa.'],
+  ['bloquear', 'Também bloquear', 'Impedir a operação indevida e registrar a tentativa. O bloqueio não apaga nem mascara o conteúdo.'],
   ['naosei', 'Ainda não sei', 'A SAN orienta a escolha na reunião.'],
 ]
 
 export const DLP_CANAIS = [
-  ['ca_email', 'E-mail corporativo ou pessoal', 'Há envio externo de anexos? Quais destinatários são autorizados?'],
-  ['ca_msg', 'WhatsApp Web, Teams e outros mensageiros', 'São utilizados para compartilhar documentos? Em quais áreas?'],
-  ['ca_nuvem', 'Google Drive, OneDrive, SharePoint e nuvem pessoal', 'Quais serviços e contas são corporativos ou permitidos?'],
+  ['ca_email', 'E-mail corporativo no Outlook / Exchange Online', 'Há envio externo de anexos? Quais destinatários são autorizados?'],
+  ['ca_gmail', 'Gmail / e-mail corporativo do Google', 'A empresa usa o e-mail do Google Workspace para anexos e envios externos?'],
+  ['ca_webmail', 'Webmail pessoal (anexos em e-mail pessoal)', 'Os colaboradores acessam e-mail pessoal no equipamento da empresa?'],
+  ['ca_nuvem', 'Microsoft 365: SharePoint, OneDrive e Teams (arquivos)', 'Há compartilhamento de arquivos com terceiros? Quais contas são corporativas ou permitidas?'],
+  ['ca_gdrive', 'Google Drive corporativo', 'Há compartilhamento externo de arquivos pelo Drive?'],
+  ['ca_pessoal', 'Nuvem pessoal (Dropbox, Drive e OneDrive pessoais…)', 'Existe uso de contas pessoais para guardar ou enviar arquivos da empresa?'],
   ['ca_usb', 'Pendrives e HDs externos', 'O uso é permitido? Existem dispositivos ou setores autorizados?'],
   ['ca_impr', 'Impressão', 'Quais documentos precisam de acompanhamento ou restrição?'],
   ['ca_ia', 'Uploads em sites e ferramentas de inteligência artificial', 'Quais serviços são usados e com quais informações?'],
+  ['ca_msg', 'WhatsApp Web, mensagens do Teams e outros mensageiros', 'São utilizados para compartilhar documentos? Em quais áreas?'],
   ['ca_tela', 'Captura, compartilhamento de tela e área de transferência', 'Essas situações fazem parte da preocupação do cliente?'],
 ]
+
+// Cobertura esperada por canal, conforme a apresentação "Safetica DLP" (Team Ti, 15 slides). Só equipe SAN.
+// A cobertura real varia por edição, sistema operacional, aplicativo e integração: sempre validar tecnicamente.
+export const DLP_COB_NIVEL = {
+  bloqueia: 'Bloqueia / notifica',
+  parcial: 'Depende do canal ou plano',
+  audita: 'Só audita',
+  nao: 'Fora da cobertura apresentada',
+}
+export const DLP_COBERTURA = {
+  ca_email: ['parcial', 'Outlook: notifica ou bloqueia com a proteção habilitada. Exchange Online: apenas audita os e-mails de saída.'],
+  ca_gmail: ['nao', 'O e-mail corporativo do Google Workspace não está incluído na integração.'],
+  ca_webmail: ['bloqueia', 'Pode impedir o upload de anexo em webmail pessoal, em equipamento com Safetica Client e política configurada.'],
+  ca_nuvem: ['bloqueia', 'SharePoint, OneDrive e Teams: audita operações de arquivo e pode cancelar compartilhamentos que violem a política. No Teams, o escopo é de arquivos, não de mensagens.'],
+  ca_gdrive: ['parcial', 'Audita compartilhamentos internos e externos, mas não os revoga; a classificação depende do plano. Upload pode ser bloqueado com o Safetica Client.'],
+  ca_pessoal: ['parcial', 'Uploads em destinos compatíveis, via Safetica Client. Confirmar o serviço específico.'],
+  ca_usb: ['bloqueia', 'USB e compartilhamentos de rede em fluxos suportados; a política pode barrar a cópia para dispositivo não autorizado.'],
+  ca_impr: ['parcial', 'Impressão em fluxos suportados. Confirmar por sistema operacional e aplicativo.'],
+  ca_ia: ['parcial', 'Arquivos e textos enviados a assistentes de IA compatíveis. Bloquear prompts exige extensão no navegador e classificação configuradas.'],
+  ca_msg: ['nao', 'Mensageiros (WhatsApp Web etc.) não aparecem na apresentação; no Teams a cobertura é só de arquivos, não de mensagens.'],
+  ca_tela: ['nao', 'Captura de tela e área de transferência não aparecem na apresentação.'],
+}
 
 export const DLP_PENDENCIAS = [
   ['pe1', 'Confirmar compatibilidade, cobertura e licenciamento'],
@@ -186,8 +212,11 @@ export const DLP_SECOES = [
             ['projeto', 'Códigos de projeto'],
             ['contrato', 'Números de contrato'],
             ['palavra', 'Palavras-chave (ex.: “confidencial”)'],
+            ['dicionario', 'Dicionários de termos do negócio'],
+            ['regex', 'Formatos próprios (códigos internos)'],
             OUT, NS,
           ], true),
+          L('da_termos', 'Termos, códigos ou formatos que identificam documentos sensíveis (ex.: palavras de folha de pagamento, códigos de projeto)'),
           M('da_formatos', 'Quais formatos precisam de atenção?', [
             ['planilha', 'Planilhas'],
             ['pdf', 'PDF'],
@@ -206,9 +235,21 @@ export const DLP_SECOES = [
     id: 's3',
     t: '3. Canais de saída',
     lead: 'Por quais meios precisamos acompanhar ou restringir o compartilhamento de informações confidenciais?',
-    interno: ['Atenção: levantar um canal não significa confirmar sua cobertura. Cada controle deverá ser validado por aplicação, sistema operacional, versão e licenciamento.'],
+    interno: ['Atenção: levantar um canal não significa confirmar sua cobertura. Cada controle deverá ser validado por aplicação, sistema operacional, versão e licenciamento.', 'A cobertura esperada de cada canal, segundo a apresentação da Safetica, aparece abaixo de cada canal e na aba Avaliação (só equipe). Não prometa ao cliente o que estiver como “fora da cobertura apresentada”.'],
     grupos: [
       { t: 'Canal a avaliar', campos: DLP_CANAIS.map(([k, t, q]) => ({ k, t, q, tipo: 'canal' })) },
+      {
+        t: 'Inteligência artificial',
+        campos: [
+          M('ca_ia_quais', 'Quais assistentes de IA os colaboradores usam?', [
+            ['chatgpt', 'ChatGPT'],
+            ['copilot', 'Microsoft Copilot'],
+            ['gemini', 'Google Gemini'],
+            ['claude', 'Claude'],
+            OUT, NS,
+          ], true),
+        ],
+      },
       {
         t: 'Fluxos legítimos',
         campos: [
@@ -231,7 +272,7 @@ export const DLP_SECOES = [
     id: 's4',
     t: '4. Ambiente técnico',
     lead: 'Qual plataforma a empresa utiliza para e-mail, arquivos e colaboração?',
-    interno: ['Validação obrigatória: confirmar a cobertura contratada da Safetica para Microsoft 365 e Google Drive, distinguindo integração de nuvem e proteção de endpoint. Não presumir suporte equivalente para Gmail, Teams, dispositivos móveis ou todos os sistemas operacionais. Controle de tráfego de rede não deve ser presumido como parte do escopo.'],
+    interno: ['Validação obrigatória: confirmar a cobertura contratada da Safetica para Microsoft 365 e Google Drive, distinguindo integração de nuvem e proteção de endpoint. Não presumir suporte equivalente para Gmail, Teams, dispositivos móveis ou todos os sistemas operacionais. Controle de tráfego de rede não deve ser presumido como parte do escopo.', 'Confirmar também a edição e o plano da Safetica: integrações (SIEM, Jira, Teams) e a classificação em nuvem dependem do plano.'],
     grupos: [
       {
         t: 'Plataforma e sistemas',
@@ -324,6 +365,22 @@ export const DLP_SECOES = [
             ['compliance', 'Jurídico / compliance'],
             NS,
           ], true),
+          M('am_nav', 'Navegadores utilizados (prompts de IA e uploads dependem de extensão no navegador)', [
+            ['chrome', 'Google Chrome'],
+            ['edge', 'Microsoft Edge'],
+            ['firefox', 'Firefox'],
+            ['safari', 'Safari'],
+            OUT, NS,
+          ], true),
+          M('am_integra', 'Os eventos precisarão alimentar alguma ferramenta da empresa?', [
+            ['splunk', 'Splunk'],
+            ['fortisiem', 'FortiSIEM'],
+            ['qradar', 'IBM QRadar'],
+            ['jira', 'Jira (chamados)'],
+            ['teams', 'Alertas no Teams (via Power Automate)'],
+            ['nenhuma', 'Nenhuma'],
+            NS,
+          ], true),
           L('am_registro', 'Registro técnico e restrições'),
         ],
       },
@@ -405,6 +462,7 @@ export const DLP_SECOES = [
             NS,
           ], true),
           R('re_retencao', 'Por quanto tempo os registros deverão permanecer disponíveis?', [['30', '30 dias'], ['90', '90 dias'], ['180', '6 meses'], ['365', '1 ano ou mais'], NS], true),
+          Y('re_saida', 'Há rotina de revisão de acessos e cópias de arquivos na saída de colaboradores?'),
           L('re_definidos', 'Responsáveis definidos'),
         ],
       },
@@ -413,14 +471,15 @@ export const DLP_SECOES = [
   {
     id: 's7',
     t: '7. Piloto, pendências e próximos passos',
-    lead: 'Definir setor piloto, usuários, equipamentos, dados de teste e cenários permitidos e proibidos. Avaliar detecção, alertas, falsos positivos, desempenho e continuidade dos fluxos legítimos. Registrar critérios mensuráveis antes do início.',
+    lead: 'Etapas da prova de conceito: 1) Diagnóstico: dados, canais e usuários do piloto. 2) Configuração: teste em auditoria e ajuste de exceções. 3) Validação: bloqueios e fluxos permitidos testados com dados fictícios. 4) Acompanhamento: revisão dos resultados e orientação para a expansão. Registrar critérios mensuráveis antes do início.',
     interno: ['Fechamento sugerido: “Vamos consolidar prioridades, validar a cobertura técnica e apresentar o escopo do piloto. A expansão e os bloqueios serão definidos a partir dos resultados e da aprovação dos responsáveis.”'],
     grupos: [
       {
         t: 'Piloto',
         campos: [
           M('pi_piloto', 'Qual setor fará o piloto? (usuários, equipamentos e cenários permitidos e proibidos na observação)', SETORES, true),
-          M('pi_criterios', 'Critérios para avaliar o piloto', [
+          M('pi_criterios', 'Critérios de aceite do piloto', [
+            ['cobertura', 'Cobertura testada nos canais do piloto'],
             ['eventos', 'Detectar os eventos esperados'],
             ['falsos', 'Taxa de falsos positivos aceitável'],
             ['desempenho', 'Sem impacto no desempenho dos equipamentos'],
@@ -445,7 +504,7 @@ export const DLP_SECOES = [
 ]
 
 export const DLP_INTERNO_GERAL = [
-  'Objetivo: identificar os dados que precisam de proteção, os canais de saída, o ambiente técnico e o modo de atuação desejado para dimensionar a proposta e a prova de conceito (PoC). O foco é a aplicação prática do DLP, sem enquadramento em LGPD.',
+  'Objetivo: identificar os dados que precisam de proteção, os canais de saída, o ambiente técnico e o modo de atuação desejado para dimensionar a proposta e a prova de conceito (PoC). O foco é a aplicação prática do DLP, sem enquadramento em LGPD. Os registros da Safetica apoiam auditorias, mas não garantem conformidade: não prometer conformidade ao cliente.',
   'Duração sugerida: 45 a 60 minutos. Utilize as perguntas como guia, registre as respostas e sinalize o que depender de validação técnica.',
 ]
 

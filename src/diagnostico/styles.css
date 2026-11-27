@@ -404,3 +404,12 @@ td select { min-height: 34px; width: auto; }
 .dg-dlp-vs { font-size: 13px; color: var(--muted); }
 .dg-dlp-canalgrid { display: grid; grid-template-columns: 1fr minmax(150px, 220px); gap: 12px; align-items: end; }
 @media (max-width: 640px) { .dg-dlp-canalgrid { grid-template-columns: 1fr; } }
+.dg-cob { display: block; font-size: 12.5px; padding: 6px 10px; border-left: 3px solid var(--line); background: var(--sunken); border-radius: 4px; }
+.dg-cob-bloqueia { border-left-color: #1f7a4d; }
+.dg-cob-parcial { border-left-color: #b7791f; }
+.dg-cob-audita { border-left-color: #b7791f; }
+.dg-cob-nao { border-left-color: #b3361f; }
+.dg-cob-tag { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 12px; font-weight: 500; background: #e3e8ee; white-space: nowrap; }
+.dg-cob-tag.dg-cob-bloqueia { background: #dff3e8; color: #17613c; }
+.dg-cob-tag.dg-cob-parcial, .dg-cob-tag.dg-cob-audita { background: #fbefd5; color: #8a5a12; }
+.dg-cob-tag.dg-cob-nao { background: #f8dfda; color: #8c2815; }
