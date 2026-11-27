@@ -92,8 +92,9 @@ async function excluirEmpresa(emp) {
   const blocos = await getDocs(collection(db, 'empresas', emp.id, 'blocos'))
   const gemi = await getDocs(collection(db, 'empresas', emp.id, 'gemi'))
   const sims = await getDocs(collection(db, 'empresas', emp.id, 'simulacao'))
+  const dlps = await getDocs(collection(db, 'empresas', emp.id, 'dlp'))
   const membros = await getDocs(query(collection(db, 'membros'), where('empresaId', '==', emp.id)))
-  const refs = [...itens.docs.map((d) => d.ref), ...logs.docs.map((d) => d.ref), ...blocos.docs.map((d) => d.ref), ...gemi.docs.map((d) => d.ref), ...sims.docs.map((d) => d.ref), ...membros.docs.map((d) => d.ref), doc(db, 'empresas', emp.id)]
+  const refs = [...itens.docs.map((d) => d.ref), ...logs.docs.map((d) => d.ref), ...blocos.docs.map((d) => d.ref), ...gemi.docs.map((d) => d.ref), ...sims.docs.map((d) => d.ref), ...dlps.docs.map((d) => d.ref), ...membros.docs.map((d) => d.ref), doc(db, 'empresas', emp.id)]
   for (let i = 0; i < refs.length; i += LOTE) {
     const batch = writeBatch(db)
     refs.slice(i, i + LOTE).forEach((r) => batch.delete(r))
