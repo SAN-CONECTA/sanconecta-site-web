@@ -7,7 +7,7 @@ import { errMsg, fmtTs, normEmail } from './util'
 const POR_LOTE = 4
 const CATEGORIAS = DLP_SECOES[1].grupos[0].campos[0].opc
 const ordemPri = { alta: 0, media: 1, baixa: 2, nao: 3 }
-const priLabel = (v) => (DLP_PRIORIDADE.find((p) => p[0] === v) || [, 'Sem prioridade'])[1]
+const priLabel = (v) => (DLP_PRIORIDADE.find((p) => p[0] === v) || ['', 'Sem prioridade'])[1]
 const lista = (s) => String(s || '').split(',').filter(Boolean)
 const rotulo = (opc, v) => (opc.find((o) => o[0] === v) || [v, v])[1]
 
