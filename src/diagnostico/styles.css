@@ -394,3 +394,13 @@ td select { min-height: 34px; width: auto; }
 .dg-dlp-interno { margin-top: 16px; padding: 10px 12px; border-left: 3px solid var(--gold); background: var(--sunken); border-radius: 4px; }
 .dg-tag-pri { margin-left: 8px; }
 @media (max-width: 640px) { .dg-dlp-pend { grid-template-columns: 1fr; } }
+.dg-dlp-q { border-top: 1px solid var(--line); padding: 12px 0; display: grid; gap: 8px; }
+.dg-dlp-q:first-of-type { border-top: 0; }
+.dg-dlp-qt { display: grid; gap: 6px; }
+.dg-dlp-qtit { font-weight: 500; }
+.dg-dlp-opcs { display: flex; flex-wrap: wrap; gap: 6px 18px; }
+.dg-dlp-opcs .dg-chk { align-items: flex-start; }
+.dg-dlp-obs textarea { min-height: 52px; }
+.dg-dlp-vs { font-size: 13px; color: var(--muted); }
+.dg-dlp-canalgrid { display: grid; grid-template-columns: 1fr minmax(150px, 220px); gap: 12px; align-items: end; }
+@media (max-width: 640px) { .dg-dlp-canalgrid { grid-template-columns: 1fr; } }

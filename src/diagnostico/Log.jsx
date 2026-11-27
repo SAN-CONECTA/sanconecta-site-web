@@ -52,6 +52,12 @@ function campoLabel(blocoId, c) {
 function valorLabel(c, v) {
   if (v === '' || v === undefined) return '(vazio)'
   if (c.startsWith('gemi.') && c.endsWith('.nota')) return `${v} pt${v === '1' ? '' : 's'}`
+  if (c.startsWith('dlp.')) {
+    const p = c.split('.')
+    const x = DLP_CHAVE_POR_NOME[`${p[1]}.${p[2]}`]
+    if (x && x.flag) return v === '1' ? 'Marcado' : 'Desmarcado'
+    if (x && x.opc) return String(v).split(',').filter(Boolean).map((o) => (x.opc.find((q) => q[0] === o) || [o, o])[1]).join(', ')
+  }
   if (c === 'status') return labelOf(STATUS, v)
   if (c === 'risk') return labelOf(RISK, rkKey(v))
   if (c === 'evidStatus') return labelOf(EVID, evKey(v))
