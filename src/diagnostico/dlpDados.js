@@ -452,7 +452,7 @@ export const DLP_INTERNO_GERAL = [
 // Chaves reais gravadas por campo (usadas pelas regras, pela tela, pelo log e pela Avaliação).
 export function chavesDoCampo(c) {
   const k = c.k
-  let ks = []
+  let ks
   if (c.tipo === 'canal') {
     ks = [
       { key: `${k}_u`, max: 40, nome: `${c.t} (usa o canal?)`, opc: SN },
