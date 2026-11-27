@@ -383,3 +383,14 @@ td select { min-height: 34px; width: auto; }
 .dg-chips-row { flex: 1 1 100%; }
 .dg-addrow .dg-empsel .dg-fld { margin-bottom: 0; }
 .dg-addrow > .dg-btn { height: 40px; box-sizing: border-box; }
+
+/* DLP (v1.22) */
+.dg-dlp-grupo { border: 0; padding: 0; margin: 14px 0 0; min-width: 0; }
+.dg-dlp-grupo > legend { font-weight: 600; padding: 0; margin-bottom: 6px; }
+.dg-dlp-canal, .dg-dlp-pend { border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; margin: 8px 0; display: grid; gap: 6px; }
+.dg-dlp-canal-t { margin: 0; display: grid; gap: 2px; }
+.dg-dlp-pend { grid-template-columns: 1fr 1fr; }
+.dg-dlp-pend .dg-dlp-canal-t { grid-column: 1 / -1; }
+.dg-dlp-interno { margin-top: 16px; padding: 10px 12px; border-left: 3px solid var(--gold); background: var(--sunken); border-radius: 4px; }
+.dg-tag-pri { margin-left: 8px; }
+@media (max-width: 640px) { .dg-dlp-pend { grid-template-columns: 1fr; } }

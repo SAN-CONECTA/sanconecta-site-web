@@ -4,6 +4,7 @@ import { db } from './firebase'
 import { BLOCO_BY_ID, EVID, RISK, STATUS, evKey, labelOf, rkKey } from './catalog'
 import { csvDownload } from './exportCsv'
 import { GEMI_QUESTOES } from './gemiDados'
+import { DLP_CHAVE_POR_NOME, DLP_SECOES } from './dlpDados'
 import { errMsg, fmtTs } from './util'
 
 const CAMPOS = {
@@ -18,11 +19,19 @@ const CAMPOS = {
   evidStatus: 'Situação da evidência',
 }
 
+const secDlp = (id) => (DLP_SECOES.find((s) => s.id === id) || { t: id }).t
+
 function campoLabel(blocoId, c) {
   if (c.startsWith('gemi.')) {
     const [, id, campo] = c.split('.')
     const q = GEMI_QUESTOES.find((x) => x.id === id)
     return `Fase Inicial ${id} ${q ? q.t : ''}: ${campo === 'nota' ? 'nota (0 a 4)' : campo === 'obs' ? 'observação' : campo === 'opcoes' ? 'opções marcadas' : 'resposta'}`
+  }
+  if (c.startsWith('dlp.')) {
+    const p = c.split('.')
+    if (p[1] === 'nota') return `DLP ${secDlp(p[2])}: nota interna da equipe`
+    const x = DLP_CHAVE_POR_NOME[`${p[1]}.${p[2]}`]
+    return `DLP ${secDlp(p[1])}: ${x ? x.nome : p[2]}`
   }
   if (c.startsWith('simulacao.')) {
     const k = c.slice(10)

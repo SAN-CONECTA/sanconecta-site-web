@@ -10,6 +10,7 @@ import Rodada from './Rodada'
 import Gemi from './Gemi'
 import PainelGemi from './PainelGemi'
 import Simulacao from './Simulacao'
+import Dlp from './Dlp'
 import Acessos from './Acessos'
 import Log from './Log'
 
@@ -21,20 +22,22 @@ const TABS = [
   ['ge', 'Maturidade de gestão empresarial'],
   ['acessos', 'Empresa e acessos'],
   ['sim', 'Simulação Prejuízo'],
+  ['dlp', 'DLP'],
   ['log', 'Log de alterações'],
 ]
 const NAV = TABS
 // Endereços antigos (v1.7) continuam levando ao lugar certo.
 const ANTIGAS = { gestao: 'ge', itens: 'painel' }
 const SO_STAFF = ['log']
-const DO_RAPIDO = ['painel', 'gemi', 'sim', 'acessos', 'log']
-const DO_COMPLETO = ['painel', 'ti', 'al', 'ge', 'sim', 'acessos', 'log']
+const DO_RAPIDO = ['painel', 'gemi', 'sim', 'dlp', 'acessos', 'log']
+const DO_COMPLETO = ['painel', 'ti', 'al', 'ge', 'sim', 'dlp', 'acessos', 'log']
 
 const ICONS = {
   painel: <><rect x="3" y="3" width="7" height="7" /><rect x="14" y="3" width="7" height="7" /><rect x="14" y="14" width="7" height="7" /><rect x="3" y="14" width="7" height="7" /></>,
   ti: <><rect x="2" y="3" width="20" height="14" rx="2" /><path d="M8 21h8M12 17v4" /></>,
   sim: <><path d="M12 2v20M17 6.5C17 4.6 14.8 3.5 12 3.5S7 4.6 7 6.5 9 9.4 12 10s5 1.4 5 3.5-2.2 3-5 3-5-1.1-5-3" /></>,
   gemi: <><path d="M13 2 3 14h9l-1 8 10-12h-9z" /></>,
+  dlp: <><path d="M12 2 4 5v6c0 5 3.4 9.3 8 11 4.6-1.7 8-6 8-11V5z" /><path d="m9 12 2 2 4-4" /></>,
   al: <><path d="M16 3h5v5M4 20 21 3M21 16v5h-5M15 15l6 6M4 4l5 5" /></>,
   ge: <><rect x="2" y="7" width="20" height="14" rx="2" /><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2" /></>,
   acessos: <><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" /></>,
@@ -57,6 +60,7 @@ export default function Empresa({ id, tab, session }) {
   const [itens, setItens] = useState(null)
   const [blocos, setBlocos] = useState(null)
   const [gemi, setGemi] = useState(null)
+  const [dlp, setDlp] = useState(null)
   const [sim, setSim] = useState(null)
   const [verSim, setVerSim] = useState(!!staff)
   const [papel, setPapel] = useState(staff ? 'staff' : undefined)
@@ -91,6 +95,28 @@ export default function Empresa({ id, tab, session }) {
     const offItens = onSnapshot(collection(db, 'empresas', id, 'itens'), mapa(setItens), onErr)
     const offBlocos = onSnapshot(collection(db, 'empresas', id, 'blocos'), mapa(setBlocos), onErr)
     const offGemi = onSnapshot(collection(db, 'empresas', id, 'gemi'), mapa(setGemi), onErr)
+    // DLP: a equipe lê a coleção toda (inclui 'notas'); o cliente lê só as seções s1..s7 (as regras negam 'notas' a ele).
+    let offDlp = () => {}
+    if (staff) {
+      offDlp = onSnapshot(collection(db, 'empresas', id, 'dlp'), mapa(setDlp), onErr)
+    } else {
+      const ids = ['s1', 's2', 's3', 's4', 's5', 's6', 's7']
+      const acc = {}
+      const vistos = new Set()
+      const offs = ids.map((sid) =>
+        onSnapshot(
+          doc(db, 'empresas', id, 'dlp', sid),
+          (d) => {
+            if (d.exists()) acc[sid] = d.data()
+            else delete acc[sid]
+            vistos.add(sid)
+            if (vistos.size === ids.length) setDlp({ ...acc })
+          },
+          onErr,
+        ),
+      )
+      offDlp = () => offs.forEach((f) => f())
+    }
     // A simulação (dados financeiros) é lida pela equipe SAN e, só leitura, por cliente com 'simulacao' marcado no vínculo.
     let offSim = () => {}
     let fora = false
@@ -119,6 +145,7 @@ export default function Empresa({ id, tab, session }) {
       offItens()
       offBlocos()
       offGemi()
+      offDlp()
       offSim()
     }
   }, [id, staff, email])
@@ -132,7 +159,7 @@ export default function Empresa({ id, tab, session }) {
   // Cliente vinculado à empresa preenche respostas e situação da evidência (v1.7), exceto em empresa arquivada.
   const canAnswer = !!emp && (staff || (papel === 'leitura' && !emp.arquivada))
 
-  if (emp === undefined || ((itens === null || blocos === null || gemi === null || sim === null) && emp !== null) || papel === undefined) {
+  if (emp === undefined || ((itens === null || blocos === null || gemi === null || dlp === null || sim === null) && emp !== null) || papel === undefined) {
     return <p className="dg-muted">Carregando empresa…</p>
   }
   if (emp === null || (!staff && !papel)) {
@@ -212,6 +239,7 @@ export default function Empresa({ id, tab, session }) {
           />
         )}
         {activeTab === 'sim' && visivel('sim') && <Simulacao key={emp.id} empId={id} emp={emp} sim={sim} user={user} canEdit={canEdit} />}
+        {activeTab === 'dlp' && <Dlp key={emp.id} empId={id} emp={emp} dlp={dlp} canEdit={canEdit} canAnswer={canAnswer} user={user} />}
         {activeTab === 'gemi' && <Gemi key={emp.id} empId={id} emp={emp} gemi={gemi} canEdit={canEdit} canAnswer={canAnswer} user={user} />}
         {RODADAS.some((r) => r.k === activeTab) && (
           <Rodada

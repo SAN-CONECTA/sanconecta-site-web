@@ -59,7 +59,7 @@ service cloud.firestore {
 
     // Códigos dos blocos: TI-01..TI-10 (com sufixo A a C), AL-01..AL-09 e GE-01..GE-09.
     function blocoIdOk(id) {
-      return id == 'GEMI' || id == 'SIMULACAO' || id.matches('^(TI-(0[1-9]|10)[A-C]?|AL-0[1-9]|GE-0[1-9])$');
+      return id == 'GEMI' || id == 'SIMULACAO' || id == 'DLP' || id.matches('^(TI-(0[1-9]|10)[A-C]?|AL-0[1-9]|GE-0[1-9])$');
     }
 
     // Exige, no mesmo lote da gravação, um registro novo no log feito por quem está gravando (uma única leitura).
@@ -76,6 +76,128 @@ service cloud.firestore {
 
     function shortStr(v, max) {
       return v is string && v.size() <= max;
+    }
+
+    // Levantamento DLP (v1.22): respostas por seção em dlp/{s1..s7}. Chaves e tamanhos gerados de dlpDados.js.
+    function dlpOpt(r, k, max) {
+      return !(k in r) || shortStr(r[k], max);
+    }
+
+    function dlp_s1(r) {
+      return r.keys().hasOnly(['id_empresa', 'id_data', 'id_part', 'id_resp', 'id_patroc', 'mo_motivo', 'mo_incid', 'mo_risco', 'mo_sucesso', 'mo_prazo', 'mo_prior'])
+        && dlpOpt(r, 'id_empresa', 200)
+        && dlpOpt(r, 'id_data', 200)
+        && dlpOpt(r, 'id_part', 2000)
+        && dlpOpt(r, 'id_resp', 200)
+        && dlpOpt(r, 'id_patroc', 200)
+        && dlpOpt(r, 'mo_motivo', 2000)
+        && dlpOpt(r, 'mo_incid', 2000)
+        && dlpOpt(r, 'mo_risco', 2000)
+        && dlpOpt(r, 'mo_sucesso', 2000)
+        && dlpOpt(r, 'mo_prazo', 2000)
+        && dlpOpt(r, 'mo_prior', 2000);
+    }
+
+    function dlp_s2(r) {
+      return r.keys().hasOnly(['da_cat', 'da_pri', 'da_outros', 'da_setores', 'da_onde', 'da_acesso', 'da_class', 'da_padroes', 'da_formatos'])
+        && dlpOpt(r, 'da_cat', 200)
+        && dlpOpt(r, 'da_pri', 200)
+        && dlpOpt(r, 'da_outros', 200)
+        && dlpOpt(r, 'da_setores', 2000)
+        && dlpOpt(r, 'da_onde', 2000)
+        && dlpOpt(r, 'da_acesso', 2000)
+        && dlpOpt(r, 'da_class', 2000)
+        && dlpOpt(r, 'da_padroes', 2000)
+        && dlpOpt(r, 'da_formatos', 2000);
+    }
+
+    function dlp_s3(r) {
+      return r.keys().hasOnly(['ca_email_p', 'ca_email_r', 'ca_msg_p', 'ca_msg_r', 'ca_nuvem_p', 'ca_nuvem_r', 'ca_usb_p', 'ca_usb_r', 'ca_impr_p', 'ca_impr_r', 'ca_ia_p', 'ca_ia_r', 'ca_tela_p', 'ca_tela_r', 'ca_legit', 'ca_parc', 'ca_exc', 'ca_fluxos'])
+        && dlpOpt(r, 'ca_email_p', 20)
+        && dlpOpt(r, 'ca_email_r', 2000)
+        && dlpOpt(r, 'ca_msg_p', 20)
+        && dlpOpt(r, 'ca_msg_r', 2000)
+        && dlpOpt(r, 'ca_nuvem_p', 20)
+        && dlpOpt(r, 'ca_nuvem_r', 2000)
+        && dlpOpt(r, 'ca_usb_p', 20)
+        && dlpOpt(r, 'ca_usb_r', 2000)
+        && dlpOpt(r, 'ca_impr_p', 20)
+        && dlpOpt(r, 'ca_impr_r', 2000)
+        && dlpOpt(r, 'ca_ia_p', 20)
+        && dlpOpt(r, 'ca_ia_r', 2000)
+        && dlpOpt(r, 'ca_tela_p', 20)
+        && dlpOpt(r, 'ca_tela_r', 2000)
+        && dlpOpt(r, 'ca_legit', 2000)
+        && dlpOpt(r, 'ca_parc', 2000)
+        && dlpOpt(r, 'ca_exc', 2000)
+        && dlpOpt(r, 'ca_fluxos', 2000);
+    }
+
+    function dlp_s4(r) {
+      return r.keys().hasOnly(['am_plat', 'am_outra', 'am_plano', 'am_usuarios', 'am_so', 'am_equip', 'am_remoto', 'am_serv', 'am_dir', 'am_agentes', 'am_seg', 'am_autoriza', 'am_registro'])
+        && dlpOpt(r, 'am_plat', 200)
+        && dlpOpt(r, 'am_outra', 200)
+        && dlpOpt(r, 'am_plano', 2000)
+        && dlpOpt(r, 'am_usuarios', 2000)
+        && dlpOpt(r, 'am_so', 2000)
+        && dlpOpt(r, 'am_equip', 2000)
+        && dlpOpt(r, 'am_remoto', 2000)
+        && dlpOpt(r, 'am_serv', 2000)
+        && dlpOpt(r, 'am_dir', 2000)
+        && dlpOpt(r, 'am_agentes', 2000)
+        && dlpOpt(r, 'am_seg', 2000)
+        && dlpOpt(r, 'am_autoriza', 2000)
+        && dlpOpt(r, 'am_registro', 2000);
+    }
+
+    function dlp_s5(r) {
+      return r.keys().hasOnly(['po_modo', 'po_bloq', 'po_justif', 'po_quem', 'po_prazo', 'po_falsos', 'po_relat'])
+        && dlpOpt(r, 'po_modo', 200)
+        && dlpOpt(r, 'po_bloq', 2000)
+        && dlpOpt(r, 'po_justif', 2000)
+        && dlpOpt(r, 'po_quem', 2000)
+        && dlpOpt(r, 'po_prazo', 2000)
+        && dlpOpt(r, 'po_falsos', 2000)
+        && dlpOpt(r, 'po_relat', 2000);
+    }
+
+    function dlp_s6(r) {
+      return r.keys().hasOnly(['re_patroc', 're_gestores', 're_comunica', 're_politica', 're_admin', 're_retencao', 're_definidos'])
+        && dlpOpt(r, 're_patroc', 2000)
+        && dlpOpt(r, 're_gestores', 2000)
+        && dlpOpt(r, 're_comunica', 2000)
+        && dlpOpt(r, 're_politica', 2000)
+        && dlpOpt(r, 're_admin', 2000)
+        && dlpOpt(r, 're_retencao', 2000)
+        && dlpOpt(r, 're_definidos', 2000);
+    }
+
+    function dlp_s7(r) {
+      return r.keys().hasOnly(['pi_piloto', 'pi_criterios', 'pe1_resp', 'pe1_prazo', 'pe2_resp', 'pe2_prazo', 'pe3_resp', 'pe3_prazo', 'pe4_resp', 'pe4_prazo', 'pi_resumo', 'pi_fora', 'pi_proxima'])
+        && dlpOpt(r, 'pi_piloto', 2000)
+        && dlpOpt(r, 'pi_criterios', 2000)
+        && dlpOpt(r, 'pe1_resp', 200)
+        && dlpOpt(r, 'pe1_prazo', 200)
+        && dlpOpt(r, 'pe2_resp', 200)
+        && dlpOpt(r, 'pe2_prazo', 200)
+        && dlpOpt(r, 'pe3_resp', 200)
+        && dlpOpt(r, 'pe3_prazo', 200)
+        && dlpOpt(r, 'pe4_resp', 200)
+        && dlpOpt(r, 'pe4_prazo', 200)
+        && dlpOpt(r, 'pi_resumo', 2000)
+        && dlpOpt(r, 'pi_fora', 2000)
+        && dlpOpt(r, 'pi_proxima', 2000);
+    }
+
+    function dlpOk(sid, r) {
+      return r is map
+        && ((sid == 's1' && dlp_s1(r))
+            || (sid == 's2' && dlp_s2(r))
+            || (sid == 's3' && dlp_s3(r))
+            || (sid == 's4' && dlp_s4(r))
+            || (sid == 's5' && dlp_s5(r))
+            || (sid == 's6' && dlp_s6(r))
+            || (sid == 's7' && dlp_s7(r)));
     }
 
     // Respostas por pergunta (v1.6): chaves fixas q01..q40, texto até 2000. Notas de maturidade por bloco: chaves b1..b10, inteiro 0 a 5.
@@ -287,6 +409,40 @@ service cloud.firestore {
           && (!('opcoes' in request.resource.data)
               || (request.resource.data.opcoes is list && request.resource.data.opcoes.size() <= 9
                   && request.resource.data.opcoes.hasOnly(['servidor', 'nobreak', 'link', 'outros', 'erp', 'integracao', 'infra', 'seguranca', 'dependencia'])))
+          && request.resource.data.updatedAt == request.time
+          && request.resource.data.updatedBy == me()
+          && logOk(emp);
+
+        allow delete: if isStaff()
+          && get(/databases/$(database)/documents/empresas/$(emp)).data.arquivada == true;
+      }
+
+      // Levantamento DLP (v1.22): SAN e cliente (perfil 'leitura') preenchem o mesmo levantamento, uma seção por documento (s1..s7).
+      // As observações internas ficam num documento à parte ('notas'), que só a equipe SAN lê e grava (regra não filtra campos).
+      match /dlp/{sid} {
+        allow read: if isStaff() || (sid != 'notas' && isMember(emp));
+
+        allow create, update: if (isStaff() || (isEditor(emp) && empAtiva(emp)))
+          && request.resource.data.keys().hasOnly(['r', 'updatedAt', 'updatedBy', 'logId'])
+          && request.resource.data.keys().hasAll(['r', 'updatedAt', 'updatedBy', 'logId'])
+          && dlpOk(sid, request.resource.data.r)
+          && request.resource.data.updatedAt == request.time
+          && request.resource.data.updatedBy == me()
+          && logOk(emp);
+
+        allow create, update: if isStaff()
+          && sid == 'notas'
+          && request.resource.data.keys().hasOnly(['n', 'updatedAt', 'updatedBy', 'logId'])
+          && request.resource.data.keys().hasAll(['n', 'updatedAt', 'updatedBy', 'logId'])
+          && request.resource.data.n is map
+          && request.resource.data.n.keys().hasOnly(['s1', 's2', 's3', 's4', 's5', 's6', 's7'])
+          && (!('s1' in request.resource.data.n) || shortStr(request.resource.data.n.s1, 4000))
+          && (!('s2' in request.resource.data.n) || shortStr(request.resource.data.n.s2, 4000))
+          && (!('s3' in request.resource.data.n) || shortStr(request.resource.data.n.s3, 4000))
+          && (!('s4' in request.resource.data.n) || shortStr(request.resource.data.n.s4, 4000))
+          && (!('s5' in request.resource.data.n) || shortStr(request.resource.data.n.s5, 4000))
+          && (!('s6' in request.resource.data.n) || shortStr(request.resource.data.n.s6, 4000))
+          && (!('s7' in request.resource.data.n) || shortStr(request.resource.data.n.s7, 4000))
           && request.resource.data.updatedAt == request.time
           && request.resource.data.updatedBy == me()
           && logOk(emp);
