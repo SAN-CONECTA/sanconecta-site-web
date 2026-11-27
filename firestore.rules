@@ -114,7 +114,7 @@ service cloud.firestore {
     }
 
     function dlp_s2(r) {
-      return r.keys().hasOnly(['da_cat', 'da_cat_v', 'da_pri', 'da_pri_v', 'da_outros', 'da_setores', 'da_setores_o', 'da_setores_v', 'da_onde', 'da_onde_o', 'da_onde_v', 'da_acesso', 'da_acesso_o', 'da_acesso_v', 'da_class', 'da_class_o', 'da_class_v', 'da_padroes', 'da_padroes_o', 'da_padroes_v', 'da_formatos', 'da_formatos_o', 'da_formatos_v'])
+      return r.keys().hasOnly(['da_cat', 'da_cat_v', 'da_pri', 'da_pri_v', 'da_outros', 'da_setores', 'da_setores_o', 'da_setores_v', 'da_onde', 'da_onde_o', 'da_onde_v', 'da_acesso', 'da_acesso_o', 'da_acesso_v', 'da_class', 'da_class_o', 'da_class_v', 'da_padroes', 'da_padroes_o', 'da_padroes_v', 'da_termos', 'da_formatos', 'da_formatos_o', 'da_formatos_v'])
         && dlpOpt(r, 'da_cat', 300)
         && dlpOpt(r, 'da_cat_v', 1)
         && dlpOpt(r, 'da_pri', 300)
@@ -135,25 +135,38 @@ service cloud.firestore {
         && dlpOpt(r, 'da_padroes', 300)
         && dlpOpt(r, 'da_padroes_o', 2000)
         && dlpOpt(r, 'da_padroes_v', 1)
+        && dlpOpt(r, 'da_termos', 2000)
         && dlpOpt(r, 'da_formatos', 300)
         && dlpOpt(r, 'da_formatos_o', 2000)
         && dlpOpt(r, 'da_formatos_v', 1);
     }
 
     function dlp_s3(r) {
-      return r.keys().hasOnly(['ca_email_u', 'ca_email_p', 'ca_email_r', 'ca_email_v', 'ca_msg_u', 'ca_msg_p', 'ca_msg_r', 'ca_msg_v', 'ca_nuvem_u', 'ca_nuvem_p', 'ca_nuvem_r', 'ca_nuvem_v', 'ca_usb_u', 'ca_usb_p', 'ca_usb_r', 'ca_usb_v', 'ca_impr_u', 'ca_impr_p', 'ca_impr_r', 'ca_impr_v', 'ca_ia_u', 'ca_ia_p', 'ca_ia_r', 'ca_ia_v', 'ca_tela_u', 'ca_tela_p', 'ca_tela_r', 'ca_tela_v', 'ca_legit', 'ca_legit_o', 'ca_legit_v', 'ca_parc', 'ca_parc_o', 'ca_parc_v', 'ca_exc', 'ca_exc_o', 'ca_exc_v', 'ca_fluxos'])
+      return r.keys().hasOnly(['ca_email_u', 'ca_email_p', 'ca_email_r', 'ca_email_v', 'ca_gmail_u', 'ca_gmail_p', 'ca_gmail_r', 'ca_gmail_v', 'ca_webmail_u', 'ca_webmail_p', 'ca_webmail_r', 'ca_webmail_v', 'ca_nuvem_u', 'ca_nuvem_p', 'ca_nuvem_r', 'ca_nuvem_v', 'ca_gdrive_u', 'ca_gdrive_p', 'ca_gdrive_r', 'ca_gdrive_v', 'ca_pessoal_u', 'ca_pessoal_p', 'ca_pessoal_r', 'ca_pessoal_v', 'ca_usb_u', 'ca_usb_p', 'ca_usb_r', 'ca_usb_v', 'ca_impr_u', 'ca_impr_p', 'ca_impr_r', 'ca_impr_v', 'ca_ia_u', 'ca_ia_p', 'ca_ia_r', 'ca_ia_v', 'ca_msg_u', 'ca_msg_p', 'ca_msg_r', 'ca_msg_v', 'ca_tela_u', 'ca_tela_p', 'ca_tela_r', 'ca_tela_v', 'ca_ia_quais', 'ca_ia_quais_o', 'ca_ia_quais_v', 'ca_legit', 'ca_legit_o', 'ca_legit_v', 'ca_parc', 'ca_parc_o', 'ca_parc_v', 'ca_exc', 'ca_exc_o', 'ca_exc_v', 'ca_fluxos'])
         && dlpOpt(r, 'ca_email_u', 40)
         && dlpOpt(r, 'ca_email_p', 20)
         && dlpOpt(r, 'ca_email_r', 2000)
         && dlpOpt(r, 'ca_email_v', 1)
-        && dlpOpt(r, 'ca_msg_u', 40)
-        && dlpOpt(r, 'ca_msg_p', 20)
-        && dlpOpt(r, 'ca_msg_r', 2000)
-        && dlpOpt(r, 'ca_msg_v', 1)
+        && dlpOpt(r, 'ca_gmail_u', 40)
+        && dlpOpt(r, 'ca_gmail_p', 20)
+        && dlpOpt(r, 'ca_gmail_r', 2000)
+        && dlpOpt(r, 'ca_gmail_v', 1)
+        && dlpOpt(r, 'ca_webmail_u', 40)
+        && dlpOpt(r, 'ca_webmail_p', 20)
+        && dlpOpt(r, 'ca_webmail_r', 2000)
+        && dlpOpt(r, 'ca_webmail_v', 1)
         && dlpOpt(r, 'ca_nuvem_u', 40)
         && dlpOpt(r, 'ca_nuvem_p', 20)
         && dlpOpt(r, 'ca_nuvem_r', 2000)
         && dlpOpt(r, 'ca_nuvem_v', 1)
+        && dlpOpt(r, 'ca_gdrive_u', 40)
+        && dlpOpt(r, 'ca_gdrive_p', 20)
+        && dlpOpt(r, 'ca_gdrive_r', 2000)
+        && dlpOpt(r, 'ca_gdrive_v', 1)
+        && dlpOpt(r, 'ca_pessoal_u', 40)
+        && dlpOpt(r, 'ca_pessoal_p', 20)
+        && dlpOpt(r, 'ca_pessoal_r', 2000)
+        && dlpOpt(r, 'ca_pessoal_v', 1)
         && dlpOpt(r, 'ca_usb_u', 40)
         && dlpOpt(r, 'ca_usb_p', 20)
         && dlpOpt(r, 'ca_usb_r', 2000)
@@ -166,10 +179,17 @@ service cloud.firestore {
         && dlpOpt(r, 'ca_ia_p', 20)
         && dlpOpt(r, 'ca_ia_r', 2000)
         && dlpOpt(r, 'ca_ia_v', 1)
+        && dlpOpt(r, 'ca_msg_u', 40)
+        && dlpOpt(r, 'ca_msg_p', 20)
+        && dlpOpt(r, 'ca_msg_r', 2000)
+        && dlpOpt(r, 'ca_msg_v', 1)
         && dlpOpt(r, 'ca_tela_u', 40)
         && dlpOpt(r, 'ca_tela_p', 20)
         && dlpOpt(r, 'ca_tela_r', 2000)
         && dlpOpt(r, 'ca_tela_v', 1)
+        && dlpOpt(r, 'ca_ia_quais', 300)
+        && dlpOpt(r, 'ca_ia_quais_o', 2000)
+        && dlpOpt(r, 'ca_ia_quais_v', 1)
         && dlpOpt(r, 'ca_legit', 40)
         && dlpOpt(r, 'ca_legit_o', 2000)
         && dlpOpt(r, 'ca_legit_v', 1)
@@ -183,7 +203,7 @@ service cloud.firestore {
     }
 
     function dlp_s4(r) {
-      return r.keys().hasOnly(['am_plat', 'am_plat_v', 'am_outra', 'am_sist', 'am_sist_o', 'am_sist_v', 'am_plano', 'am_plano_o', 'am_plano_v', 'am_usuarios', 'am_usuarios_o', 'am_usuarios_v', 'am_so', 'am_so_o', 'am_so_v', 'am_equip', 'am_equip_o', 'am_equip_v', 'am_remoto', 'am_remoto_o', 'am_remoto_v', 'am_serv', 'am_serv_o', 'am_serv_v', 'am_dir', 'am_dir_o', 'am_dir_v', 'am_agentes', 'am_agentes_o', 'am_agentes_v', 'am_seg', 'am_seg_o', 'am_seg_v', 'am_autoriza', 'am_autoriza_o', 'am_autoriza_v', 'am_registro'])
+      return r.keys().hasOnly(['am_plat', 'am_plat_v', 'am_outra', 'am_sist', 'am_sist_o', 'am_sist_v', 'am_plano', 'am_plano_o', 'am_plano_v', 'am_usuarios', 'am_usuarios_o', 'am_usuarios_v', 'am_so', 'am_so_o', 'am_so_v', 'am_equip', 'am_equip_o', 'am_equip_v', 'am_remoto', 'am_remoto_o', 'am_remoto_v', 'am_serv', 'am_serv_o', 'am_serv_v', 'am_dir', 'am_dir_o', 'am_dir_v', 'am_agentes', 'am_agentes_o', 'am_agentes_v', 'am_seg', 'am_seg_o', 'am_seg_v', 'am_autoriza', 'am_autoriza_o', 'am_autoriza_v', 'am_nav', 'am_nav_o', 'am_nav_v', 'am_integra', 'am_integra_o', 'am_integra_v', 'am_registro'])
         && dlpOpt(r, 'am_plat', 300)
         && dlpOpt(r, 'am_plat_v', 1)
         && dlpOpt(r, 'am_outra', 200)
@@ -220,6 +240,12 @@ service cloud.firestore {
         && dlpOpt(r, 'am_autoriza', 300)
         && dlpOpt(r, 'am_autoriza_o', 2000)
         && dlpOpt(r, 'am_autoriza_v', 1)
+        && dlpOpt(r, 'am_nav', 300)
+        && dlpOpt(r, 'am_nav_o', 2000)
+        && dlpOpt(r, 'am_nav_v', 1)
+        && dlpOpt(r, 'am_integra', 300)
+        && dlpOpt(r, 'am_integra_o', 2000)
+        && dlpOpt(r, 'am_integra_v', 1)
         && dlpOpt(r, 'am_registro', 2000);
     }
 
@@ -249,7 +275,7 @@ service cloud.firestore {
     }
 
     function dlp_s6(r) {
-      return r.keys().hasOnly(['re_patroc', 're_gestores', 're_gestores_o', 're_gestores_v', 're_comunica', 're_comunica_o', 're_comunica_v', 're_politica', 're_politica_o', 're_politica_v', 're_admin', 're_admin_o', 're_admin_v', 're_retencao', 're_retencao_o', 're_retencao_v', 're_definidos'])
+      return r.keys().hasOnly(['re_patroc', 're_gestores', 're_gestores_o', 're_gestores_v', 're_comunica', 're_comunica_o', 're_comunica_v', 're_politica', 're_politica_o', 're_politica_v', 're_admin', 're_admin_o', 're_admin_v', 're_retencao', 're_retencao_o', 're_retencao_v', 're_saida', 're_saida_o', 're_saida_v', 're_definidos'])
         && dlpOpt(r, 're_patroc', 200)
         && dlpOpt(r, 're_gestores', 300)
         && dlpOpt(r, 're_gestores_o', 2000)
@@ -266,6 +292,9 @@ service cloud.firestore {
         && dlpOpt(r, 're_retencao', 40)
         && dlpOpt(r, 're_retencao_o', 2000)
         && dlpOpt(r, 're_retencao_v', 1)
+        && dlpOpt(r, 're_saida', 40)
+        && dlpOpt(r, 're_saida_o', 2000)
+        && dlpOpt(r, 're_saida_v', 1)
         && dlpOpt(r, 're_definidos', 2000);
     }
 

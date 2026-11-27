@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
 import { collection, doc, serverTimestamp, writeBatch } from 'firebase/firestore'
 import { db } from './firebase'
-import { DLP_CANAIS, DLP_INTERNO_GERAL, DLP_MODOS, DLP_OPC, DLP_PENDENCIAS, DLP_PRIORIDADE, DLP_SECOES, SN, chavesDoCampo } from './dlpDados'
+import { DLP_CANAIS, DLP_COBERTURA, DLP_COB_NIVEL, DLP_INTERNO_GERAL, DLP_MODOS, DLP_OPC, DLP_PENDENCIAS, DLP_PRIORIDADE, DLP_SECOES, SN, chavesDoCampo } from './dlpDados'
 import { errMsg, fmtTs, normEmail } from './util'
 
 const POR_LOTE = 4
@@ -101,7 +101,7 @@ function Controle({ c, sid, form, set, dis }) {
   return null
 }
 
-function Campo({ c, sid, form, set, dis }) {
+function Campo({ c, sid, form, set, dis, staff }) {
   const nome = (k) => `${sid}.${k}`
   if (c.tipo === 'pend') {
     return (
@@ -129,6 +129,11 @@ function Campo({ c, sid, form, set, dis }) {
       <Wrap className={aberto ? 'dg-fld' : 'dg-dlp-qt'}>
         <span className={aberto ? undefined : 'dg-dlp-qtit'}>{c.t}</span>
         {c.q && <span className="dg-muted dg-small">{c.q}</span>}
+        {staff && c.tipo === 'canal' && DLP_COBERTURA[c.k] && (
+          <span className={`dg-cob dg-cob-${DLP_COBERTURA[c.k][0]}`}>
+            <b>Cobertura esperada (só equipe): {DLP_COB_NIVEL[DLP_COBERTURA[c.k][0]]}.</b> {DLP_COBERTURA[c.k][1]}
+          </span>
+        )}
         <Controle c={c} sid={sid} form={form} set={set} dis={dis} />
       </Wrap>
       {temObs && (
@@ -196,6 +201,11 @@ function Avaliacao({ dlp, emp, staff, notas, irPara }) {
   if (g('s1', 'mo_incid') === 'sim') atencao.push('O cliente relatou incidente ou suspeita de vazamento: tratar como prioridade.')
   if (plat.length) atencao.push('Cobertura da Safetica para a plataforma informada ainda precisa de validação técnica.')
 
+  // Cobertura esperada (apresentação da Safetica) dos canais que o cliente usa ou priorizou. Só equipe SAN.
+  const cobCanais = staff ? canais.filter((c) => (c.p && c.p !== 'nao') || c.u === 'sim').filter((c) => DLP_COBERTURA[c.k]) : []
+  const altaSemCob = cobCanais.filter((c) => c.p === 'alta' && DLP_COBERTURA[c.k][0] === 'nao')
+  if (altaSemCob.length) atencao.push(`Equipe: ${altaSemCob.length} canal(is) de prioridade alta fora da cobertura apresentada (${altaSemCob.map((c) => c.t).join('; ')}). Alinhar expectativa com o cliente.`)
+
   const notasComTexto = staff ? DLP_SECOES.filter((s) => String((notas && notas[s.id]) || '').trim()) : []
 
   return (
@@ -246,6 +256,7 @@ function Avaliacao({ dlp, emp, staff, notas, irPara }) {
         {linha('Classificação / rótulos', 's2', 'da_class')}
         {linha('Padrões identificáveis', 's2', 'da_padroes')}
         {linha('Formatos', 's2', 'da_formatos')}
+        {g('s2', 'da_termos') && <p className="dg-small"><b>Termos e códigos:</b> {g('s2', 'da_termos')}</p>}
       </section>
 
       <section className="dg-card">
@@ -265,10 +276,37 @@ function Avaliacao({ dlp, emp, staff, notas, irPara }) {
             </tbody>
           </table>
         </div>
+        {linha('Assistentes de IA em uso', 's3', 'ca_ia_quais')}
         {linha('Compartilhamentos legítimos', 's3', 'ca_legit')}
         {linha('Parceiros e destinos autorizados', 's3', 'ca_parc')}
         {linha('Exceções por setor', 's3', 'ca_exc')}
       </section>
+
+      {staff && (
+        <section className="dg-card">
+          <h2>Cobertura esperada dos canais <span className="dg-tag">só equipe</span></h2>
+          <p className="dg-muted dg-small">Cruza os canais que o cliente usa ou priorizou com o que a apresentação da Safetica (Team Ti) informa. É uma referência para a conversa, não uma confirmação: valide por edição, sistema operacional, aplicativo e integração antes de prometer.</p>
+          {cobCanais.length ? (
+            <div className="dg-tblwrap">
+              <table>
+                <thead><tr><th>Canal</th><th>Prioridade</th><th>Cobertura</th><th>O que a apresentação diz</th></tr></thead>
+                <tbody>
+                  {cobCanais.map((c) => (
+                    <tr key={c.k}>
+                      <td>{c.t}</td>
+                      <td>{priLabel(c.p)}</td>
+                      <td><span className={`dg-cob-tag dg-cob-${DLP_COBERTURA[c.k][0]}`}>{DLP_COB_NIVEL[DLP_COBERTURA[c.k][0]]}</span></td>
+                      <td className="dg-logv">{DLP_COBERTURA[c.k][1]}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <p className="dg-muted">Marque os canais usados ou a prioridade no Levantamento para ver a cobertura esperada.</p>
+          )}
+        </section>
+      )}
 
       <section className="dg-card">
         <h2>Ambiente técnico</h2>
@@ -283,6 +321,8 @@ function Avaliacao({ dlp, emp, staff, notas, irPara }) {
         {linha('Dados fora da nuvem', 's4', 'am_serv')}
         {linha('Diretório', 's4', 'am_dir')}
         {linha('Instalação dos agentes', 's4', 'am_agentes')}
+        {linha('Navegadores', 's4', 'am_nav')}
+        {linha('Integrações com a empresa', 's4', 'am_integra')}
         {linha('Segurança já implantada', 's4', 'am_seg')}
       </section>
 
@@ -299,6 +339,7 @@ function Avaliacao({ dlp, emp, staff, notas, irPara }) {
         {linha('Política interna', 's6', 're_politica')}
         {linha('Quem administra', 's6', 're_admin')}
         {linha('Retenção dos registros', 's6', 're_retencao')}
+        {linha('Rotina de saída de colaboradores', 's6', 're_saida')}
       </section>
 
       <section className="dg-card">
@@ -486,7 +527,7 @@ export default function Dlp({ empId, emp, dlp, canEdit, canAnswer, user }) {
                     {s.grupos.map((gr) => (
                       <fieldset className="dg-dlp-grupo" key={gr.t} disabled={!canAnswer}>
                         <legend>{gr.t}</legend>
-                        {gr.campos.map((c) => <Campo key={c.k} c={c} sid={s.id} form={form} set={set} dis={!canAnswer} />)}
+                        {gr.campos.map((c) => <Campo key={c.k} c={c} sid={s.id} form={form} set={set} dis={!canAnswer} staff={canEdit} />)}
                       </fieldset>
                     ))}
                     {canEdit && (
