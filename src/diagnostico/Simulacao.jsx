@@ -12,7 +12,7 @@ const CAMPOS = [
   ['custo', 'Custo médio mensal por colaborador', 'R$/pessoa', 'Salário médio + encargos (cerca de 68% a 80%)', 'moeda'],
   ['pct', '% da operação afetada na parada', '%', 'Impacto médio na produção e nas vendas', 'pct'],
   ['emerg', 'Custo emergencial por incidente', 'R$/evento', 'Técnico avulso, peças urgentes, horas extras', 'moeda'],
-  ['rto', 'Tempo de parada simulado (RTO)', 'horas', 'Cenário foco para a análise detalhada', 'int'],
+  ['rto', 'Tempo de parada simulado', 'horas', 'Quanto tempo a operação ficaria parada. Compare com o RTO que a empresa aceita', 'int'],
   ['invest', 'Investimento mensal em TI preventiva', 'R$/mês', 'Contrato gerenciado, backup em nuvem, EDR/RMM', 'moeda'],
 ]
 
