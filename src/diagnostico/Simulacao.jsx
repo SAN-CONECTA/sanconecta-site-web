@@ -21,9 +21,31 @@ const LIM = {
   fat: [0, 1e10], dias: [1, 31], horas: [1, 24], colab: [0, 1e6], custo: [0, 1e7], pct: [0, 1], emerg: [0, 1e9], rto: [0, 8760], invest: [0, 1e9],
 }
 
-const toNum = (v) => {
-  const n = Number(String(v).replace(',', '.'))
-  return Number.isFinite(n) ? n : NaN
+const MOEDA = CAMPOS.filter((c) => c[4] === 'moeda').map((c) => c[0])
+
+const toNum = (v, moeda) => {
+  // Moeda vem formatada (R$48.000.000,00): tira o símbolo e os pontos de milhar e usa a vírgula como decimal.
+  const t = moeda ? String(v).replace(/[^\d,]/g, '') : String(v)
+  const n = Number(t.replace(',', '.'))
+  return Number.isFinite(n) && String(t).trim() !== '' ? n : NaN
+}
+
+// Formata enquanto digita: R$48.000.000,00 (milhar com ponto, centavos depois da vírgula).
+const milhar = (d) => d.replace(/\B(?=(\d{3})+(?!\d))/g, '.')
+function mascaraMoeda(raw) {
+  const limpo = String(raw).replace(/[^\d,]/g, '')
+  if (!limpo) return ''
+  const i = limpo.indexOf(',')
+  const inteiro = (i < 0 ? limpo : limpo.slice(0, i)).replace(/^0+(?=\d)/, '')
+  const dec = i < 0 ? null : limpo.slice(i + 1).replace(/,/g, '').slice(0, 2)
+  return `R$${milhar(inteiro || '0')}${dec === null ? '' : `,${dec}`}`
+}
+// Ao sair do campo, completa os centavos (R$48.000.000 vira R$48.000.000,00).
+function fechaMoeda(txt) {
+  const m = mascaraMoeda(txt)
+  if (!m) return m
+  const [int, dec = ''] = m.split(',')
+  return `${int},${dec.padEnd(2, '0')}`
 }
 
 function Barras({ itens }) {
@@ -47,7 +69,7 @@ export default function Simulacao({ empId, emp, sim, user, canEdit }) {
   const email = normEmail(user.email)
   const salvo = sim && sim.atual ? sim.atual : null
   const base = { ...SIM_PADRAO, ...(salvo ? Object.fromEntries(Object.keys(SIM_PADRAO).filter((k) => typeof salvo[k] === 'number').map((k) => [k, salvo[k]])) : {}) }
-  const mostra = (k, v) => (k === 'pct' ? String(Math.round(v * 1000) / 10) : String(v))
+  const mostra = (k, v) => (k === 'pct' ? String(Math.round(v * 1000) / 10) : MOEDA.includes(k) ? `R$${v.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : String(v))
   const [txt, setTxt] = useState(() => Object.fromEntries(Object.keys(SIM_PADRAO).map((k) => [k, mostra(k, base[k])])))
   const [busy, setBusy] = useState(false)
   const [msg, setMsg] = useState({ kind: '', text: '' })
@@ -55,7 +77,7 @@ export default function Simulacao({ empId, emp, sim, user, canEdit }) {
   const valores = {}
   let erro = ''
   Object.keys(SIM_PADRAO).forEach((k) => {
-    const n = toNum(txt[k])
+    const n = toNum(txt[k], MOEDA.includes(k))
     const v = k === 'pct' ? n / 100 : n
     if (Number.isNaN(v) || v < LIM[k][0] || v > LIM[k][1]) erro = erro || `Valor inválido em “${CAMPOS.find((c) => c[0] === k)[1]}”.`
     valores[k] = v
@@ -112,7 +134,15 @@ export default function Simulacao({ empId, emp, sim, user, canEdit }) {
                   <td>{l}</td>
                   <td className="dg-muted">{u}</td>
                   <td>
-                    <input className="dg-sim-in" inputMode="decimal" value={txt[k]} onChange={(e) => setTxt((t) => ({ ...t, [k]: e.target.value }))} aria-label={l} disabled={!canEdit} />
+                    <input
+                      className="dg-sim-in"
+                      inputMode="decimal"
+                      value={txt[k]}
+                      onChange={(e) => setTxt((t) => ({ ...t, [k]: MOEDA.includes(k) ? mascaraMoeda(e.target.value) : e.target.value }))}
+                      onBlur={() => MOEDA.includes(k) && setTxt((t) => ({ ...t, [k]: fechaMoeda(t[k]) }))}
+                      aria-label={l}
+                      disabled={!canEdit}
+                    />
                   </td>
                   <td className="dg-muted dg-small">{o}</td>
                 </tr>
